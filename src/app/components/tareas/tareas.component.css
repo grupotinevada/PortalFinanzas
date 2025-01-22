@@ -1,0 +1,363 @@
+/* Offcanvas general */
+.offcanvas {
+  background-color: #ffffff; /* Fondo blanco */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  width: 400px; /* Ajuste de ancho */
+}
+.offcanvas-header {
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Cuando se abre el offcanvas, bloquear el desplazamiento del contenido */
+body.offcanvas-open {
+  overflow: hidden; /* Bloquea el scroll de la página */
+}
+
+/* Contenido del offcanvas */
+.offcanvas-body {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+/* Lista de Archivos */
+.files-list .file-item {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+}
+
+.files-list .file-info a {
+  color: #007bff;
+  font-weight: 500;
+  text-decoration: none;
+}
+.files-list .file-info a:hover {
+  text-decoration: underline;
+}
+
+
+
+/* Spinner de carga */
+.spinner-border {
+  color: #3bafda; /* Azul principal */
+}
+
+/* Botón de cerrar */
+.btn-close {
+  color: #fff;
+  font-size: 1.2rem;
+  background-color: transparent;
+  border: none;
+  transition: color 0.3s;
+}
+
+.btn-close:hover {
+  color: #d3d3d3;
+}
+
+/* Sección de Subida */
+.upload-section {
+  background-color: #f9f9f9;
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.upload-section h6 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.selected-file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+
+/* Botones Personalizados */
+.custom-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.custom-button.upload {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.custom-button.upload:hover {
+  background-color: #0056b3;
+}
+
+.custom-button.confirm {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.custom-button.confirm:hover {
+  background-color: #218838;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .offcanvas {
+    width: 100%; /* Ancho completo para móviles */
+  }
+
+  .file-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+
+.jumbotron {
+  color: #4e5356;
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+  border-radius: 10px;
+  border: solid white 1px;
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.142);
+  backdrop-filter: blur(30px);
+  background-color: rgba(255, 255, 255, 0.2); /* Fondo translúcido */
+  position: relative; /* Posicionamiento para el botón */
+}
+/* Contenido */
+.content {
+  padding-top: 20px;
+}
+.custom-dialog-container {
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff; /* Fondo limpio */
+  max-height: 90vh; /* Altura máxima */
+  overflow-y: auto; /* Habilita el scroll si el contenido excede */
+}
+/* Alinear las fechas en una fila */
+.project-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.project-dates p {
+  margin: 0;
+}
+
+.project-dates .date {
+  background-color: aliceblue;
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+}
+
+.project-dates .date-area {
+
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+}
+
+/* Botones */
+.toolbar {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-left: 20px;
+  margin-bottom: 5px;
+}
+
+.button-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Botones personalizados */
+.custom-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #fff;
+  text-transform: uppercase;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.custom-button .icon {
+  font-size: 20px;
+}
+.custom-button.hist {
+  background-color: #3bafda;
+
+}
+
+.custom-button.hist:hover {
+  background-color: #3498db;
+  transform: scale(1.05);
+}
+
+.custom-button.doc {
+  background-color: #3bafda;
+  margin-left: 20px;
+}
+
+.custom-button.doc:hover {
+  background-color: #3498db;
+  transform: scale(1.05);
+}
+.custom-button.confir {
+  background-color: #05a300;
+  margin-left: 15px;
+  margin-bottom: 10px;
+}
+.custom-button.confir:hover {
+  background-color: #007000;
+  transform: scale(1.05);
+}
+
+.text-arch{
+  font: size 15px; ;
+}
+.custom-button.subarch {
+  background-color: #3bafda;
+  margin-left: 15px;
+  margin-bottom: 10px;
+}
+.custom-button.subarch:hover {
+  background-color: #3498db;
+  transform: scale(1.05);
+}
+/* Colores y efectos de botones */
+.custom-button.download {
+  background-color: #217346;
+}
+
+.custom-button.download:hover {
+  background-color: #1b5e3e;
+  transform: scale(1.05);
+}
+
+.custom-button.upload {
+  background-color: #3bafda;
+}
+
+.custom-button.upload:hover {
+  background-color: #3498db;
+  transform: scale(1.05);
+}
+
+.custom-button.delete {
+  background-color: #e74c3c;
+}
+
+.custom-button.delete:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
+}
+
+.custom-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+/* Mensaje de error */
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Cambia el tamaño de la fuente de toda la tabla */
+table {
+  font-size: 1.2rem; /* Cambia este valor según el tamaño deseado */
+}
+
+/* Opcional: Cambia el tamaño de las celdas del encabezado */
+th.mat-header-cell {
+  font-size: 2rem; /* Tamaño más grande para los encabezados */
+  font-weight: bold; /* Negrita opcional */
+}
+
+/* Opcional: Cambia el tamaño de las celdas */
+td.mat-cell {
+  font-size: 1.2rem; /* Tamaño para las celdas de datos */
+}
+
+p{
+  font-size: 1.3rem;
+}
+
+.mat-mdc-table tbody, .mat-mdc-table tfoot, .mat-mdc-table thead, .mat-mdc-cell, .mat-mdc-footer-cell, .mat-mdc-header-row, .mat-mdc-row, .mat-mdc-footer-row, .mat-mdc-table .mat-mdc-header-cell{
+  font-size: 1.1rem;
+}
+
+/* Adaptabilidad para pantallas pequeñas */
+@media (max-width: 768px) {
+  .project-dates {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .custom-button {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-left: 0;
+  }
+}
+.progress{
+  height: 20px; 
+  max-width: 300px; 
+  margin: 0 auto;
+  border: 0.5px solid blanchedalmond;
+}
+
+.text-center{
+  color: rgb(24, 24, 24);
+  border-top: 1px solid rgb(0, 0, 0);
+  box-shadow: #333;
+}
+/*Area color*/
+
+/* Colores dinámicos para los títulos */
+.titulo-bg-primary { background: #076BCB; color: rgb(255, 255, 255);}
+.titulo-bg-success { background: #2A9061;color: rgb(255, 255, 255); }
+.titulo-bg-warning { background: rgb(250, 205, 120); color: black; }
+.titulo-bg-secondary { background: rgb(252, 95, 95); color: rgb(255, 255, 255);}
+.titulo-bg-light { background: rgb(255, 235, 235); color: black; }

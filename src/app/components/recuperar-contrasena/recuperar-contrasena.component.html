@@ -1,0 +1,61 @@
+<div class="recuperar-contrasena-container">
+  <h1>Recuperar Contraseña</h1>
+
+  <!-- Paso 1: Ingresar correo -->
+  <div *ngIf="step === 1" class="step active">
+    <form [formGroup]="emailForm" (ngSubmit)="enviarCodigo()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Correo Electrónico</mat-label>
+        <input matInput type="email" formControlName="correo" placeholder="Ingresa tu correo" />
+        <mat-error *ngIf="emailForm.get('correo')?.hasError('required')">El correo es obligatorio.</mat-error>
+        <mat-error *ngIf="emailForm.get('correo')?.hasError('email')">Debe ser un correo válido.</mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="emailForm.invalid">Enviar Código</button>
+    </form>
+  </div>
+
+<!-- Paso 2: Ingresar código -->
+<div *ngIf="step === 2" class="step active">
+  <div class="timer">
+    <p>Tiempo restante: {{ minutes }}:{{ seconds | number:'2.0' }}</p>
+  </div>
+  <form [formGroup]="codeForm" (ngSubmit)="verificarCodigo()">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Código de Verificación</mat-label>
+      <input matInput type="text" formControlName="codigo" placeholder="Ingresa el código" />
+      <mat-error *ngIf="codeForm.get('codigo')?.hasError('required')">El código es obligatorio.</mat-error>
+      <mat-error *ngIf="codeForm.get('codigo')?.hasError('minlength') || codeForm.get('codigo')?.hasError('maxlength')">
+        El código debe tener 6 caracteres.
+      </mat-error>
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="submit" [disabled]="codeForm.invalid">Verificar Código</button>
+  </form>
+</div>
+
+  <!-- Paso 3: Ingresar nueva contraseña -->
+  <div *ngIf="step === 3" class="step active">
+    <form [formGroup]="passwordForm" (ngSubmit)="actualizarContrasena()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nueva Contraseña</mat-label>
+        <input matInput type="password" formControlName="nuevaContrasena" placeholder="Ingresa tu nueva contraseña" />
+        <mat-error *ngIf="passwordForm.get('nuevaContrasena')?.hasError('required')">
+          La contraseña es obligatoria.
+        </mat-error>
+        <mat-error *ngIf="passwordForm.get('nuevaContrasena')?.hasError('minlength')">
+          La contraseña debe tener al menos 8 caracteres.
+        </mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="passwordForm.invalid">Cambiar Contraseña</button>
+    </form>
+  </div>
+
+  <!-- Botón para retroceder (opcional) -->
+  <div class="actions" *ngIf="step > 1">
+    <button mat-button color="accent" (click)="step = step - 1">Atrás</button>
+  </div>
+
+  <!-- Botón para ir a la página de login -->
+  <div class="actions">
+    <button mat-button color="accent" (click)="irALogin()">Ir a Login</button>
+  </div>
+</div>

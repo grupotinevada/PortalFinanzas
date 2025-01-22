@@ -1,0 +1,55 @@
+<div class="offcanvas offcanvas-end custom-bg-nevada" tabindex="-1" id="offcanvasFiltro" aria-labelledby="offcanvasFiltroLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasFiltroLabel">Filtros</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <form [formGroup]="filtroForm">
+        <div class="mb-3">
+          <label for="nombreProyecto" class="form-label">Título del Proyecto</label>
+          <input type="text" id="nombreProyecto" class="form-control" formControlName="nombreProyecto" />
+        </div>
+        <div class="mb-3">
+          <label for="descripcionEstado" class="form-label">Estado</label>
+          <select id="descripcionEstado" class="form-select" formControlName="descripcionEstado">
+            <option value="">Todos</option>
+            <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="area" class="form-label">Gerencia</label>
+            <select id="area" class="form-select" formControlName="area">
+              <option value="">Todos</option>
+              <option *ngFor="let area of area" [value]="area">{{ area }}</option>
+            </select>
+          </div>
+
+        <div class="mb-3">
+          <label for="porcentajeMin" class="form-label">Progreso Mínimo (%)</label>
+          <input type="number" id="porcentajeMin" class="form-control" formControlName="porcentajeMin" />
+        </div>
+        <div class="mb-3">
+          <label for="porcentajeMax" class="form-label">Progreso Máximo (%)</label>
+          <input type="number" id="porcentajeMax" class="form-control" formControlName="porcentajeMax" placeholder="100"/>
+        </div>
+        <div class="mb-3">
+          <label for="fechaDesde" class="form-label">Fecha desde:</label>
+          <input type="date" id="fechaInicio" class="form-control" formControlName="fechaDesde" />
+        </div>
+        <div class="mb-3">
+          <label for="fechaHasta" class="form-label">Hasta:</label>
+          <input type="date" id="fechaReal" class="form-control" formControlName="fechaHasta" />
+        </div>
+        <div class="mb-3">
+            <label for="fechaFin" class="form-label">Fecha Fin</label>
+            <input type="date" id="fechaFin" class="form-control" formControlName="fechaFin" />
+          </div>
+        <div class="d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary" (click)="limpiarFiltros()">Limpiar</button>
+          <button type="button" class="btn btn-primary" (click)="filtrar()">Aplicar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  

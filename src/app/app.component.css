@@ -1,0 +1,35 @@
+/* Estilos de fondo para el login y página de inicio */
+
+/* Contenedor principal que incluye sidebar y contenido */
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  transition: all 0.3s ease;
+}
+
+.container.no-sidebar .main-content {
+  flex: 1;
+  width: 100%; /* Ocupa todo el ancho cuando no hay sidebar */
+  margin-left: 0; /* Asegúrate de que no se reserve espacio para el sidebar */
+}
+
+/* Contenido principal que se adapta al estado del sidebar */
+.main-content {
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  padding: 0px;
+  flex-grow: 1; /* Permite que el contenido ocupe el espacio restante */
+  height: 100%;
+  overflow: auto;
+}
+
+/* Cuando el sidebar está visible, desplaza el contenido */
+.main-content.shifted {
+  margin-left: 250px; /* Ancho completo del sidebar cuando está visible */
+}
+
+/* Cuando el sidebar está oculto, el contenido ocupa todo el ancho */
+.main-content.full-width {
+  margin-left: 100px; /* Ancho reducido del sidebar cuando está oculto */
+  width: 100%; /* Opción adicional para asegurar el ancho completo */
+}

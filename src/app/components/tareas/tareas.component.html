@@ -1,0 +1,283 @@
+<div *ngIf="showSpinner">
+  <app-spinner [isLoading]="showSpinner"></app-spinner>
+</div>
+<div class="p-5 m-3 jumbotron position-relative" *ngFor="let proyecto of proyecto">
+  <!-- Botón en la esquina superior derecha -->
+
+  <!-- Contenedor principal de información -->
+  <div class="content">
+    <!-- Nombre del proyecto -->
+    <div class="d-flex align-items-center mb-3">
+      <h1 class="display-4 flex-grow-1">{{ proyecto.nombreProyecto }}</h1>
+    </div>
+    <!-- Descripción -->
+    <h3 class="lead mb-4">{{ proyecto.descripcion }}</h3>
+    <p style="top: 10px; position: relative;" *ngIf="!tieneCambios && cambios.length === 0">No se han hecho cambios en el proyecto</p>
+    <button class="custom-button hist position-relative" 
+    *ngIf="tieneCambios"
+    (click)="abrirHistorialCambios()">
+    Ver Historial de Cambios 🕘
+    <span 
+      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+      *ngIf="!cambiosRevisados">
+      NUEVO
+    </span>
+    </button>
+   
+<!-- Botón para abrir sidebar -->
+<!-- Botón para abrir sidebar -->
+<button  class="custom-button doc" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+  <i class="fas fa-file-alt"></i> Documentos 📄
+</button>
+
+
+
+    <!-- Fechas -->
+    <div class="project-dates">
+      <div class="date-area" [ngClass]="getAreaClass(proyecto.idArea)">
+        <strong>{{ proyecto.nombreArea }}</strong>
+      </div>
+      <div class="date">
+        <strong>Inicio:</strong> {{ proyecto.fechaInicio ? (proyecto.fechaInicio | date) : 'Sin fecha' }}
+      </div>
+      <div class="date">
+        <strong>Compromiso:</strong> {{ proyecto.fechaReal ? (proyecto.fechaReal | date) : 'Sin fecha' }}
+      </div>
+      <div class="date">
+        <strong>Estimado:</strong> {{ proyecto.fechaFin ? (proyecto.fechaFin | date) : 'Sin fecha' }}
+      </div>
+      <div class="date">
+        <strong>Creado:</strong> {{ proyecto.fechaCreacion ? (proyecto.fechaCreacion | date) : 'Sin fecha' }}
+      </div>
+
+    </div>
+  </div>
+  <br>
+
+  <div class="text-center">
+    <br>
+    <p>Progreso total</p>
+
+    <!-- Spinner mientras se calculan las tareas   -->
+    <div *ngIf="showSpinner" class="spinner-border text-primary" role="status" style="margin: 10px auto;">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div *ngIf="!showSpinner" class="progress">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+        [style.width.%]="proyecto?.porcentajeAvance || 0" [attr.aria-valuenow]="proyecto?.porcentajeAvance || 0"
+        aria-valuemin="0" aria-valuemax="100">
+        {{ proyecto?.porcentajeAvance | number: "1.0-0" }}%
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <div class="toolbar button-container" *ngIf="usuario.idArea === proyecto.idArea ||  usuario.idRol === 1">
+    <!-- Botón de Descargar Plantilla -->
+    <button class="custom-button download" (click)="descargarConArchivoDinamico()">
+      <span class="icon excel-icon">📄</span> Descargar Excel
+    </button>
+
+    <!-- Botón de Subir Planilla (Input file) -->
+    <label class="custom-button upload">
+      <span class="icon excel-icon">📤</span> Subir Planilla
+      <input class="subir upload__input" type="file" (change)="validateFile($event)" accept=".xlsx" hidden />
+    </label>
+  </div>
+
+  <div *ngIf="showErrorMessage" class="error-message">
+    El archivo debe ser de tipo .xlsx
+  </div>
+  <div *ngIf="showErrorMessage" class="error-message">
+    Los datos del archivo Excel no son válidos.
+  </div>
+
+  <!-- Tareas -->
+  <h3>Tareas</h3>
+  <div *ngIf="!showSpinner && tareas.data && tareas.data.length > 0" class="table-responsive">
+
+    <table mat-table [dataSource]="tareas" matSort class="mat-elevation-z8" style="font-size: 1.2em;">
+
+      <!-- Nombre Column -->
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+
+
+        <td mat-cell *matCellDef="let tarea"> {{ tarea.nombre }} </td>
+      </ng-container>
+
+
+      <!-- Descripción Column -->
+      <ng-container matColumnDef="descripcion">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripción </th>
+        <td mat-cell *matCellDef="let tarea"> {{ tarea.descripcion }} </td>
+      </ng-container>
+
+      <!-- Progreso Column -->
+      <ng-container matColumnDef="porcentajeAvance">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Progreso </th>
+        <td mat-cell *matCellDef="let tarea" style="text-align: center;">
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+              [attr.aria-valuenow]="tarea.porcentajeAvance" aria-valuemin="0" aria-valuemax="100"
+              [style.width.%]="tarea.porcentajeAvance">
+            </div>
+          </div>
+          {{ tarea.porcentajeAvance | number: "1.0-0" }}%
+        </td>
+      </ng-container>
+
+      <!-- Estado Column -->
+      <ng-container matColumnDef="descripcionEstado">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+        <td mat-cell *matCellDef="let tarea">
+          <span class="status-circle">{{ tarea.descripcionEstado
+            }} </span>
+        </td>
+      </ng-container>
+
+      <!-- Fecha Inicio Column -->
+      <ng-container matColumnDef="fechaInicio">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Inicio </th>
+        <td mat-cell *matCellDef="let tarea"> {{ tarea.fechaInicio | date: 'dd-MM-YYYY' }} </td>
+      </ng-container>
+
+      <!-- Fecha Compromiso Column -->
+      <ng-container matColumnDef="fechaCompromiso">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Compromiso </th>
+        <td mat-cell *matCellDef="let tarea"> {{ tarea.fechaCompromiso | date: 'dd-MM-YYYY'}} </td>
+      </ng-container>
+
+      <!-- Fecha Fin Column -->
+      <ng-container matColumnDef="fechaFin">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Fin </th>
+        <td mat-cell *matCellDef="let tarea">
+          {{ tarea.fechaFin ? (tarea.fechaFin | date: 'dd-MM-yyy') : 'Sin fecha de fin' }}
+
+        </td>
+      </ng-container>
+
+      <!-- Header Row -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsTareas"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsTareas;"></tr>
+    </table>
+  </div>
+
+  <div *ngIf="!showSpinner && (!tareas?.data || tareas.data.length === 0)">
+    <p>No hay tareas asociadas a este proyecto.</p>
+  </div>
+
+
+
+  <div *ngFor="let tarea of tareas.data">
+    <div class="modal fade" [id]="'modal-' + tarea.idTarea" data-bs-backdrop="static" data-bs-keyboard="false"
+      tabindex="-1" [attr.aria-labelledby]="'modalLabel-' + tarea.idTarea" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" [id]="'modalLabel-' + tarea.idTarea">Agregar Archivos - {{ tarea.nombreTarea }}
+            </h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
+            <form>
+              <input type="file" id="myFile" name="filename" accept=".xlsx" (change)="validateFile($event)">
+              <p *ngIf="showErrorMessage" style="color: red;">El archivo debe ser de tipo .xlsx</p>
+            </form>
+            <!-- Mostrar el valor de la celda A1 -->
+            <div *ngIf="cellA1Value">
+              <p><strong>Valor de la celda A1:</strong> {{ cellA1Value }}</p>
+            </div>
+            <br>
+          </div>
+          <div class="modal-footer">
+            <app-download-excel></app-download-excel>
+            <button type="submit" class="btn btn-primary">Aceptar</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Salir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Canvas de Subida de Archivos -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" *ngFor="let proyecto of proyecto">
+  <div class="offcanvas-header">
+    <h5 id="offcanvasRightLabel" class="text-dark">Gestor de Archivos</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="files-sidebar">
+      <!-- Título -->
+
+
+      <!-- Sección de Subida -->
+      <div class="upload-section mb-4 p-3 border rounded">
+        <h6 class="text-dark mb-2">Subir Archivo</h6>
+        <input 
+          type="file" 
+          #fileInput 
+          (change)="onFileSelected($event)" 
+          style="display: none"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
+        <button class="custom-button upload w-100 mb-2" 
+                *ngIf="usuario.idArea === proyecto.idArea || usuario.idRol === 1" 
+                (click)="fileInput.click()">
+          <i class="fas fa-upload"></i> Elegir Archivo
+        </button>
+        <div *ngIf="archivoSeleccionado" class="selected-file d-flex justify-content-between align-items-center">
+          <span class="text-muted"> {{truncarNombreArchivo(archivoSeleccionado.name)}}</span>
+          <button class="custom-button confirm" (click)="subirArchivo()">
+            Subir
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de Archivos -->
+      <div class="files-list">
+        <!-- Spinner de Carga -->
+        <div *ngIf="loading" class="text-center py-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+
+        <!-- Mensaje de Archivos Vacíos -->
+        <div *ngIf="!loading && archivosProyecto.length === 0" class="text-center py-3">
+          <p class="text-muted mb-0">No hay archivos disponibles</p>
+        </div>
+
+        <!-- Lista de Archivos -->
+        <div *ngIf="!loading && archivosProyecto.length > 0" class="file-items">
+          <div *ngFor="let archivo of archivosProyecto" class="file-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+            <div class="file-info">
+              <a
+                (click)="descargarArchivo(archivo.nombre_completo)"
+                class="file-name"
+                href="javascript:void(0);">
+                {{ truncarNombreArchivo(archivo.nombre_completo) }}
+              </a>
+              <small class="text-muted d-block">
+                Subido por: {{archivo.usuario_nombre}}
+              </small>
+              <small class="text-muted d-block">
+                {{archivo.fechacreacion | date:'dd/MM/yyyy HH:mm'}}
+              </small>
+            </div>
+            <button *ngIf="usuario.idArea === proyecto.idArea" 
+                    class="btn btn-danger btn-sm" 
+                    (click)="confirmarEliminarArchivo(archivo.idarchivo,proyecto.idProyecto)">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+.custom-bg-nevada {
+  background: var(--nevada);
+}
+.icon-bar {
+  width: 80px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding-top: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.logo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.company-logo {
+  width: 60px; /* Ajusta el tamaño según tu preferencia */
+  height: auto;
+}
+
+.icon-bar button {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  filter: invert(100%);
+}
+
+.offcanvas {
+  width: 250px;
+}
+
+.offcanvas-header {
+  padding-bottom: 0;
+}
+
+.offcanvas-body ul li {
+  margin-bottom: 10px; /* Espaciado entre elementos */
+}
+
+.offcanvas .btn-close {
+  position: relative;
+  bottom: 0;
+}

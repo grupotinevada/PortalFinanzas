@@ -1,0 +1,21 @@
+
+
+  html, body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-image: url("/prueba.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
+  }
+  :root {
+    --nevada: linear-gradient(to bottom, #ffffff, #C4E4F7); /* Celeste a blanco */
+  }
+  

@@ -1,0 +1,10 @@
+<div class="timeline">
+  <h2>Historial de cambios</h2>
+  <div class="timeline-event" *ngFor="let cambio of data.cambios">
+    <div class="timeline-date">{{ cambio.fechaAccion | date: 'dd-MM-yyyy HH:mm' }}</div>
+    <div class="timeline-details">
+      <p class="timeline-text" [innerHTML]="formatearDetallesCambio(cambio)"></p>
+      <span class="timeline-user">Usuario ID: {{ cambio.correo }}</span>
+    </div>
+  </div>
+</div>

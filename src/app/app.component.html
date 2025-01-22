@@ -1,0 +1,11 @@
+<div class="container" [class.no-sidebar]="!showSidebar" style="max-width: 100vw; --bs-gutter-x: unset;">
+  <!-- Sidebar siempre visible pero ajustable según su estado (oculto/visible) -->
+  <app-sidebar *ngIf="showSidebar" (sidebarToggled)="onSidebarToggled($event)"></app-sidebar>
+
+  <!-- Contenido principal con clases dinámicas -->
+  <div class="main-content" 
+       [class.shifted]="!isSidebarHidden && showSidebar" 
+       [class.full-width]="isSidebarHidden || !showSidebar">
+    <router-outlet></router-outlet>
+  </div>
+</div>

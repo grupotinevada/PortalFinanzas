@@ -1,0 +1,44 @@
+
+<mat-card class="login-container">
+    <img mat-card-image class="nevada-img" src="/nevadaicon.webp" alt="Nevada"  />
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()"><br>
+        <div class="input-container">
+            <img class="icon-user" src="/user.png" alt="">
+            <mat-form-field appearance="fill">
+                <mat-label>Correo electrónico</mat-label>
+                <input matInput formControlName="correo" type="email" autocomplete="on"  required />
+                <mat-error *ngIf="loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched">
+                    Introduce un correo válido.
+                </mat-error>
+            </mat-form-field>
+        </div>
+        
+        <div class="input-container">
+            <img class="icon-pass" src="/lock.png" alt="">
+            <mat-form-field appearance="fill">
+                <mat-label>Contraseña</mat-label>
+               
+                <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" required />
+                <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button" disableRipple>
+                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+                    La contraseña es requerida.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <!--<a href="https://portalti.inevada.cl/" class="rec-pass">¿Problemas con iniciar sesión?</a>
+            Enlace para recuperar contraseña -->
+        <div class="link-container">
+            <a routerLink="/recuperar-contrasena" class="rec-pass">¿Olvidaste tu contraseña?</a>
+        </div>
+        <br>
+        
+        <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid">
+            Iniciar sesión
+        </button>
+    </form>
+    <p *ngIf="loginError" class="error">{{ loginError }}</p>
+</mat-card>

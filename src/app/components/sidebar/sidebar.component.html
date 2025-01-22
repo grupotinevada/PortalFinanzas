@@ -1,0 +1,83 @@
+<!-- Barra lateral con iconos -->
+<div class="icon-bar custom-bg-nevada text-white vh-100 d-flex flex-column align-items-center">
+  <!-- Logo de la empresa -->
+  <div class="logo-container p-2">
+    <img src="/nevadaicon.png" alt="Logo de la empresa" class="company-logo">
+  </div>
+
+  <!-- Botones de navegación con iconos -->
+  <button mat-icon-button class="text-secondary my-2" (click)="IrInicio()" matTooltip="Panel">
+    <mat-icon>dashboard</mat-icon>
+  </button>
+  <button mat-icon-button class="text-secondary my-2" (click)="irAProyecto()" matTooltip="Proyectos">
+    <mat-icon>work</mat-icon>
+  </button>
+  <div *ngIf="usuario?.idRol === 1">
+    <button mat-icon-button class="text-secondary my-2" (click)="iraAdmin()" matTooltip="Admin">
+      <mat-icon>settings</mat-icon>
+    </button> 
+  </div> 
+  <button mat-icon-button class="text-secondary my-2" (click)="iraMiperfil()" matTooltip="Mi perfil">
+    <mat-icon>account_box</mat-icon>
+  </button>
+
+  <button mat-icon-button class="text-secondary my-2" (click)="cerrarSesion()" matTooltip="Cerrar sesión">
+    <mat-icon>logout</mat-icon>
+  </button>
+
+  <!-- Botón para abrir el offcanvas -->
+  <button mat-icon-button class="btn-dark mt-auto mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+    <mat-icon>arrow_forward_ios</mat-icon>
+  </button>
+</div>
+
+<!-- Offcanvas Sidebar -->
+<div class="offcanvas offcanvas-start custom-bootstrap-component text-dark" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+  <div class="offcanvas-header justify-content-center">
+    <div class="logo-container">
+      <img src="/nevadaicon.png" alt="Logo de la empresa" class="company-logo">
+    </div>
+  </div>
+  <div class="offcanvas-body d-flex flex-column p-0">
+    <div class="user-info p-3 d-flex align-items-center">
+      <mat-icon>account_circle</mat-icon>
+      <span class="fw-bold ms-2">{{ nombreUsuario }}</span>
+      
+    </div>
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item my-2">
+        <button mat-icon-button class="text-dark w-100 text-start d-flex align-items-center" (click)="IrInicio()">
+          <mat-icon class="me-2">dashboard</mat-icon> <span>Panel</span>
+        </button>
+      </li>
+      <li class="my-2">
+        <button mat-icon-button class="text-dark w-100 text-start d-flex align-items-center" (click)="irAProyecto()">
+          <mat-icon class="me-2">work</mat-icon> <span>Proyectos</span>
+        </button>
+      </li>
+      <div *ngIf="usuario?.idRol === 1">
+        <li class="my-2">
+          <button mat-icon-button class="text-dark w-100 text-start d-flex align-items-center" (click)="iraAdmin()">
+            <mat-icon class="me-2">settings</mat-icon> <span>Admin</span>
+          </button>
+        </li>
+      </div>
+      <li class="nav-item my-2">
+        <button mat-icon-button class="text-dark w-100 text-start d-flex align-items-center" (click)="iraMiperfil()">
+          <mat-icon class="me-2">account_box</mat-icon> <span>Mi Perfil</span>
+        </button>
+      </li>
+      <li class="my-2">
+        <button mat-icon-button class="text-dark w-100 text-start d-flex align-items-center" (click)="cerrarSesion()">
+          <mat-icon class="me-2">logout</mat-icon> <span>Cerrar sesión</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div class="d-flex justify-content-end p-3">
+
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close">
+
+    </button>
+  </div>
+</div>

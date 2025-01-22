@@ -1,0 +1,48 @@
+<h2 mat-dialog-title class="dialog-title">Crear Nuevo Usuario</h2>
+<br>
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()" class="form-container">
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Correo</mat-label>
+      <input matInput formControlName="correo" type="email" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="rol" required>
+        <mat-option *ngIf="roles.length === 0" disabled>Cargando roles...</mat-option>
+        <mat-option *ngFor="let rol of roles" [value]="rol.idRol">
+          {{ rol.descripcion }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Área</mat-label>
+      <mat-select formControlName="area" required>
+        <mat-option *ngIf="areas.length === 0" disabled>Cargando áreas...</mat-option>
+        <mat-option *ngFor="let area of areas" [value]="area.idArea">
+          {{ area.nombre }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    
+    <mat-checkbox class="checkbox" formControlName="habilitado">
+      Habilitado
+    </mat-checkbox>
+  </form>
+</mat-dialog-content>
+
+<div mat-dialog-actions class="dialog-actions">
+  <div class="buttons">
+  <button mat-button  mat-button type="button" (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" type="submit" [disabled]="!usuarioForm.valid" (click)="guardarUsuario()">Guardar</button>
+  </div> 
+</div>
+
+

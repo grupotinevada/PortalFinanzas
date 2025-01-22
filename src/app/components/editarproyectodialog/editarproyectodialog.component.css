@@ -1,0 +1,62 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  max-width: 900px; /* Manteniendo el ancho original */
+  margin: auto;
+  box-sizing: border-box;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+/* Sección de botones alineados a la izquierda */
+.buttons {
+  display: flex;
+  justify-content: flex-start; /* Botones alineados a la izquierda */
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Hover para botones */
+.buttons button {
+  transition: transform 0.2s ease, background-color 0.3s ease;
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.buttons button:hover {
+  transform: scale(1.05); /* Aumenta ligeramente el tamaño */
+  background-color: #e0f7fa; /* Azul claro al hover */
+  border-color: #00acc1; /* Borde más destacado */
+}
+
+/* Botón específico (si quieres diferenciar uno) */
+.buttons button:first-child:hover {
+  background-color: #e0f7fa; /* Naranja claro */
+  border-color: #00acc1;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .form-grid {
+      grid-template-columns: 1fr; /* Apila los elementos en pantallas más pequeñas */
+  }
+
+  .buttons {
+      flex-wrap: wrap; /* Permite que los botones se ajusten */
+  }
+}

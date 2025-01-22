@@ -1,0 +1,264 @@
+<div class="caja-jumbotron">
+  <div class="parent">
+    <!-- Columna izquierda: Perfil y Resumen -->
+    <div class="profile-column">
+      <!-- Perfil del Usuario -->
+      <div class="container-perfil">
+        <img class="imagen-perfil" src="../user-1.png" alt="Foto de perfil" />
+        <div class="user-info">
+          <p class="nombre">{{ perfil.nombre }}</p>
+          <p [ngClass]="getAreaClass(usuario.idArea)" class="area-badge">
+            {{ usuario.nombreArea }}
+          </p>
+          <p class="correo">{{ usuario.correo }}</p>
+        </div>
+      </div>
+
+      <!-- Resumen de Proyectos -->
+      <div class="container-resumen estado-proyectos">
+        <h3>Resumen de Proyectos</h3>
+        
+        <!-- Grid para métricas -->
+        <div class="metrics-grid">
+          <!-- Gráfico circular de proyectos -->
+          <div class="metric-card estado-proyectos">
+            <h4>Estado de Proyectos</h4>
+            <div class="donut-chart-container" *ngIf="proyectosAtrasados > 0">
+              <div class="donut-chart">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="circle projects-on-time"
+                    [attr.stroke-dasharray]="getOnTimeProjectsPercentage()"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="circle projects-delayed"
+                    [attr.stroke-dasharray]="getDelayedProjectsPercentage()"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="chart-center">
+                  <span class="total-projects">{{ totalProyectos }}</span>
+                  <span class="total-label">Total</span>
+                </div>
+              </div>
+              <!-- Leyenda original -->
+              <div class="chart-legend">
+                <div class="legend-item">
+                  <span class="legend-color on-time"></span>
+                  <span>Al día: {{ totalProyectos - proyectosAtrasados }}</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color delayed"></span>
+                  <span>Atrasados: {{ proyectosAtrasados }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Gráfico cuando no hay proyectos atrasados pero hay proyectos -->
+            <div class="donut-chart-container" *ngIf="proyectosAtrasados <= 0 && totalProyectos > 0">
+              <div class="donut-chart">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="circle projects-on-time"
+                    stroke-dasharray="100, 100"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="chart-center">
+                  <span class="total-projects">Al día</span>
+                </div>
+              </div>
+              <!-- Leyenda simplificada -->
+              <div class="chart-legend">
+                <div class="legend-item">
+                  <span class="legend-color on-time"></span>
+                  <span>Al día: {{ totalProyectos }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mensaje cuando no hay proyectos -->
+            <div class="donut-chart-container" *ngIf="totalProyectos === 0">
+              <div class="donut-chart">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="chart-center">
+                  <span class="total-projects">No hay</span>
+                  <span class="total-label">atrasos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="metric-card progreso-promedio">
+            <h4>Progreso Promedio</h4>
+            <div class="progress-circle-container">
+              <div class="progress-circle">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <path class="circle progreso"
+                      [ngClass]="{'no-data': promedioProgreso === 0}"
+                      [attr.stroke-dasharray]="promedioProgreso + ',100'"
+                      d="M18 2.0845
+                         a 15.9155 15.9155 0 0 1 0 31.831
+                         a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="progress-value">
+                  {{ promedioProgreso | number:'1.0-0' }}%
+                </div>
+              </div>
+            </div>
+          </div>     
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: Formulario de edición -->
+    <div class="form-column">
+      <div class="container-edit">
+        <h2>Actualizar Perfil</h2>
+        <form (ngSubmit)="actualizarPerfil()">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              class="form-control"
+              [(ngModel)]="perfil.nombre"
+              name="nombre"
+              placeholder="Nombre actual"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="correo">Correo</label>
+            <input
+              type="email"
+              id="correo"
+              class="form-control"
+              [(ngModel)]="perfil.correo"
+              name="correo"
+              placeholder="Correo nuevo"
+              required
+              disabled="true" 
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="contrasenaActual">Contraseña Actual</label>
+            <div class="input-group">
+              <input
+                [type]="mostrarContrasena ? 'text' : 'password'"
+                id="contrasenaActual"
+                class="form-control"
+                [(ngModel)]="perfil.contrasenaActual"
+                name="contrasenaActual"
+                placeholder="Contraseña actual"
+                required
+              />
+              <button type="button" class="btn-mostrar" (click)="toggleMostrarContrasena()">
+                {{ mostrarContrasena ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="nuevaContrasena">Nueva Contraseña</label>
+            <input
+              [type]="mostrarContrasena ? 'text' : 'password'"
+              id="nuevaContrasena"
+              class="form-control"
+              [(ngModel)]="perfil.nuevaContrasena"
+              name="nuevaContrasena"
+              minlength="8"
+              maxlength="16"
+              placeholder="Nueva contraseña"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="confirmarNuevaContrasena">Confirmar Nueva Contraseña</label>
+            <input
+              [type]="mostrarContrasena ? 'text' : 'password'"
+              id="confirmarNuevaContrasena"
+              class="form-control"
+              [(ngModel)]="perfil.confirmarNuevaContrasena"
+              name="confirmarNuevaContrasena"
+              minlength="8"
+              maxlength="16"
+              placeholder="Confirma la nueva contraseña"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de desarrollo (proyectos) -->
+  <div class="dev-panel" *ngIf="isDevelopment">
+    <div class="container-proyectos">
+      <h3>Proyectos Asignados</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Compromiso</th>
+            <th>Progreso</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let proyecto of proyectos">
+            <td>{{ proyecto.nombreProyecto }}</td>
+            <td>{{ proyecto.descripcion }}</td>
+            <td>{{ proyecto.fechaInicio | date }}</td>
+            <td>{{ proyecto.fechaReal | date }} </td>
+            <td>
+              <div class="progress-container">
+                <div class="progress">
+                  <div class="progress-bar progress-bar-striped progress-bar-animated"
+                    [ngClass]="getProgressColor(proyecto)" role="progressbar"
+                    [attr.aria-valuenow]="proyecto.porcentajeAvance" aria-valuemin="0" aria-valuemax="100"
+                    [style.width.%]="proyecto.porcentajeAvance"></div>
+                </div>
+                <span>{{ proyecto.porcentajeAvance }}%</span>
+              </div>
+            </td>
+            
+          <td>
+            <span
+              class="status-indicator"
+              [ngClass]="{
+                'en-progreso': proyecto.descripcionEstado === 'En Progreso',
+                'finalizado': proyecto.descripcionEstado === 'Finalizado',
+                'pendiente': proyecto.descripcionEstado === 'Pendiente'
+              }"
+            ></span>
+            {{ proyecto.descripcionEstado }}
+          </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

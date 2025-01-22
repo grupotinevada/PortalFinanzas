@@ -1,0 +1,79 @@
+<div class="dialog-container">
+    <h6>Editar Proyecto - {{ nombreArea }}</h6>
+
+    <app-spinner [isLoading]="showSpinner"></app-spinner>
+
+    <form [formGroup]="proyectoForm" (ngSubmit)="editarProyecto()">
+        <div class="form-grid">
+            <!-- Nombre del proyecto -->
+            <mat-form-field appearance="fill">
+                <mat-label>Nombre del Proyecto</mat-label>
+                <input matInput id="nombreProyecto" formControlName="nombreProyecto"
+                    placeholder="Ingrese el nombre del proyecto"  maxlength="30"/>
+                <mat-error *ngIf="proyectoForm.get('nombreProyecto')?.hasError('required')">
+                    El nombre del proyecto es obligatorio.
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Descripción -->
+            <mat-form-field appearance="fill">
+                <mat-label>Descripción</mat-label>
+                <input matInput id="descripcion" formControlName="descripcion"
+                    placeholder="Ingrese la descripción del proyecto"  maxlength="30"/>
+                <mat-error *ngIf="proyectoForm.get('descripcion')?.hasError('required')">
+                    La descripción es obligatoria.
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Estado -->
+            <mat-form-field appearance="fill">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="idEstado">
+                    <mat-option *ngFor="let estado of estados" [value]="estado.idEstado">
+                        {{ estado.descripcion }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <!-- Fecha de inicio -->
+            <mat-form-field appearance="fill">
+                <mat-label>Fecha de Inicio</mat-label>
+                <input matInput [matDatepicker]="picker1" id="fechaInicio" formControlName="fechaInicio" />
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+                <mat-error
+                    *ngIf="proyectoForm.get('fechaReal')?.touched && proyectoForm.get('fechaReal')?.hasError('required')">
+                    La fecha de compromiso es obligatoria.
+                </mat-error>
+            </mat-form-field>
+            <!-- Fecha de compromiso -->
+            <mat-form-field appearance="fill">
+                <mat-label>Fecha de Compromiso</mat-label>
+                <input matInput [matDatepicker]="picker2" id="fechaReal" formControlName="fechaReal" />
+                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+                <mat-error
+                    *ngIf="proyectoForm.get('fechaReal')?.touched && proyectoForm.get('fechaReal')?.hasError('required')">
+                    La fecha de compromiso es obligatoria.
+                </mat-error>
+            </mat-form-field>
+            <!-- Fecha de fin -->
+            <mat-form-field appearance="fill">
+                <mat-label>Fecha de Finalización</mat-label>
+                <input matInput [matDatepicker]="picker3" id="fechaFin" formControlName="fechaFin" />
+                <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                <mat-datepicker #picker3></mat-datepicker>
+                <mat-error
+                    *ngIf="proyectoForm.get('fechaFin')?.touched && proyectoForm.get('fechaFin')?.hasError('required')">
+                    La fecha de compromiso es obligatoria.
+                </mat-error>
+            </mat-form-field>
+
+
+            <div class="buttons">
+                <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+                <button mat-raised-button color="primary" type="submit">Editar</button>
+            </div>
+        </div>
+    </form>
+
+</div>

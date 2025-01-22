@@ -1,0 +1,71 @@
+
+<div class="bg-BEE7FB p-5 m-3 jumbotron">
+<div class="acciones">
+  <h1>Lista de usuarios</h1>
+  <button mat-raised-button color="primary" (click)="abrirModalCrearUsuario()">Crear Usuario</button>
+</div>
+
+<!-- Tabla de Usuarios -->
+<div class="tabla-usuarios mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource" class="mat-table">
+
+    <!-- Columna ID -->
+    <ng-container matColumnDef="idUsuario">
+      <th mat-header-cell *matHeaderCellDef> ID </th>
+      <td mat-cell *matCellDef="let usuario"> {{ usuario.idUsuario }} </td>
+    </ng-container>
+
+    <!-- Columna Nombre -->
+    <ng-container matColumnDef="nombre">
+      <th mat-header-cell *matHeaderCellDef> Nombre </th>
+      <td mat-cell *matCellDef="let usuario"> {{ usuario.nombre }} </td>
+    </ng-container>
+
+    <!-- Columna Correo -->
+    <ng-container matColumnDef="correo">
+      <th mat-header-cell *matHeaderCellDef> Correo </th>
+      <td mat-cell *matCellDef="let usuario"> {{ usuario.correo }} </td>
+    </ng-container>
+
+    <!-- Columna Rol -->
+    <ng-container matColumnDef="descripcionRol">
+      <th mat-header-cell *matHeaderCellDef> Rol </th>
+      <td mat-cell *matCellDef="let usuario"> {{ usuario.descripcionRol }} </td>
+    </ng-container>
+
+    <!-- Columna Área -->
+    <ng-container matColumnDef="nombreArea">
+      <th mat-header-cell *matHeaderCellDef> Área </th>
+      <td mat-cell *matCellDef="let usuario"> {{ usuario.nombreArea }} </td>
+    </ng-container>
+
+    <!-- Columna Habilitado -->
+    <ng-container matColumnDef="habilitado">
+      <th mat-header-cell *matHeaderCellDef> Habilitado </th>
+      <td mat-cell *matCellDef="let usuario">
+        {{ usuario.habilitado === 1 ? 'Sí' : 'No' }}
+      </td>
+    </ng-container>
+
+<!-- Acciones Column -->
+<ng-container matColumnDef="acciones">
+  <th mat-header-cell *matHeaderCellDef> Acciones </th>
+  <td mat-cell *matCellDef="let usuario">
+    <button 
+    mat-icon-button 
+    color="primary" 
+    title="Editar usuario"
+    (click)="abrirModalEditarUsuario(usuario)">
+    <mat-icon>edit</mat-icon>
+    </button>
+  </td>
+</ng-container>
+
+
+    <!-- Header y Filas -->
+    <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+  </table>
+</div>
+
+</div>

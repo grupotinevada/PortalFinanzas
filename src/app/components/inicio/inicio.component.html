@@ -1,0 +1,89 @@
+<app-spinner [isLoading]="showSpinner"></app-spinner>
+
+<body [ngClass]="{ admin: rol === 1, editor: rol === 2, viewer: rol === 3 }">
+
+    <!-- Contenido visible solo para editores 
+    <div *ngIf="rol === 1">
+      <div class="limited-content">
+        futura lista de usuarios
+      </div>
+    </div>-->
+
+
+  <!-- Contenido visible solo para administradores y editores-->
+  <div *ngIf="rol === 1 || rol === 2">
+    <div *ngIf="!showSpinner" class="content">
+      <div class="table-container">
+        <div *ngIf="hayProyectos(); else noProyectos" class="table-container">
+          <!-- Encabezados de Áreas -->
+          <div class="areas-header sticky-header">
+            <div class="empty-title-cell"></div>
+            <div class="areas-columns">
+              <div 
+              *ngFor="let area of filtrarAreas()"  
+              class="area-title-cell" [ngClass]="getAreaClass(area.id)">
+                <h3 class="area-title">{{ area.nombre }}</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fila completa para cada trimestre -->
+          <div *ngFor="let trimestre of trimestres" class="trimestre-row">
+            <!-- Columna izquierda: Título del Trimestre -->
+            <div class="trimestre-title-cell">
+              <h3>{{ trimestre }}</h3>
+            </div>
+
+            <!-- Columnas dinámicas: Proyectos por área -->
+            <div class="areas-columns">
+              <div *ngFor="let area of filtrarAreas()" class="area-column">
+                <!-- Proyectos del área dentro del trimestre -->
+                <div class="project-card clickable" *ngFor="
+                  let proyecto of filtrarProyectosPorTrimestre(area, trimestre)
+                " (click)="irATareas(proyecto.idProyecto)">
+
+                  <!-- Badge combinado para proyectos atrasados -->
+                  <span *ngIf="proyectoAtrasado(proyecto)"
+                    class="badge animated-gradient-badge position-absolute top-0 start-100 translate-middle">
+                    ⚠️
+                  </span>
+
+                  <h4 class="project-title">{{ proyecto.nombreProyecto }}</h4>
+                  <div class="progress-container">
+                    <div class="progress">
+                      <div class="progress-bar progress-bar-striped progress-bar-animated"
+                        [ngClass]="getAreaClass(area.id)" role="progressbar"
+                        [attr.aria-valuenow]="proyecto.porcentajeAvance" aria-valuemin="0" aria-valuemax="100"
+                        [style.width.%]="proyecto.porcentajeAvance"></div>
+                    </div>
+                    <span>{{ proyecto.porcentajeAvance }}%</span>
+                  </div>
+                  <p>
+                    <strong>Fecha Compromiso:</strong>
+                    {{ proyecto.fechaReal | date : "dd/MM/yyyy" }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Mostrar mensaje si no hay proyectos -->
+        <ng-template #noProyectos>
+          <div class="no-projects-message">
+            <p>No hay proyectos</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Contenido visible solo para viewers -->
+  <div *ngIf="rol === 3">
+    <div class="no-access-message">
+      <p>No tienes permisos para acceder a esta información.</p>
+    </div>
+  </div>
+
+</body>

@@ -1,0 +1,187 @@
+<app-filtro #filtroComponent (aplicarFiltros)="aplicarFiltros($event)"></app-filtro>
+<div class="bg-BEE7FB p-5 m-3 jumbotron">
+  <div class="header">
+    <h1>{{ area }}</h1>
+    <div class="toolbar bg-light py-2 px-3 d-flex justify-content-between align-items-center border-bottom">
+      <!-- Filter Section -->
+      <div class="filter-container d-flex align-items-center">
+        <button class="btn btn-primary d-flex align-items-center" (click)="openNuevoProyectoDialog()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-plus-circle me-2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          Agregar Proyecto
+        </button>
+
+      </div>
+
+      <div class="filtros-aplicados py-1 my-3" *ngIf="filtrosAplicados && Object.keys(filtrosAplicados).length > 0">
+        <div class="d-flex flex-wrap gap-2">
+          <!-- Filtro por Nombre del Proyecto -->
+
+
+          <!-- Filtro por Estado -->
+          <span *ngIf="filtrosAplicados.descripcionEstado" class="badge bg-secondary">
+            Estado: {{ filtrosAplicados.descripcionEstado }}
+            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close"
+              (click)="eliminarFiltro('descripcionEstado')"></button>
+          </span>
+
+          <!-- Filtro por Progreso Mínimo -->
+          <span *ngIf="filtrosAplicados.porcentajeMin" class="badge bg-secondary">
+            Progreso mínimo: {{ filtrosAplicados.porcentajeMin }}%
+            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close"
+              (click)="eliminarFiltro('porcentajeMin')"></button>
+          </span>
+
+          <!-- Filtro por Progreso Máximo -->
+          <span *ngIf="filtrosAplicados.porcentajeMax" class="badge bg-secondary">
+            Progreso máximo: {{ filtrosAplicados.porcentajeMax }}%
+            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close"
+              (click)="eliminarFiltro('porcentajeMax')"></button>
+          </span>
+
+          <!-- Filtro por Fecha de Inicio -->
+          <span *ngIf="filtrosAplicados.fechaDesde" class="badge bg-secondary">
+            Fecha inicio: {{ filtrosAplicados.fechaDesde | date }}
+            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close"
+              (click)="eliminarFiltro('fechaDesde')"></button>
+          </span>
+
+          <!-- Filtro por Fecha de Compromiso -->
+          <span *ngIf="filtrosAplicados.fechaHasta" class="badge bg-secondary">
+            Fecha compromiso: {{ filtrosAplicados.fechaHasta | date }}
+            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close"
+              (click)="eliminarFiltro('fechaHasta')"></button>
+          </span>
+
+          <!-- Filtro por Fecha de Compromiso -->
+          <span *ngIf="filtrosAplicados.fechaFin" class="badge bg-secondary">
+            Fecha compromiso: {{ filtrosAplicados.fechaFin | date: 'dd/MM/yyyy' }}
+            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close"
+              (click)="eliminarFiltro('fechaFin')"></button>
+          </span>
+
+          <!-- Filtro por Área -->
+          <span *ngIf="filtrosAplicados.area" class="badge bg-secondary">
+            Área: {{ filtrosAplicados.area }}
+            <button type="button" class="btn-close btn-close-white ms-2" aria-label="Close"
+              (click)="eliminarFiltro('area')"></button>
+          </span>
+        </div>
+      </div>
+
+
+      <!-- Add Project Section -->
+      <div class="add-project-container">
+        <button class="btn btn-warning d-flex align-items-center" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasFiltro" aria-controls="offcanvasFiltro">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-filter me-2">
+            <polygon points="22 3 2 3 10 12.5 10 19 14 21 14 12.5 22 3"></polygon>
+          </svg>
+          Filtro
+        </button>
+      </div>
+    </div>
+
+
+    <app-spinner [isLoading]="showSpinner"></app-spinner>
+
+    <br>
+    <div *ngIf="proyectos.length" class="table-responsive">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <!-- Nombre Proyecto Column -->
+        <ng-container matColumnDef="nombreProyecto">
+          <th mat-header-cell *matHeaderCellDef title="Título del proyecto"> Título </th>
+          <td mat-cell *matCellDef="let proyecto"> {{ proyecto.nombreProyecto }} </td>
+        </ng-container>
+
+        <!-- Descripción Column -->
+        <ng-container matColumnDef="descripcion">
+          <th mat-header-cell *matHeaderCellDef title="Descripción del proyecto"> Descripción </th>
+          <td mat-cell *matCellDef="let proyecto"> {{ proyecto.descripcion }} </td>
+        </ng-container>
+
+        <!-- Gerencia Column -->
+        <ng-container matColumnDef="nombreArea" title="Gerencia asociada al proyecto">
+          <th mat-header-cell *matHeaderCellDef> Gerencia </th>
+          <td mat-cell *matCellDef="let proyecto"> {{ proyecto.nombreArea }} </td>
+        </ng-container>
+
+        <!-- Fecha de inicio Column -->
+        <ng-container matColumnDef="fechaInicio">
+          <th mat-header-cell *matHeaderCellDef title="Fecha de incializacion del proyecto"> Fecha de inicio </th>
+          <td mat-cell *matCellDef="let proyecto"> {{ proyecto.fechaInicio | date }} </td>
+        </ng-container>
+
+        <!-- Fecha de compromiso Column -->
+        <ng-container matColumnDef="fechaReal">
+          <th mat-header-cell *matHeaderCellDef title="Fecha de compromiso para finalizar el proyecto"> Fecha de
+            compromiso </th>
+          <td mat-cell *matCellDef="let proyecto"> {{ proyecto.fechaReal | date }} </td>
+        </ng-container>
+
+        <!-- Fecha de fin Column -->
+        <ng-container matColumnDef="fechaFin">
+          <th mat-header-cell *matHeaderCellDef title="Fecha en que se finalizó el proyecto"> Fecha de Finalización
+          </th>
+          <td mat-cell *matCellDef="let proyecto"> {{ proyecto.fechaFin ? (proyecto.fechaFin | date) : 'Sin fecha fin' }} </td>
+        </ng-container>
+
+        <!-- Progreso Column -->
+        <ng-container matColumnDef="porcentajeAvance">
+          <th mat-header-cell *matHeaderCellDef title="Progreso de avance en porcentaje del proyecto"> Progreso </th>
+          <td mat-cell *matCellDef="let proyecto" style="text-align: center;">
+
+            {{proyecto.porcentajeAvance | number: "1.0-0"}}%
+          </td>
+        </ng-container>
+
+        <!-- Estado Column (con círculo de estado) -->
+        <ng-container matColumnDef="descripcionEstado">
+          <th mat-header-cell *matHeaderCellDef title="Estado actual del proyecto"> Estado </th>
+          <td mat-cell *matCellDef="let proyecto">
+            <span class="status-circle" [ngClass]="{
+          'finalizado': proyecto.descripcionEstado === 'Finalizado',
+          'pendiente': proyecto.descripcionEstado === 'Pendiente',
+          'en-progreso': proyecto.descripcionEstado === 'En Progreso'
+        }"></span>
+            {{ proyecto.descripcionEstado }}
+          </td>
+        </ng-container>
+
+        <!-- Acciones Column -->
+        <ng-container matColumnDef="tareas">
+          <th mat-header-cell *matHeaderCellDef> Acciones </th>
+          <td mat-cell *matCellDef="let proyecto">
+            <button mat-icon-button color="primary" title="Ver Tareas" (click)="verTareas(proyecto.idProyecto)">
+              <mat-icon color="accent">visibility</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" title="Editar proyecto" [disabled]="!proyecto.editable"
+              (click)="openEditarProyecto(proyecto.idProyecto, proyecto.editable)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button *ngIf="rol === 1" mat-icon-button color="primary" title="Eliminar proyecto" [disabled]="!proyecto.editable"
+            (click)="eliminarProyecto(proyecto.idProyecto)">
+            <mat-icon color="warn">delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <!-- Header Row -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <!-- Data Row -->
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+
+
+    <!-- Mensaje si el usuario no tiene proyectos -->
+    <mat-card *ngIf="proyectos.length === 0" class="alert alert-info mt-4">
+      No tienes proyectos registrados.
+    </mat-card>

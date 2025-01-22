@@ -1,0 +1,47 @@
+<app-spinner [isLoading]="showSpinner"></app-spinner>
+<h2 mat-dialog-title class="dialog-title">Editar Usuario</h2>
+<br>
+<mat-dialog-content class="dialog-content">
+  <form (ngSubmit)="guardarCambios()" class="form-container">
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Nombre</mat-label>
+      <input matInput [(ngModel)]="usuario.nombre" name="nombre" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Correo</mat-label>
+      <input matInput [(ngModel)]="usuario.correo" name="correo" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Rol</mat-label>
+      <mat-select [(ngModel)]="usuario.idRol" name="idRol" required>
+        <mat-option *ngFor="let rol of roles" [value]="rol.idRol">
+          {{ rol.descripcion }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Área</mat-label>
+      <mat-select [(ngModel)]="usuario.idArea" name="idArea" required>
+        <mat-option *ngFor="let area of areas" [value]="area.idArea">
+          {{ area.nombre }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-checkbox class="checkbox" [(ngModel)]="usuario.habilitado" name="habilitado">
+      Habilitado
+    </mat-checkbox>
+
+    <div mat-dialog-actions class="dialog-actions">
+      <div class="buttons">
+      <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+      <button mat-raised-button color="primary" type="submit" (click)="guardarCambios()">Guardar Cambios</button>
+    </div>
+  </div>
+  </form>
+</mat-dialog-content>
+
+

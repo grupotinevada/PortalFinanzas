@@ -1,0 +1,119 @@
+/* Estilo general para la página */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+  }
+  .jumbotron {
+    color:#4e5356;
+    text-align: start;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+    border: solid white 1px;
+    box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.142);
+    backdrop-filter: blur(90px);
+  }
+  .mat-mdc-table tbody, .mat-mdc-table tfoot, .mat-mdc-table thead, .mat-mdc-cell, .mat-mdc-footer-cell, .mat-mdc-header-row, .mat-mdc-row, .mat-mdc-footer-row, .mat-mdc-table .mat-mdc-header-cell{
+    font-size: 1rem;
+  }
+  /* Título */
+  h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+/* Contenedor para alinear el encabezado y el botón */
+.acciones {
+    display: flex; /* Activa el modo de diseño Flexbox */
+    align-items: center; /* Alinea los elementos verticalmente al centro */
+    justify-content: space-between; /* Coloca el título a la izquierda y el botón a la derecha */
+    margin-bottom: 16px; /* Espaciado debajo del contenedor */
+  }
+  
+  /* Ajustes para el encabezado */
+  .acciones h2 {
+    margin: 0; /* Quita márgenes adicionales del encabezado */
+  }
+  
+  /* Ajustes para el botón */
+  .acciones button {
+    margin-left: auto; /* Empuja el botón hacia la derecha */
+  }
+  
+  
+/* Contenedor de la tabla centrada */
+.tabla-usuarios {
+    margin: 0 auto; /* Centra la tabla horizontalmente */
+    max-width: 95%; /* Margen a los lados */
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  
+  /* Tabla de Material Angular */
+  .mat-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .mat-header-cell {
+    background-color: #1976d2; /* Azul primario de Material */
+    color: #ffffff;
+    font-weight: bold;
+    text-align: left;
+    padding: 10px;
+  }
+  
+  .mat-cell {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .mat-header-row {
+    height: 50px;
+  }
+  
+  .mat-row:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* Estilo para las columnas de acciones */
+  .mat-cell button {
+    margin-right: 10px;
+    font-size: 12px;
+  }
+  
+  .mat-cell button[color="accent"] {
+    color: #1976d2; /* Azul primario */
+  }
+  
+  .mat-cell button[color="warn"] {
+    color: #d32f2f; /* Rojo de advertencia */
+  }
+  
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .tabla-usuarios {
+      overflow-x: auto;
+    }
+  
+    .mat-header-cell, .mat-cell {
+      padding: 8px;
+      font-size: 12px;
+    }
+  
+    .acciones button {
+      font-size: 12px;
+    }
+  }
+  
+  .custom-dialog-container {
+    border-radius: 8px; /* Agrega bordes redondeados al modal */
+    padding: 1rem; /* Añade un padding interno para separar el contenido de los bordes */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Aplica una sombra para un efecto más elegante */
+  }

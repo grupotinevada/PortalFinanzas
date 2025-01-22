@@ -1,0 +1,107 @@
+/* Estilos para los mensajes de snackbar */
+.success-snackbar {
+    background: #4caf50;
+    color: white;
+  }
+  
+  .warning-snackbar {
+    background: #ff9800;
+    color: white;
+  }
+  
+  .error-snackbar {
+    background: #f44336;
+    color: white;
+  }
+  
+  /* Estilo para el botón de cerrar */
+  .success-snackbar .mat-simple-snackbar-action,
+  .warning-snackbar .mat-simple-snackbar-action,
+  .error-snackbar .mat-simple-snackbar-action {
+    color: white;
+  }
+
+
+
+  .dialog-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #485465; /* Color primario */
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .dialog-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  
+  .form-field {
+    width: 100%;
+  }
+  
+  .checkbox {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .cancel-button {
+    color: #f44336; /* Rojo claro */
+  }
+  
+  .save-button {
+    background-color: #4caf50; /* Verde */
+    color: white;
+  
+    &:hover {
+      background-color: #45a049;
+    }
+  }
+  
+
+  .buttons {
+    display: flex;
+    justify-content: flex-start; /* Botones alineados a la izquierda */
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  /* Hover para botones */
+  .buttons button {
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .buttons button:hover {
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño */
+    background-color: #e0f7fa; /* Azul claro al hover */
+    border-color: #00acc1; /* Borde más destacado */
+  }
+  
+  /* Botón específico (si quieres diferenciar uno) */
+  .buttons button:first-child:hover {
+    background-color: #e0f7fa; /* Naranja claro */
+    border-color: #00acc1;
+  }

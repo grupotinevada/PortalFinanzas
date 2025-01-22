@@ -1,0 +1,156 @@
+/* Wrapper General */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Asegura el centrado vertical completo */
+}
+
+/* Login Container */
+.login-container {
+  max-width: 800px;
+  width: 30vw;
+  min-width: 380px;
+  padding: 2% 30px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  border: 6px solid rgba(211, 211, 211, 0.422);
+  background-color: transparent;
+  text-align: center;
+  font-size: 1em;
+  /* backdrop-filter: blur(10px); Fondo borroso */
+  border-radius: 12px; /* Bordes redondeados */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--nevada);
+
+}
+
+.login-container:hover {
+  transform: translateY(-5px); /* Eleva el card en hover */
+  /* box-shadow: 0px 6px 30px rgba(0, 0, 0, 0.3); Sombra más intensa */
+}
+
+/* Imagen Nevada */
+.nevada-img {
+  width: 50%;
+  display: block;
+  margin: 0 auto 20px;
+  mix-blend-mode:darken;
+  filter: drop-shadow();
+
+}
+
+
+/* Input Container */
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.icon-user,
+.icon-pass {
+  width: 35px;
+  opacity: 0.7;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.input-container:hover .icon-user,
+.input-container:hover .icon-pass {
+  transform: scale(1.1); /* Agranda el icono en hover */
+  opacity: 1;
+}
+
+/* Inputs */
+mat-form-field {
+  flex: 1;
+  max-width: 100%;
+}
+
+mat-form-field input {
+  font-size: 1em;
+}
+
+.mat-mdc-form-field-wrapper {
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.9);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mat-mdc-form-field-wrapper:hover {
+  background-color: rgba(240, 248, 255, 0.9); /* Azul tenue en hover */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Efecto de halo */
+}
+
+.mat-mdc-input-element:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(88, 210, 255, 0.8); /* Halo azul más fuerte */
+}
+
+/* Enlaces */
+.rec-pass {
+  display: block;
+  margin: 10px 0;
+  font-size: 0.9em;
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.rec-pass:hover {
+  color: #0056b3; /* Azul más oscuro */
+  text-shadow: 0 0 3px rgba(0, 123, 255, 0.5); /* Brillo ligero */
+}
+
+/* Botones */
+button[mat-flat-button] {
+  margin-top: 10px;
+  font-size: 1.1em;
+  color: #fff;
+  background-color: #58d2ff;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+button[mat-flat-button]:hover {
+  background-color: #007bff; /* Azul más oscuro */
+  box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.4); /* Sombra azul */
+  transform: translateY(-2px); /* Efecto de elevación */
+}
+
+button[mat-flat-button]:active {
+  transform: translateY(0); /* Restablecer elevación */
+  box-shadow: 0px 2px 5px rgba(0, 123, 255, 0.4); /* Sombra reducida */
+}
+
+/* Errores */
+.error {
+  margin-top: 10px;
+  color: red;
+  font-size: 0.9em;
+  text-shadow: 0px 0px 2px rgba(255, 0, 0, 0.4); /* Ligero brillo */
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+  .login-container {
+    width: 90%;
+    min-width: unset;
+    padding: 20px;
+  }
+
+  .nevada-img {
+    width: 70%;
+  }
+
+  mat-form-field {
+    max-width: 100%;
+  }
+}
+
+@media screen and (min-width: 600px) and (max-width: 2559px) {
+  mat-form-field {
+    max-width: 650px;
+  }
+}

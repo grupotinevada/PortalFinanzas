@@ -1,0 +1,15 @@
+
+<nav class="navbar">
+    <div class="navbar-left">
+      <span>Bienvenido(a)! {{ nombreUsuario }}</span>
+    </div>
+    <div class="navbar-right">
+      <!-- Botón Proyecto: Solo visible para usuarios con idRol = 2 -->
+      <button mat-flat-button *ngIf="usuario?.idRol === 2" (click)="irAProyecto()">Proyecto</button>
+      <!-- Botón Panel -->
+      <button mat-flat-button (click)="IrInicio()">Panel</button>
+      <!-- Botón Cerrar Sesión -->
+      <button mat-flat-button (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </nav>
+  

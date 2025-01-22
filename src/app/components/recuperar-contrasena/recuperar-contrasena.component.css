@@ -1,0 +1,105 @@
+/* Estilos generales */
+.recuperar-contrasena-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Estilo para los formularios */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+/* Botones */
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  background-color: #e0e0e0;
+  color: #bdbdbd;
+}
+
+button:not(:disabled):hover {
+  background-color: #1976d2;
+  color: white;
+}
+
+button.mat-raised-button {
+  background-color: #1976d2;
+  color: white;
+  font-weight: bold;
+}
+
+button.mat-button {
+  background-color: transparent;
+  color: #1976d2;
+}
+
+/* Mensajes de error */
+.mat-error {
+  font-size: 0.875rem;
+  color: #f44336;
+  margin-top: 5px;
+}
+
+/* Estilo para las acciones (botón atrás) */
+.actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+
+/* Estilo para las transiciones entre pasos */
+div {
+  transition: opacity 0.3s ease;
+}
+
+div * {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Estilos específicos para cada paso */
+.step {
+  display: none;
+}
+
+.step.active {
+  display: block;
+}
+
+.timer {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #d32f2f; /* Color rojo para destacar */
+}

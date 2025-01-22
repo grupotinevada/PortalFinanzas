@@ -1,0 +1,26 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #3f8ad1;
+    color: white;
+    
+    
+  }
+  
+  .navbar-left {
+    font-size: 1.2em;
+  }
+  
+  .navbar-right button {
+    margin-left: 10px;
+    padding: 0.5rem 1rem;
+    background-color: #005CBB;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+
+  

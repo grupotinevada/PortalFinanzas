@@ -1,0 +1,220 @@
+/* General */
+body {
+
+  font-family: Arial, sans-serif;
+  margin: 1rem;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.content {
+  margin: 0 auto;
+  width: 100%;
+  overflow-x: auto;
+  max-width: 100%; /* Ajuste máximo */
+  border-radius: 10px;
+}
+
+/* Tabla y encabezados */
+.table-container {
+  zoom:0.8;
+  position: relative;
+  overflow-y: auto;
+  max-height: 200vh; /* Valor por defecto para pantallas grandes */
+  background-color: #f1f1f1;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.541);
+  border-radius: 0.5%;
+
+}
+
+/* Encabezado fijo */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #fff;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Encabezado de Áreas */
+.areas-header {
+  display: flex;
+  flex-wrap: nowrap;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #c5c6c6;
+}
+
+.empty-title-cell {
+  width: 15%;
+  min-width: 150px;
+}
+
+.area-title-cell {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: calc(1rem + 0.5vw); /* Ajuste dinámico */
+  font-weight: bold;
+  border-radius: 10px;
+  color: white;
+  border: solid 1px rgba(0, 0, 0, 0.185);
+}
+
+.trimestre-row {
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  border-bottom: 5px solid rgb(255, 255, 255);
+}
+
+.trimestre-title-cell {
+  width: 15%;
+  min-width: 6.25rem;
+  text-align: center;
+  font-size: calc(0.5rem + 0.3vw);
+  font-weight: bold;
+  padding: 2px;
+  color: #ffffff;
+  border-right: 1px solid rgb(255, 255, 255);
+  background-color: #7798B8;
+  border-radius: 10px;
+    /* Centrado vertical y horizontal con Flexbox */
+    display: flex;
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+}
+
+.areas-columns {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+}
+
+.area-column {
+  flex: 1;
+  min-width: 250px;
+}
+/*Alerta proyecto atrasado*/
+
+.animated-gradient-badge {
+  background: linear-gradient(45deg, #ff0000, #ff8c00);
+  color: #fff;
+  padding: 7px 2px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  animation: blink 1.5s infinite;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.project-card.atrasado {
+  border-color: #ff4d4f; /* Opcional: resaltar borde de proyectos atrasados */
+  
+}
+/* Tarjetas de Proyectos */
+.project-card {
+
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.253);
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.project-title {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: calc(0.9rem + 0.3vw);
+  font-weight: bold;
+}
+
+.project-card p {
+  font-size: calc(0.8rem + 0.2vw);
+}
+
+/* Contenedor que organiza la barra y el porcentaje */
+.progress-container {
+  display: flex;
+  align-items: center;  /* Centra la barra y el porcentaje verticalmente */
+  justify-content: space-between; /* Barra a la izquierda y porcentaje a la derecha */
+  width: 100%; /* Asegura que el contenedor ocupe el 100% del ancho */
+}
+
+.progress {
+  flex-grow: 1;  /* Hace que la barra ocupe todo el espacio disponible */
+  height: 0.8rem;
+  border-radius: 10px;
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  line-height: 20px;
+  font-size: calc(0.7rem + 0.2vw);
+  color: #fff;
+  transition: width 0.4s ease;  /* Transición suave en el ancho de la barra */
+  border-radius: 10px;
+}
+
+.progress-container span {
+  margin-left: 10px; /* Espacio entre la barra y el porcentaje */
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .content {
+    padding: 0.3rem;
+  }
+
+  .trimestre-title-cell, .area-title-cell {
+    font-size: 1rem;
+  }
+
+  .project-card {
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+}
+@media (max-height: 800px) {
+  .table-container {
+    max-height: 140vh; /* Se ajusta automáticamente en pantallas más pequeñas */
+    zoom: 0.8;
+  }
+}
+
+@media (min-width: 1921px) {
+  .table-container{
+    max-height: 100vh;
+  }
+  .content {
+    max-width: 100%;
+  }
+}
+
+/* Colores dinámicos para los títulos */
+.titulo-bg-primary { background-color: #076BCB; }
+.titulo-bg-success { background-color: #2A9061; }
+.titulo-bg-warning { background-color: rgb(250, 205, 120); }
+.titulo-bg-secondary { background-color: rgb(252, 95, 95); }
+.titulo-bg-light { background-color: rgb(255, 235, 235); }

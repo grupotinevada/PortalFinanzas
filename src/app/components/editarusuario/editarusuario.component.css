@@ -1,0 +1,71 @@
+.dialog-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #485465; /* Color primario */
+    text-align: center;
+    margin-bottom: 0.2rem;
+  }
+  
+  .dialog-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  
+  .form-field {
+    width: 100%;
+  }
+  
+  .checkbox {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: flex-start; /* Botones alineados a la izquierda */
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  /* Hover para botones */
+  .buttons button {
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .buttons button:hover {
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño */
+    background-color: #e0f7fa; /* Azul claro al hover */
+    border-color: #00acc1; /* Borde más destacado */
+  }
+  
+  /* Botón específico (si quieres diferenciar uno) */
+  .buttons button:first-child:hover {
+    background-color: #e0f7fa; /* Naranja claro */
+    border-color: #00acc1;
+  }
+  mat-label{
+    margin-top: 1rem;
+  }

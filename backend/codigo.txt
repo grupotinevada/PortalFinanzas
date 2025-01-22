@@ -1,0 +1,48 @@
+// Endpoint para actualizar proyecto
+app.put('/proyecto/:id', (req, res) => {
+    const idProyecto = req.params.id;
+    const { 
+        nombre, 
+        descripcion, 
+        fechaInicio, 
+        fechaFin, 
+        fechaReal, 
+        porcentajeAvance, 
+        idUsuario, 
+        idArea, 
+        idEstado 
+    } = req.body;
+
+    const query = `
+        UPDATE proyecto 
+        SET 
+            nombre = ?, 
+            descripcion = ?, 
+            fechaInicio = ?, 
+            fechaFin = ?, 
+            fechaReal = ?, 
+            porcentajeAvance = ?, 
+            idUsuario = ?, 
+            idArea = ?, 
+            idEstado = ?
+        WHERE idProyecto = ?`;
+
+    pool.execute(query, [
+        nombre, 
+        descripcion, 
+        fechaInicio, 
+        fechaFin, 
+        fechaReal, 
+        porcentajeAvance, 
+        idUsuario, 
+        idArea, 
+        idEstado, 
+        idProyecto
+    ], (err) => {
+        if (err) {
+            console.error(err);  // Puedes agregar un log para depuración
+            return res.status(500).send('Error updating project');
+        }
+        res.status(200).send('Project updated successfully');
+    });
+});

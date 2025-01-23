@@ -264,7 +264,7 @@
 
 .btn-mostrar {
   padding: 8px 15px;
-  background-color: #007bff;
+  background-color: #51c462;
   color: white;
   border: none;
   border-radius: 5px !important;
@@ -273,13 +273,13 @@
 }
 
 .btn-mostrar:hover {
-  background-color: #0056b3;
+  background-color: #548a3d;
 }
 
 .btn-primary {
   width: 100%;
   padding: 12px;
-  background-color: #007bff;
+  background-color: #51c462;
   color: white;
   border: none;
   border-radius: 5px;
@@ -289,7 +289,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
+  background-color: #548a3d;
 }
 
 /* Panel de desarrollo */

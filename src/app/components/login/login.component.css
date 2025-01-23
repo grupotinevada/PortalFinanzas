@@ -80,12 +80,12 @@ mat-form-field input {
 
 .mat-mdc-form-field-wrapper:hover {
   background-color: rgba(240, 248, 255, 0.9); /* Azul tenue en hover */
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Efecto de halo */
+  box-shadow: 0 0 8px rgba(132, 255, 140, 0.3); /* Efecto de halo */
 }
 
 .mat-mdc-input-element:focus {
   outline: none;
-  box-shadow: 0 0 10px rgba(88, 210, 255, 0.8); /* Halo azul más fuerte */
+  box-shadow: 0 0 10px rgba(132, 255, 140, 0.3); /* Halo azul más fuerte */
 }
 
 /* Enlaces */
@@ -93,13 +93,13 @@ mat-form-field input {
   display: block;
   margin: 10px 0;
   font-size: 0.9em;
-  color: #007bff;
+  color: #022d06;
   text-decoration: none;
   transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .rec-pass:hover {
-  color: #0056b3; /* Azul más oscuro */
+  color: #1CB160; /* Azul más oscuro */
   text-shadow: 0 0 3px rgba(0, 123, 255, 0.5); /* Brillo ligero */
 }
 
@@ -108,14 +108,14 @@ button[mat-flat-button] {
   margin-top: 10px;
   font-size: 1.1em;
   color: #fff;
-  background-color: #58d2ff;
+  background-color: #397554;
   border-radius: 8px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 button[mat-flat-button]:hover {
-  background-color: #007bff; /* Azul más oscuro */
-  box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.4); /* Sombra azul */
+  background-color: #3fb248; /* Azul más oscuro */
+  box-shadow: 0px 4px 10px rgba(0, 255, 85, 0.666); /* Sombra azul */
   transform: translateY(-2px); /* Efecto de elevación */
 }
 

@@ -2,26 +2,26 @@
 <div class="icon-bar custom-bg-nevada text-white vh-100 d-flex flex-column align-items-center">
   <!-- Logo de la empresa -->
   <div class="logo-container p-2">
-    <img src="/nevadaicon.png" alt="Logo de la empresa" class="company-logo">
+    <img src="/nevadaicon.webp" alt="Logo de la empresa" class="company-logo">
   </div>
 
   <!-- Botones de navegación con iconos -->
-  <button mat-icon-button class="text-secondary my-2" (click)="IrInicio()" matTooltip="Panel">
+  <button mat-icon-button class="text-secondary my-2" (click)="IrInicio()" matTooltip="Panel" title="Panel">
     <mat-icon>dashboard</mat-icon>
   </button>
-  <button mat-icon-button class="text-secondary my-2" (click)="irAProyecto()" matTooltip="Proyectos">
+  <button mat-icon-button class="text-secondary my-2" (click)="irAProyecto()" matTooltip="Proyectos" title="Proyectos">
     <mat-icon>work</mat-icon>
   </button>
   <div *ngIf="usuario?.idRol === 1">
-    <button mat-icon-button class="text-secondary my-2" (click)="iraAdmin()" matTooltip="Admin">
+    <button mat-icon-button class="text-secondary my-2" (click)="iraAdmin()" matTooltip="Admin" title="Admin">
       <mat-icon>settings</mat-icon>
     </button> 
   </div> 
-  <button mat-icon-button class="text-secondary my-2" (click)="iraMiperfil()" matTooltip="Mi perfil">
+  <button mat-icon-button class="text-secondary my-2" (click)="iraMiperfil()" matTooltip="Mi perfil" title="Mi perfil">
     <mat-icon>account_box</mat-icon>
   </button>
 
-  <button mat-icon-button class="text-secondary my-2" (click)="cerrarSesion()" matTooltip="Cerrar sesión">
+  <button mat-icon-button class="text-secondary my-2" (click)="cerrarSesion()" matTooltip="Cerrar sesión" title="Cerrar sesión">
     <mat-icon>logout</mat-icon>
   </button>
 
@@ -35,7 +35,7 @@
 <div class="offcanvas offcanvas-start custom-bootstrap-component text-dark" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
   <div class="offcanvas-header justify-content-center">
     <div class="logo-container">
-      <img src="/nevadaicon.png" alt="Logo de la empresa" class="company-logo">
+      <img src="/nevadaicon.webp" alt="Logo de la empresa" class="company-logo">
     </div>
   </div>
   <div class="offcanvas-body d-flex flex-column p-0">

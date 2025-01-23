@@ -40,7 +40,7 @@ body.offcanvas-open {
 
 /* Spinner de carga */
 .spinner-border {
-  color: #3bafda; /* Azul principal */
+  color: #45db34; /* Azul principal */
 }
 
 /* Botón de cerrar */
@@ -85,24 +85,6 @@ body.offcanvas-open {
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.custom-button.upload {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.custom-button.upload:hover {
-  background-color: #0056b3;
-}
-
-.custom-button.confirm {
-  background-color: #28a745;
-  color: #fff;
-}
-
-.custom-button.confirm:hover {
-  background-color: #218838;
 }
 
 .btn-danger {
@@ -217,45 +199,26 @@ body.offcanvas-open {
   font-size: 20px;
 }
 .custom-button.hist {
-  background-color: #3bafda;
-
+  background-color: #217346;
 }
 
 .custom-button.hist:hover {
-  background-color: #3498db;
-  transform: scale(1.05);
+  background-color: #00ba82;
+  transform: scale(1.02);
 }
 
 .custom-button.doc {
-  background-color: #3bafda;
+  background-color: #217346;
   margin-left: 20px;
 }
 
 .custom-button.doc:hover {
-  background-color: #3498db;
-  transform: scale(1.05);
-}
-.custom-button.confir {
-  background-color: #05a300;
-  margin-left: 15px;
-  margin-bottom: 10px;
-}
-.custom-button.confir:hover {
-  background-color: #007000;
-  transform: scale(1.05);
+  background-color: #00ba82;
+  transform: scale(1.02);
 }
 
 .text-arch{
   font: size 15px; ;
-}
-.custom-button.subarch {
-  background-color: #3bafda;
-  margin-left: 15px;
-  margin-bottom: 10px;
-}
-.custom-button.subarch:hover {
-  background-color: #3498db;
-  transform: scale(1.05);
 }
 /* Colores y efectos de botones */
 .custom-button.download {
@@ -263,31 +226,23 @@ body.offcanvas-open {
 }
 
 .custom-button.download:hover {
-  background-color: #1b5e3e;
+  background-color: #00ba82;
   transform: scale(1.05);
 }
 
 .custom-button.upload {
-  background-color: #3bafda;
+  background-color: #217346;
 }
 
 .custom-button.upload:hover {
-  background-color: #3498db;
+  background-color: #00ba82;
   transform: scale(1.05);
 }
 
-.custom-button.delete {
-  background-color: #e74c3c;
-}
-
-.custom-button.delete:hover {
-  background-color: #c0392b;
-  transform: scale(1.05);
-}
 
 .custom-button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+  box-shadow: 0 0 0 3px 217346;
 }
 
 /* Mensaje de error */

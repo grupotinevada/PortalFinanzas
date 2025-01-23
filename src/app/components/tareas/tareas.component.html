@@ -59,7 +59,7 @@
     <p>Progreso total</p>
 
     <!-- Spinner mientras se calculan las tareas   -->
-    <div *ngIf="showSpinner" class="spinner-border text-primary" role="status" style="margin: 10px auto;">
+    <div *ngIf="showSpinner" class="spinner-border " role="status" style="margin: 10px auto;">
       <span class="visually-hidden">Cargando...</span>
     </div>
 
@@ -233,7 +233,7 @@
         </button>
         <div *ngIf="archivoSeleccionado" class="selected-file d-flex justify-content-between align-items-center">
           <span class="text-muted"> {{truncarNombreArchivo(archivoSeleccionado.name)}}</span>
-          <button class="custom-button confirm" (click)="subirArchivo()">
+          <button class="btn btn-outline-success" (click)="subirArchivo()">
             Subir
           </button>
         </div>
@@ -271,7 +271,7 @@
               </small>
             </div>
             <button *ngIf="usuario.idArea === proyecto.idArea" 
-                    class="btn btn-danger btn-sm" 
+                    class="btn btn-outline-danger btn-sm" 
                     (click)="confirmarEliminarArchivo(archivo.idarchivo,proyecto.idProyecto)">
               <i class="fas fa-trash"></i> Eliminar
             </button>

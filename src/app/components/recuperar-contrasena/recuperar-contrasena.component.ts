@@ -17,6 +17,7 @@ export class RecuperarContrasenaComponent {
   minutes: number = 3;
   seconds: number = 0;
   timer: any;
+  showSpinner: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -53,14 +54,24 @@ export class RecuperarContrasenaComponent {
   }
 
   enviarCodigo() {
+    this.showSpinner = true;
     const { correo } = this.emailForm.value;
     this.recuperarContrasenaService.enviarCodigo(correo).subscribe({
       next: () => {
         this.step = 2; // Avanzar al paso 2
         this.startTimer(); // Iniciar el temporizador
         this.snackBar.open('Código de verificación enviado al correo.', 'Cerrar', { duration: 3000 });
+        this.showSpinner = false;
       },
-      error: () => this.snackBar.open('Error al enviar el código.', 'Cerrar', { duration: 3000 }),
+      error: (err) => {
+        if (err.status === 404 && err.error?.message === 'Correo no encontrado en la base de datos') {
+          this.snackBar.open('El correo no existe en la base de datos.', 'Cerrar', { duration: 3000 });
+          this.showSpinner = false;
+        } else {
+          this.snackBar.open('Error al enviar el código. Lo sentimos, por favor intente más tarde', 'Cerrar', { duration: 3000 });
+          this.showSpinner = false;
+        }
+      },
     });
   }
 

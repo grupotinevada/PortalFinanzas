@@ -1,3 +1,4 @@
+<app-spinner [isLoading]="showSpinner"></app-spinner>
 <div class="recuperar-contrasena-container">
   <h1>Recuperar Contraseña</h1>
 
@@ -10,7 +11,7 @@
         <mat-error *ngIf="emailForm.get('correo')?.hasError('required')">El correo es obligatorio.</mat-error>
         <mat-error *ngIf="emailForm.get('correo')?.hasError('email')">Debe ser un correo válido.</mat-error>
       </mat-form-field>
-      <button mat-raised-button color="primary" type="submit" [disabled]="emailForm.invalid">Enviar Código</button>
+      <button class="btn btn-success" type="submit" [disabled]="emailForm.invalid">Enviar Código</button>
     </form>
   </div>
 
@@ -28,7 +29,7 @@
         El código debe tener 6 caracteres.
       </mat-error>
     </mat-form-field>
-    <button mat-raised-button color="primary" type="submit" [disabled]="codeForm.invalid">Verificar Código</button>
+    <button class="btn btn-success" type="submit" [disabled]="codeForm.invalid">Verificar Código</button>
   </form>
 </div>
 
@@ -45,17 +46,17 @@
           La contraseña debe tener al menos 8 caracteres.
         </mat-error>
       </mat-form-field>
-      <button mat-raised-button color="primary" type="submit" [disabled]="passwordForm.invalid">Cambiar Contraseña</button>
+      <button class="btn btn-success" type="submit" [disabled]="passwordForm.invalid">Cambiar Contraseña</button>
     </form>
   </div>
 
   <!-- Botón para retroceder (opcional) -->
   <div class="actions" *ngIf="step > 1">
-    <button mat-button color="accent" (click)="step = step - 1">Atrás</button>
+    <button class="btn btn-outline-danger" (click)="step = step - 1">Atrás</button>
   </div>
 
   <!-- Botón para ir a la página de login -->
   <div class="actions">
-    <button mat-button color="accent" (click)="irALogin()">Ir a Login</button>
+    <button class="btn btn-outline-secondary" (click)="irALogin()">Volver a iniciar sesión</button>
   </div>
 </div>

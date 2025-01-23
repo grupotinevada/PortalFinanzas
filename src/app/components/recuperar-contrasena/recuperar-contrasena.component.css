@@ -41,22 +41,6 @@ button:disabled {
   color: #bdbdbd;
 }
 
-button:not(:disabled):hover {
-  background-color: #1976d2;
-  color: white;
-}
-
-button.mat-raised-button {
-  background-color: #1976d2;
-  color: white;
-  font-weight: bold;
-}
-
-button.mat-button {
-  background-color: transparent;
-  color: #1976d2;
-}
-
 /* Mensajes de error */
 .mat-error {
   font-size: 0.875rem;

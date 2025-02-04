@@ -18,8 +18,10 @@ export class EditarproyectodialogComponent implements OnInit {
   nombreArea: string = '';
   proyectoOriginal: any; // Almacena el proyecto original
   localFechaInicio: string | null = null;
- localFechaFin: string | null = null;
- localFechaReal: string | null = null;
+  localFechaFin: string | null = null;
+  localFechaReal: string | null = null;
+  areas: any[] = [];
+  usuarioArea: number = 0;
 
   constructor(
     private dialogRef: MatDialogRef<EditarproyectodialogComponent>,
@@ -37,7 +39,10 @@ export class EditarproyectodialogComponent implements OnInit {
       fechaReal: [null, Validators.required],
       porcentajeAvance: [0, [Validators.required]],
       idUsuario: [this.authService.getUsuarioId(), Validators.required],
-      idArea: [this.authService.getUsuario().idArea, Validators.required],
+      idArea: [{
+        value: this.authService.getUsuario().idArea === 5 ? null : this.authService.getUsuario().idArea,
+        disabled: this.authService.getUsuario().idArea !== 5
+      }, Validators.required],
       idEstado: ['', Validators.required]
     });
   }
@@ -51,7 +56,7 @@ export class EditarproyectodialogComponent implements OnInit {
     })
     this.cargarProyecto(this.data.idProyecto); // Cargar el proyecto por ID
     this.cargarEstados(); // Cargar la lista de estados
-
+    this.getAreas();
   }
 
   mostrarAlertaFechaFin() {
@@ -186,4 +191,16 @@ export class EditarproyectodialogComponent implements OnInit {
     fechaFinControl?.updateValueAndValidity();  // Actualiza la validez
 
   }
+
+  getAreas(): void {
+    this.proyectoService.getArea().subscribe(
+      (data: any[]) => {
+        this.areas = data;
+        //console.log('Areas cargadas:', this.areas); // Verifica que se carguen correctamente
+      },
+      error => {
+        console.error('Error al cargar areas', error);
+      }
+    );
+}
 }

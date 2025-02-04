@@ -34,6 +34,20 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
+
+                  <!-- Campo Grupo (idArea) -->
+      <mat-form-field appearance="fill">
+        <mat-label>Grupo</mat-label>
+        <mat-select formControlName="idArea">
+          <mat-option *ngFor="let area of areas" [value]="area.idArea">
+            {{ area.descripcion }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="proyectoForm.get('idArea')?.touched && proyectoForm.get('idArea')?.hasError('required')">
+          Este campo es obligatorio.
+        </mat-error>
+      </mat-form-field>
+      
             <!-- Fecha de inicio -->
             <mat-form-field appearance="fill">
                 <mat-label>Fecha de Inicio</mat-label>

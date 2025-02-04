@@ -11,6 +11,7 @@ import { ProyectoService } from '../../services/proyecto.service';
 })
 export class HistorialCambiosDialogComponent implements OnInit {
   estadosMap: { [key: number]: string } = {};
+  areasMap: { [key: number]: string } = {};
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private dialogRef: MatDialogRef<HistorialCambiosDialogComponent>,
@@ -19,6 +20,7 @@ export class HistorialCambiosDialogComponent implements OnInit {
   ) {}
 ngOnInit(): void {
   this.cargarEstados();
+  this.cargarAreas();
 }
 /**
  * Formatea los detalles de un cambio para mostrarlos en el historial.
@@ -63,14 +65,35 @@ cargarEstados(): void {
   );
 }
 
+cargarAreas(): void {
+  this.proyectoService.getArea().subscribe(
+    (area: any[]) => {
+      this.areasMap = area.reduce((map, area) => {
+        map[area.idArea] = area.descripcion;
+        return map;
+      }, {});
+    },
+    (error) => {
+      console.error('Error al cargar los estados:', error);
+    }
+  );
+}
+
 
 formatearEstado(idEstado: number): string {
   return this.estadosMap[idEstado] || `Estado desconocido (${idEstado})`;
 }
 
+formatearArea(idArea: number): string {
+  return this.areasMap[idArea] || `Estado desconocido (${idArea})`;
+}
+
 private formatearValor(key: string, valor: any): string {
   if (key === 'idEstado' && typeof valor === 'number') {
     return this.formatearEstado(valor);
+  }
+  if (key === 'idArea' && typeof valor === 'number') {
+    return this.formatearArea(valor);
   }
   return this.formatearFechaSiAplica(valor);
 }

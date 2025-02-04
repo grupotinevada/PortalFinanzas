@@ -2,13 +2,6 @@
 
 <body [ngClass]="{ admin: rol === 1, editor: rol === 2, viewer: rol === 3 }">
 
-    <!-- Contenido visible solo para editores 
-    <div *ngIf="rol === 1">
-      <div class="limited-content">
-        futura lista de usuarios
-      </div>
-    </div>-->
-
 
   <!-- Contenido visible solo para administradores y editores-->
   <div *ngIf="rol === 1 || rol === 2">
@@ -74,15 +67,6 @@
           </div>
         </ng-template>
       </div>
-    </div>
-  </div>
-
-
-
-  <!-- Contenido visible solo para viewers -->
-  <div *ngIf="rol === 3">
-    <div class="no-access-message">
-      <p>No tienes permisos para acceder a esta información.</p>
     </div>
   </div>
 

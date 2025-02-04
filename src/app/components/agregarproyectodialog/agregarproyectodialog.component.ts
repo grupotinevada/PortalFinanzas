@@ -19,7 +19,10 @@ export class AgregarproyectodialogComponent implements OnInit {
   proyectoForm: FormGroup;
   proyectos: Proyecto[] = [];
   listaProyectos: Proyecto[] = [];
-  
+  areas: any[] = [];
+  usuarioArea: number = 0;
+
+
   formatLabel(value: number): string {
     return  `${value}`;
   }
@@ -39,7 +42,10 @@ export class AgregarproyectodialogComponent implements OnInit {
       fechaFin: ['', { validators: [], updateOn: 'blur' }],  // Inicialmente sin validadores
       porcentajeAvance: [0, [Validators.required]],
       idUsuario: [this.authService.getUsuarioId(), Validators.required],
-      idArea: [this.authService.getUsuario().idArea, Validators.required],
+      idArea: [{
+        value: this.authService.getUsuario().idArea === 5 ? null : this.authService.getUsuario().idArea,
+        disabled: this.authService.getUsuario().idArea !== 5
+      }, Validators.required],
       idEstado: ['', Validators.required]
     });  // Validador de grupo para validar fechaFin
 
@@ -51,8 +57,9 @@ export class AgregarproyectodialogComponent implements OnInit {
      this.proyectoForm.get('idEstado')?.valueChanges.subscribe((estadoId) => {
       this.updateFechaFinValidation(estadoId);
       //console.log("Actualizacion de estado: ", estadoId)
+      
     });
-
+    this.getAreas();
     // Llama al método getEstado (supongo que es para obtener los estados desde un servicio)
     this.getEstado();
   }
@@ -123,6 +130,7 @@ export class AgregarproyectodialogComponent implements OnInit {
   mostrarAlerta() {
     window.alert('El formulario es inválido, por favor revisar todos los campos.');
   }
+
   // Función para asegurarse de que las fechas estén en el formato correcto (si es necesario)
   private formatDate(date: any): string | null {
     if (date) {
@@ -152,6 +160,19 @@ export class AgregarproyectodialogComponent implements OnInit {
       }
     );
   }
+
+  getAreas(): void {
+    this.proyectoService.getArea().subscribe(
+      (data: any[]) => {
+        this.areas = data;
+        //console.log('Areas cargadas:', this.areas); // Verifica que se carguen correctamente
+      },
+      error => {
+        console.error('Error al cargar areas', error);
+      }
+    );
 }
 
+
+}
 

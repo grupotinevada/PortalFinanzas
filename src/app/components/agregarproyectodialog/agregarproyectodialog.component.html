@@ -42,7 +42,18 @@
           El estado del proyecto es obligatorio.
         </mat-error>
       </mat-form-field>
-
+      <!-- Campo Grupo (idArea) -->
+      <mat-form-field appearance="fill">
+        <mat-label>Grupo</mat-label>
+        <mat-select formControlName="idArea">
+          <mat-option *ngFor="let area of areas" [value]="area.idArea">
+            {{ area.descripcion }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="proyectoForm.get('idArea')?.touched && proyectoForm.get('idArea')?.hasError('required')">
+          Este campo es obligatorio.
+        </mat-error>
+      </mat-form-field>
       <!-- Campo Fecha de Inicio -->
       <mat-form-field>
         <mat-label>Fecha de inicio</mat-label>
@@ -77,22 +88,8 @@
           La fecha de finalización es obligatoria cuando el estado es "Finalizado".
         </mat-error>
       </mat-form-field>
-      <!-- Campo Porcentaje de Avance -->
-      <!-- <div>
-        <label>Avance de proyecto</label>
-        <mat-slider min="0" max="100" step="1" showTickMarks discrete [displayWith]="formatLabel">
-          <input matSliderThumb  formControlName="porcentajeAvance" min="0" max="100"   />
-        </mat-slider>
-      </div>
-      <mat-error *ngIf="proyectoForm.get('porcentajeAvance')?.hasError('rangoInvalido')">
-        El porcentaje debe estar entre 0 y 100.
-      </mat-error>
-      <mat-error
-        *ngIf="proyectoForm.get('porcentajeAvance')?.touched && proyectoForm.get('porcentajeAvance')?.hasError('required')">
-        Este campo es obligatorio.
-      </mat-error> -->
-     
-    
+
+
 
     </div>
 

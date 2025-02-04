@@ -127,9 +127,7 @@ cargarProyectos(): void {
         console.log(response);
 
         // Actualiza la lista de proyectos (opcional)
-        this.proyectos = this.proyectos.filter(
-          (proyecto) => proyecto.idProyecto !== idProyecto
-        );
+        this.cargarProyectos()
       },
       error: (error) => {
         console.error('Error al eliminar el proyecto:', error);

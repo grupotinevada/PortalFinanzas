@@ -20,6 +20,9 @@
   <button mat-icon-button class="text-secondary my-2" (click)="iraMiperfil()" matTooltip="Mi perfil" title="Mi perfil">
     <mat-icon>account_box</mat-icon>
   </button>
+  <button mat-icon-button class="text-secondary my-2" (click)="iraAprobaciones()" matTooltip="Aprobaciones" title="Aprobaciones">
+    <mat-icon>check_circle</mat-icon>
+  </button>
 
   <button mat-icon-button class="text-secondary my-2" (click)="cerrarSesion()" matTooltip="Cerrar sesión" title="Cerrar sesión">
     <mat-icon>logout</mat-icon>
@@ -62,6 +65,11 @@
           </button>
         </li>
       </div>
+      <li class="my-2">
+        <button mat-icon-button class="text-dark w-100 text-start d-flex align-items-center" (click)="iraAprobaciones()">
+          <mat-icon class="me-2">check_circle</mat-icon> <span>Aprobaciones</span>
+        </button>
+      </li>      
       <li class="nav-item my-2">
         <button mat-icon-button class="text-dark w-100 text-start d-flex align-items-center" (click)="iraMiperfil()">
           <mat-icon class="me-2">account_box</mat-icon> <span>Mi Perfil</span>

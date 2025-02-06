@@ -32,7 +32,7 @@ const logger = createLogger({
         new transports.File({
             filename: 'logs/app.log',
             maxsize: 5 * 1024 * 1024, // 5 MB
-            // maxFiles: 5, // Mantiene un máximo de 5 archivos o más
+           // maxFiles: 5, // Mantiene un máximo de 5 archivos o más
         }),
     ],
 });
@@ -214,7 +214,7 @@ const authenticateToken = (req, res, next) => {
 // Configuración de Multer para guardar archivos en la carpeta "archivos"
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, 'archivos')); // Carpeta local "archivos"
+        cb(null, path.join(__dirname,'archivos')); // Carpeta local "archivos"
     },
     filename: function (req, file, cb) {
         // Usamos solo el nombre original del archivo
@@ -411,7 +411,7 @@ app.get('/api/archivos/:id', (req, res) => {
 // GET /api/archivos/:idproyecto - Obtener archivos por proyecto
 app.get('/api/archivos/:idproyecto', (req, res) => {
     const { idproyecto } = req.params;
-
+    
     const query = `
         SELECT idarchivo, idproyecto, idarea, idusuario, 
                nombre AS nombre_completo, ruta, fechacreacion
@@ -578,10 +578,24 @@ app.get('/proyecto/usuario/:idUsuario', (req, res) => {
 });
 
 
+// Configuración de Nodemailer
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
 
 // Endpoint para solicitar un cambio en un proyecto
 app.put('/proyecto/:id/solicitud', (req, res) => {
     const idProyecto = req.params.id;
+
+    //console.log('🔹 ID Proyecto recibido:', idProyecto);
+    //console.log('🔹 Body recibido en Node:', req.body);
+
     const {
         nombre,
         descripcion,
@@ -589,16 +603,22 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
         fechaFin,
         fechaReal,
         porcentajeAvance,
-        idUsuario, // Solicitante
+        idSolicitante,
         idArea,
         idEstado,
-        descripcionAprobacion // Justificación del cambio
+        descripcionAprobacion
     } = req.body;
 
-    // Verificar si el proyecto existe
+    //console.log('🔹 idSolicitante extraído del body:', idSolicitante);
+
+    if (!idSolicitante) {
+        console.error('⚠️ ERROR: idSolicitante no recibido en el backend.');
+        return res.status(400).json({ success: false, message: 'El idSolicitante es requerido' });
+    }
+
     pool.query('SELECT * FROM PROYECTO WHERE idProyecto = ?', [idProyecto], (err, results) => {
         if (err) {
-            console.error('Error al obtener proyecto:', err);
+            console.error('⚠️ Error al obtener proyecto:', err);
             return res.status(500).json({ success: false, message: 'Error al obtener proyecto' });
         }
 
@@ -606,25 +626,99 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
             return res.status(404).json({ success: false, message: 'Proyecto no encontrado' });
         }
 
-        // Insertar la solicitud de cambio en APROBACION
+        //console.log('✅ Proyecto encontrado, insertando solicitud...');
+
         const insertQuery = `
-        INSERT INTO APROBACION (
-            idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal, 
-            porcentajeAvance, idSolicitante, idArea, idEstado, idEstadoSolicitud, 
-            descripcionCambio
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-    `;
+            INSERT INTO APROBACION (
+                idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal, 
+                porcentajeAvance, idSolicitante, idArea, idEstado, idEstadoSolicitud, 
+                descripcionAprobacion
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        `;
 
         pool.query(insertQuery, [
             idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal,
-            porcentajeAvance, idUsuario, idArea, idEstado, 3, // Estado inicial de la solicitud (pendiente)
+            porcentajeAvance, idSolicitante, idArea, idEstado, 3, // Estado inicial de la solicitud
             descripcionAprobacion
         ], (err) => {
             if (err) {
-                console.error('Error al registrar solicitud:', err);
+                console.error('⚠️ Error al registrar solicitud:', err);
                 return res.status(500).json({ success: false, message: 'Error al registrar solicitud' });
             }
-            res.json({ success: true, message: 'Solicitud de cambio registrada. Esperando aprobación.' });
+
+            //console.log('✅ Solicitud insertada correctamente en la BD');
+
+            // Obtener el correo del solicitante
+            pool.query('SELECT correo FROM USUARIO WHERE idUsuario = ?', [idSolicitante], (err, results) => {
+                if (err) {
+                    console.error('⚠️ Error al obtener correo del usuario:', err);
+                    return res.status(500).json({ success: false, message: 'Error al obtener correo del usuario' });
+                }
+
+                if (results.length === 0) {
+                    return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+                }
+
+                const correoSolicitante = results[0].correo;
+                //console.log('📧 Correo del solicitante:', correoSolicitante);
+
+                // Obtener correos de todos los administradores (idRol = 1)
+                pool.query('SELECT correo FROM USUARIO WHERE idRol = 1', (err, adminResults) => {
+                    if (err) {
+                        console.error('⚠️ Error al obtener correos de administradores:', err);
+                        return res.status(500).json({ success: false, message: 'Error al obtener correos de administradores' });
+                    }
+
+                    if (adminResults.length === 0) {
+                        console.warn('⚠️ No hay administradores registrados en la BD.');
+                    }
+
+                    // Extraer los correos de los administradores
+                    const correosAdmins = adminResults.map(row => row.correo);
+                    //console.log('📧 Correos de administradores:', correosAdmins);
+
+                    // Crear el correo para el solicitante
+                    const mailOptionsSolicitante = {
+                        from: '"PortalFinanzas" <noreply@inevada.cl>',
+                        to: correoSolicitante,
+                        subject: 'Solicitud de Cambio en Proyecto',
+                        text: `Tu solicitud de cambio para el proyecto "${nombre}" ha sido registrada y está pendiente de aprobación.`,
+                        html: `<p>Tu solicitud de cambio para el proyecto "<b>${nombre}</b>" ha sido registrada y está <b>pendiente de aprobación</b>.</p>`
+                    };
+
+                    // Enviar correo al solicitante
+                    transporter.sendMail(mailOptionsSolicitante, (err, info) => {
+                        if (err) {
+                            console.error('⚠️ Error al enviar correo al solicitante:', err);
+                        } else {
+                            //console.log('✅ Correo enviado al solicitante:', info.response);
+                        }
+                    });
+
+                    // Crear el correo para los administradores
+                    if (correosAdmins.length > 0) {
+                        const mailOptionsAdmins = {
+                            from: '"PortalFinanzas" <noreply@inevada.cl>',
+                            to: correosAdmins.join(','), // Enviar a todos los administradores
+                            subject: 'Nueva Solicitud de Cambio en Proyecto',
+                            text: `Se ha registrado una nueva solicitud de cambio en el proyecto "${nombre}". Por favor, revisarla y aprobar o rechazar según corresponda.`,
+                            html: `<p>Se ha registrado una nueva solicitud de cambio en el proyecto "<b>${nombre}</b>".</p>
+                                   <p>Por favor, revisarla y aprobar o rechazar según corresponda.</p>`
+                        };
+
+                        // Enviar correo a los administradores
+                        transporter.sendMail(mailOptionsAdmins, (err, info) => {
+                            if (err) {
+                                console.error('⚠️ Error al enviar correo a administradores:', err);
+                            } else {
+                                //console.log('✅ Correo enviado a administradores:', info.response);
+                            }
+                        });
+                    }
+
+                    res.json({ success: true, message: 'Solicitud de cambio registrada y correos enviados.' });
+                });
+            });
         });
     });
 });
@@ -658,7 +752,7 @@ app.put('/aprobacion/:id', (req, res) => {
             `;
 
             pool.query(updateQuery, [
-                solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio,
+                solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio, 
                 solicitud.fechaFin, solicitud.fechaReal, solicitud.porcentajeAvance,
                 solicitud.idArea, solicitud.idEstado, solicitud.idProyecto
             ], (err) => {
@@ -721,6 +815,60 @@ app.put('/aprobacion/:id', (req, res) => {
         }
     });
 });
+
+
+// Endpoint para obtener las solicitudes pendientes con comparación de cambios
+app.get('/solicitudes/cambios', (req, res) => {
+    const query = `
+        SELECT 
+            A.idAprobacion,
+            U.nombre AS nombreSolicitante,
+            A.fechaSolicitud,
+            A.descripcionAprobacion AS descripcionSolicitud,
+            A.idEstadoSolicitud,
+            E.nombre AS estadoSolicitud,
+            P.* AS proyectoOriginal,
+            A.* AS aprobacion
+        FROM APROBACION A
+        JOIN USUARIO U ON A.idSolicitante = U.idUsuario
+        JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
+        JOIN PROYECTO P ON A.idProyecto = P.idProyecto
+        WHERE A.idEstadoSolicitud = 3
+    `;
+
+    pool.query(query, (err, results) => {
+        if (err) {
+            console.error('Error al obtener solicitudes:', err);
+            return res.status(500).json({ success: false, message: 'Error al obtener solicitudes' });
+        }
+
+        const solicitudes = results.map((row) => {
+            const cambios = {};
+            const camposAComparar = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance'];
+
+            camposAComparar.forEach((campo) => {
+                if (row[`P.${campo}`] !== row[`A.${campo}`]) {
+                    cambios[campo] = {
+                        anterior: row[`P.${campo}`],
+                        nuevo: row[`A.${campo}`]
+                    };
+                }
+            });
+
+            return {
+                nombreSolicitante: row.nombreSolicitante,
+                fechaSolicitud: row.fechaSolicitud,
+                descripcionSolicitud: row.descripcionSolicitud,
+                cambios,
+                estadoSolicitud: row.estadoSolicitud
+            };
+        });
+
+        res.json(solicitudes);
+    });
+});
+
+
 
 
 // Endpoint para obtener el historial de cambios
@@ -1406,8 +1554,8 @@ app.post('/usuarios', (req, res) => {
                     return res.status(500).json({ error: 'Error al crear el usuario' });
                 }
 
-                res.status(201).json({
-                    message: 'Usuario creado con éxito',
+                res.status(201).json({ 
+                    message: 'Usuario creado con éxito', 
                     usuario: { nombre, correo, idRol, idArea }
                 });
             });
@@ -1610,12 +1758,12 @@ app.post('/login', (req, res) => {
                 logger.warn(`Contraseña incorrecta para el correo: ${correo}`, { timestamp: new Date() });
                 return res.status(401).json({ message: 'Credenciales inválidas' });
             }
-
+        
             const sessionToken = sessionManager.createSession(
                 usuario.idUsuario,
                 deviceInfo || 'Unknown Device'
             );
-
+        
             const token = jwt.sign(
                 {
                     id: usuario.idUsuario,
@@ -1628,14 +1776,14 @@ app.post('/login', (req, res) => {
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
-
+        
             // Log con el nombre, correo y dispositivo
             logger.info(`Inicio de sesión exitoso para el usuario`, {
                 userName: usuario.nombre,
                 userEmail: usuario.correo,
                 deviceInfo: deviceInfo || 'Unknown Device'
             });
-
+        
             res.status(200).json({
                 message: 'Inicio de sesión exitoso',
                 token,
@@ -1673,10 +1821,10 @@ app.get('/active-sessions', authenticateToken, (req, res) => {
 });
 
 // Inicio del servidor en el puerto definido en variables de entorno
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-
-
-
+    
+    
+    
 });

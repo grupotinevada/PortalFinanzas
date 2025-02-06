@@ -32,7 +32,7 @@ const logger = createLogger({
         new transports.File({
             filename: 'logs/app.log',
             maxsize: 5 * 1024 * 1024, // 5 MB
-           // maxFiles: 5, // Mantiene un máximo de 5 archivos o más
+            // maxFiles: 5, // Mantiene un máximo de 5 archivos o más
         }),
     ],
 });
@@ -214,7 +214,7 @@ const authenticateToken = (req, res, next) => {
 // Configuración de Multer para guardar archivos en la carpeta "archivos"
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname,'archivos')); // Carpeta local "archivos"
+        cb(null, path.join(__dirname, 'archivos')); // Carpeta local "archivos"
     },
     filename: function (req, file, cb) {
         // Usamos solo el nombre original del archivo
@@ -411,7 +411,7 @@ app.get('/api/archivos/:id', (req, res) => {
 // GET /api/archivos/:idproyecto - Obtener archivos por proyecto
 app.get('/api/archivos/:idproyecto', (req, res) => {
     const { idproyecto } = req.params;
-    
+
     const query = `
         SELECT idarchivo, idproyecto, idarea, idusuario, 
                nombre AS nombre_completo, ruta, fechacreacion
@@ -579,8 +579,8 @@ app.get('/proyecto/usuario/:idUsuario', (req, res) => {
 
 
 
-// Endpoint para modificar un proyecto por id
-app.put('/proyecto/:id', (req, res) => {
+// Endpoint para solicitar un cambio en un proyecto
+app.put('/proyecto/:id/solicitud', (req, res) => {
     const idProyecto = req.params.id;
     const {
         nombre,
@@ -589,68 +589,139 @@ app.put('/proyecto/:id', (req, res) => {
         fechaFin,
         fechaReal,
         porcentajeAvance,
-        idUsuario,
+        idUsuario, // Solicitante
         idArea,
-        idEstado
+        idEstado,
+        descripcionAprobacion // Justificación del cambio
     } = req.body;
 
-    // Obtener los valores actuales del proyecto
+    // Verificar si el proyecto existe
     pool.query('SELECT * FROM PROYECTO WHERE idProyecto = ?', [idProyecto], (err, results) => {
         if (err) {
             console.error('Error al obtener proyecto:', err);
             return res.status(500).json({ success: false, message: 'Error al obtener proyecto' });
         }
 
-        const proyectoAnterior = results[0];
-        if (!proyectoAnterior) {
+        if (results.length === 0) {
             return res.status(404).json({ success: false, message: 'Proyecto no encontrado' });
         }
 
-        // Actualizar el proyecto
-        const queryUpdate = `
-            UPDATE PROYECTO
-            SET nombre = ?, descripcion = ?, fechaInicio = ?, fechaFin = ?, fechaReal = ?, 
-                porcentajeAvance = ?, idUsuario = ?, idArea = ?, idEstado = ?
-            WHERE idProyecto = ?;
-        `;
+        // Insertar la solicitud de cambio en APROBACION
+        const insertQuery = `
+        INSERT INTO APROBACION (
+            idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal, 
+            porcentajeAvance, idSolicitante, idArea, idEstado, idEstadoSolicitud, 
+            descripcionCambio
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    `;
 
-        pool.query(queryUpdate, [
-            nombre, descripcion, fechaInicio, fechaFin, fechaReal,
-            porcentajeAvance, idUsuario, idArea, idEstado, idProyecto
+        pool.query(insertQuery, [
+            idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal,
+            porcentajeAvance, idUsuario, idArea, idEstado, 3, // Estado inicial de la solicitud (pendiente)
+            descripcionAprobacion
         ], (err) => {
             if (err) {
-                console.error('Error al actualizar proyecto:', err);
-                return res.status(500).json({ success: false, message: 'Error al actualizar proyecto' });
+                console.error('Error al registrar solicitud:', err);
+                return res.status(500).json({ success: false, message: 'Error al registrar solicitud' });
             }
-
-            // Registrar los cambios en logProyecto
-            const detalles = JSON.stringify({
-                nombre: { anterior: proyectoAnterior.nombre, nuevo: nombre },
-                descripcion: { anterior: proyectoAnterior.descripcion, nuevo: descripcion },
-                fechaInicio: { anterior: proyectoAnterior.fechaInicio, nuevo: fechaInicio },
-                fechaFin: { anterior: proyectoAnterior.fechaFin, nuevo: fechaFin },
-                fechaReal: { anterior: proyectoAnterior.fechaReal, nuevo: fechaReal },
-                porcentajeAvance: { anterior: proyectoAnterior.porcentajeAvance, nuevo: porcentajeAvance },
-                idArea: { anterior: proyectoAnterior.idArea, nuevo: idArea },
-                idEstado: { anterior: proyectoAnterior.idEstado, nuevo: idEstado }
-            });
-
-            const logQuery = `
-                INSERT INTO LOG_PROYECTO (idProyecto, idUsuario, accion, detalles) 
-                VALUES (?, ?, 'UPDATE', ?);
-            `;
-
-            pool.query(logQuery, [idProyecto, idUsuario, detalles], (err) => {
-                if (err) {
-                    console.error('Error al registrar log:', err);
-                    return res.status(500).json({ success: false, message: 'Error al registrar log' });
-                }
-
-                res.json({ success: true, message: 'Proyecto actualizado y log registrado' });
-            });
+            res.json({ success: true, message: 'Solicitud de cambio registrada. Esperando aprobación.' });
         });
     });
 });
+
+
+// Endpoint para aprobar o rechazar una solicitud de cambio
+app.put('/aprobacion/:id', (req, res) => {
+    const idAprobacion = req.params.id;
+    const { idAprobador, estadoSolicitud } = req.body; // estadoSolicitud: 2 (Aprobado), 3 (Rechazado)
+
+    // Obtener la solicitud pendiente
+    pool.query('SELECT * FROM APROBACION WHERE idAprobacion = ?', [idAprobacion], (err, results) => {
+        if (err) {
+            console.error('Error al obtener solicitud:', err);
+            return res.status(500).json({ success: false, message: 'Error al obtener solicitud' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
+        }
+
+        const solicitud = results[0];
+
+        // Si se aprueba, actualizar la tabla PROYECTO
+        if (estadoSolicitud === 2) { // Aprobado
+            const updateQuery = `
+                UPDATE PROYECTO
+                SET nombre = ?, descripcion = ?, fechaInicio = ?, fechaFin = ?, fechaReal = ?, 
+                    porcentajeAvance = ?, idArea = ?, idEstado = ?
+                WHERE idProyecto = ?;
+            `;
+
+            pool.query(updateQuery, [
+                solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio,
+                solicitud.fechaFin, solicitud.fechaReal, solicitud.porcentajeAvance,
+                solicitud.idArea, solicitud.idEstado, solicitud.idProyecto
+            ], (err) => {
+                if (err) {
+                    console.error('Error al actualizar proyecto:', err);
+                    return res.status(500).json({ success: false, message: 'Error al actualizar proyecto' });
+                }
+
+                // Registrar en LOG_PROYECTO
+                const detalles = JSON.stringify({
+                    nombre: solicitud.nombre,
+                    descripcion: solicitud.descripcion,
+                    fechaInicio: solicitud.fechaInicio,
+                    fechaFin: solicitud.fechaFin,
+                    fechaReal: solicitud.fechaReal,
+                    porcentajeAvance: solicitud.porcentajeAvance,
+                    idArea: solicitud.idArea,
+                    idEstado: solicitud.idEstado
+                });
+
+                const logQuery = `
+                    INSERT INTO LOG_PROYECTO (idProyecto, idUsuario, accion, detalles) 
+                    VALUES (?, ?, 'APROBADO', ?);
+                `;
+
+                pool.query(logQuery, [solicitud.idProyecto, idAprobador, detalles], (err) => {
+                    if (err) {
+                        console.error('Error al registrar log:', err);
+                        return res.status(500).json({ success: false, message: 'Error al registrar log' });
+                    }
+
+                    // Marcar la solicitud como aprobada
+                    const updateAprobacionQuery = `
+                        UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?;
+                    `;
+
+                    pool.query(updateAprobacionQuery, [idAprobador, estadoSolicitud, idAprobacion], (err) => {
+                        if (err) {
+                            console.error('Error al actualizar estado de aprobación:', err);
+                            return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
+                        }
+
+                        res.json({ success: true, message: 'Solicitud aprobada y cambios aplicados' });
+                    });
+                });
+            });
+        } else { // Rechazado
+            const updateAprobacionQuery = `
+                UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?;
+            `;
+
+            pool.query(updateAprobacionQuery, [idAprobador, estadoSolicitud, idAprobacion], (err) => {
+                if (err) {
+                    console.error('Error al actualizar estado de solicitud:', err);
+                    return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
+                }
+
+                res.json({ success: true, message: 'Solicitud rechazada' });
+            });
+        }
+    });
+});
+
 
 // Endpoint para obtener el historial de cambios
 app.get('/proyecto/:id/log', (req, res) => {
@@ -1335,8 +1406,8 @@ app.post('/usuarios', (req, res) => {
                     return res.status(500).json({ error: 'Error al crear el usuario' });
                 }
 
-                res.status(201).json({ 
-                    message: 'Usuario creado con éxito', 
+                res.status(201).json({
+                    message: 'Usuario creado con éxito',
                     usuario: { nombre, correo, idRol, idArea }
                 });
             });
@@ -1539,12 +1610,12 @@ app.post('/login', (req, res) => {
                 logger.warn(`Contraseña incorrecta para el correo: ${correo}`, { timestamp: new Date() });
                 return res.status(401).json({ message: 'Credenciales inválidas' });
             }
-        
+
             const sessionToken = sessionManager.createSession(
                 usuario.idUsuario,
                 deviceInfo || 'Unknown Device'
             );
-        
+
             const token = jwt.sign(
                 {
                     id: usuario.idUsuario,
@@ -1557,14 +1628,14 @@ app.post('/login', (req, res) => {
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
-        
+
             // Log con el nombre, correo y dispositivo
             logger.info(`Inicio de sesión exitoso para el usuario`, {
                 userName: usuario.nombre,
                 userEmail: usuario.correo,
                 deviceInfo: deviceInfo || 'Unknown Device'
             });
-        
+
             res.status(200).json({
                 message: 'Inicio de sesión exitoso',
                 token,
@@ -1605,7 +1676,7 @@ app.get('/active-sessions', authenticateToken, (req, res) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    
-    
-    
+
+
+
 });

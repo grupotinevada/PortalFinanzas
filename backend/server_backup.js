@@ -239,7 +239,7 @@ app.get('/uploads/:filename/:idProyecto', (req, res) => {
     // Consulta a la base de datos para recuperar el nombre original y la ruta, incluyendo el filtro por idProyecto
     const query = `
         SELECT ruta, nombre
-        FROM panel_control_dba.archivos_proyecto 
+        FROM panel_finanzas_dba.archivos_proyecto 
         WHERE nombre = ? AND idproyecto = ?
     `;
 

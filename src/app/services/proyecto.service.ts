@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
-
+import { AuthService } from './auth.service';
 
 
 export interface Proyecto {
@@ -51,7 +51,7 @@ export class ProyectoService {
   private proyectosSubject = new BehaviorSubject<Proyecto[]>([]);
   proyectos$ = this.proyectosSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   // Método para obtener la lista de proyectos
   getProyectos(): Observable<Proyecto[]> {
@@ -74,13 +74,35 @@ export class ProyectoService {
     return this.http.get<Proyecto[]>(url);
   }
 
+
+
+
+
   //metodo para modificar proyecto
-  updateProyecto(idProyecto: number, proyecto: any): Observable<any> {
-    const url = `${this.apiBase}/proyecto/${idProyecto}`;
-    return this.http.put(url, proyecto, {
-      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  // Solicitar cambio en un proyecto (Crea un registro en APROBACION)
+  solicitarCambioProyecto(idProyecto: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiBase}/proyecto/${idProyecto}/solicitud`, data);
+}
+  // Obtener solicitudes pendientes
+  obtenerSolicitudes() {
+    return this.http.get(`${this.apiBase}/solicitudes-pendientes`);
+  }
+  // Aprobar solicitud (Aplica cambios en PROYECTO y actualiza LOG)
+  aprobarSolicitud(idAprobacion: number, estadoSolicitud: number) {
+    return this.http.put(`/aprobacion/${idAprobacion}`, {
+      idAprobador: this.authService.getUsuarioId(),
+      estadoSolicitud: estadoSolicitud
     });
   }
+
+  // Rechazar solicitud (Solo actualiza el estado de la solicitud)
+  rechazarSolicitud(idSolicitud: number, idAprobador: number, motivo: string) {
+    return this.http.put(`${this.apiBase}/rechazar-solicitud/${idSolicitud}`, { idAprobador, motivo });
+  }
+
+
+
+
   //metodo para eliminar proyecto
   deleteProyecto(idProyecto: number): Observable<any> {
     return this.http.delete(`${this.apiBase}/proyectos/${idProyecto}`, { responseType: 'text' });

@@ -3,7 +3,7 @@
 
     <app-spinner [isLoading]="showSpinner"></app-spinner>
 
-    <form [formGroup]="proyectoForm" (ngSubmit)="editarProyecto()">
+    <form [formGroup]="proyectoForm" (ngSubmit)="enviarSolicitud()">
         <div class="form-grid">
             <!-- Nombre del proyecto -->
             <mat-form-field appearance="fill">
@@ -36,17 +36,17 @@
             </mat-form-field>
 
                   <!-- Campo Grupo (idArea) -->
-      <mat-form-field appearance="fill">
-        <mat-label>Grupo</mat-label>
-        <mat-select formControlName="idArea">
-          <mat-option *ngFor="let area of areas" [value]="area.idArea">
-            {{ area.descripcion }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="proyectoForm.get('idArea')?.touched && proyectoForm.get('idArea')?.hasError('required')">
-          Este campo es obligatorio.
-        </mat-error>
-      </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Grupo</mat-label>
+                <mat-select formControlName="idArea">
+                <mat-option *ngFor="let area of areas" [value]="area.idArea">
+                    {{ area.descripcion }}
+                </mat-option>
+                </mat-select>
+                <mat-error *ngIf="proyectoForm.get('idArea')?.touched && proyectoForm.get('idArea')?.hasError('required')">
+                Este campo es obligatorio.
+                </mat-error>
+            </mat-form-field>
       
             <!-- Fecha de inicio -->
             <mat-form-field appearance="fill">
@@ -81,6 +81,15 @@
                     La fecha de compromiso es obligatoria.
                 </mat-error>
             </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Descripción del cambio:</mat-label>
+                <textarea matInput id="descripcionCambio" formControlName="descripcionCambio"></textarea>
+                <mat-error *ngIf="proyectoForm.get('descripcionCambio')?.hasError('required')">
+                    <p>El minimo de caracteres es 10 y/o ingresa caracteres validos.</p>
+                </mat-error>
+            </mat-form-field>
+
 
 
             <div class="buttons">

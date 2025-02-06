@@ -22,6 +22,7 @@ export class EditarproyectodialogComponent implements OnInit {
   localFechaReal: string | null = null;
   areas: any[] = [];
   usuarioArea: number = 0;
+  fechaCreacion: Date | null = null;
 
   constructor(
     private dialogRef: MatDialogRef<EditarproyectodialogComponent>,
@@ -32,18 +33,22 @@ export class EditarproyectodialogComponent implements OnInit {
   ) {
     // Inicializar el formulario reactivo
     this.proyectoForm = this.fb.group({
+      idProyecto: [this.data.idProyecto, Validators.required],
       nombreProyecto: ['', [Validators.required, Validators.maxLength(30)]],
       descripcion: ['', [Validators.required, Validators.maxLength(30)]],
       fechaInicio: [null, Validators.required],
       fechaFin: [null, { validators: [], updateOn: 'blur' }],
       fechaReal: [null, Validators.required],
       porcentajeAvance: [0, [Validators.required]],
-      idUsuario: [this.authService.getUsuarioId(), Validators.required],
+      idSolicitante: [this.authService.getUsuarioId(), Validators.required],
+      idAprobador: [null],
       idArea: [{
         value: this.authService.getUsuario().idArea === 5 ? null : this.authService.getUsuario().idArea,
         disabled: this.authService.getUsuario().idArea !== 5
       }, Validators.required],
-      idEstado: ['', Validators.required]
+      idEstado: ['', Validators.required],
+      idEstadoSolicitud: [3, Validators.required],
+      descripcionCambio: ['', [Validators.required, Validators.maxLength(250), Validators.pattern('^[a-zA-Z0-9 ]+$'), Validators.minLength(10)]]
     });
   }
 
@@ -111,68 +116,72 @@ export class EditarproyectodialogComponent implements OnInit {
     );
   }
 
-  editarProyecto(): void { 
+  enviarSolicitud(): void {
     if (this.proyectoForm.valid) {
-      this.showSpinner = true;
-  
-      // Datos nuevos del formulario
-      const proyectoActualizado = this.proyectoForm.value;
-  
-    // Convertir las fechas a formato 'yyyy-MM-dd'
-    const fechas: Record<string, string | null> = {}; // Definimos un Record para fechas
-    ['fechaInicio', 'fechaReal', 'fechaFin'].forEach((key) => {
-      fechas[key] = proyectoActualizado[key] 
-        ? new Date(proyectoActualizado[key]).toISOString().split('T')[0] 
-        : null;
-    });
-  
-      // Armar el objeto para enviar al backend
-      const proyectoEnviado = {
-        ...proyectoActualizado,
-        nombre: proyectoActualizado.nombreProyecto, // Reemplazar 'nombreProyecto' por 'nombre'
-        ...fechas,
-      };
-  
-      // Eliminar campos innecesarios
-      delete proyectoEnviado.nombreProyecto;
-  
-    // Detectar cambios para registro (detallesCambios)
-    const detallesCambios: Record<string, { anterior: any, nuevo: any }> = {}; // Firma de índice para detallesCambios
-    for (const key in this.proyectoOriginal) {
-      if (this.proyectoOriginal[key] !== proyectoEnviado[key]) {
-        detallesCambios[key] = {
-          anterior: this.proyectoOriginal[key] || null,
-          nuevo: proyectoEnviado[key] || null,
+        this.showSpinner = true;
+
+        const solicitud = this.proyectoForm.getRawValue(); // Obtener valores incluso si están deshabilitados
+
+        // Convertir fechas al formato 'yyyy-MM-dd'
+        const fechas: Record<string, string | null> = {};
+        ['fechaInicio', 'fechaReal', 'fechaFin'].forEach((key) => {
+            fechas[key] = solicitud[key]
+                ? new Date(solicitud[key]).toISOString().split('T')[0]
+                : null;
+        });
+
+        // Armar el objeto para enviar al backend
+        const solicitudEnviada = {
+            ...solicitud,
+            nombre: solicitud.nombreProyecto,
+            ...fechas,
+            descripcionAprobacion: solicitud.descripcionCambio,
         };
-      }
-    }
-  
-      // Agregar cambios detectados al payload del backend
-      const payload = {
-        ...proyectoEnviado,
-        cambios: detallesCambios,
-      };
-  
-      //console.log('Datos enviados al backend:', payload);
-  
-      // Llamada al servicio para actualizar el proyecto
-      this.proyectoService.updateProyecto(this.data.idProyecto, payload).subscribe(
-        (response) => {
-          //console.log('Proyecto actualizado exitosamente', response);
-          this.showSpinner = false;
-          this.dialogRef.close(response); // Cerrar el diálogo y pasar el resultado
-        },
-        (error) => {
-          console.error('Error al actualizar proyecto', error);
-          this.showSpinner = false;
+
+        // Eliminar campos innecesarios
+        delete solicitudEnviada.nombreProyecto;
+        delete solicitudEnviada.descripcionCambio;
+
+        // Detectar cambios para registro (detallesCambios)
+        const detallesCambios: Record<string, { anterior: any, nuevo: any }> = {};
+        for (const key in this.proyectoOriginal) {
+            if (this.proyectoOriginal[key] !== solicitudEnviada[key]) {
+                detallesCambios[key] = {
+                    anterior: this.proyectoOriginal[key] || null,
+                    nuevo: solicitudEnviada[key] || null,
+                };
+            }
         }
-      );
+
+        // Agregar cambios detectados al payload del backend
+        const payload = {
+            ...solicitudEnviada,
+            cambios: detallesCambios,
+        };
+
+        if (!this.data.idProyecto) {
+            console.error('Error: idProyecto es undefined');
+            this.showSpinner = false;
+            return;
+        }
+
+        // Llamada al servicio para enviar la solicitud
+        this.proyectoService.solicitarCambioProyecto(this.data.idProyecto, payload).subscribe(
+            (response) => {
+                this.showSpinner = false;
+                this.dialogRef.close(response);
+            },
+            (error) => {
+                console.error('Error al enviar solicitud', error);
+                this.showSpinner = false;
+            }
+        );
     } else {
-      //console.log('Formulario inválido');
-      this.mostrarAlerta();
+        this.mostrarAlerta();
+        console.log(this.proyectoForm.value);
     }
-  }
-  
+}
+
 
   onCancel(): void {
     this.dialogRef.close(false);

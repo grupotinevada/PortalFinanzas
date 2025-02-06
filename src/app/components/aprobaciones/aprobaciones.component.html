@@ -1,0 +1,58 @@
+<div class="container">
+    <h2>Solicitudes de Cambios</h2>
+  
+    <!-- Tabla de solicitudes -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Usuario Solicitante</th>
+          <th>Cambio Solicitado</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let solicitud of solicitudes">
+          <td>{{ solicitud.usuarioSolicitante }}</td>
+          <td>{{ solicitud.cambioSolicitado }}</td>
+          <td>{{ solicitud.descripcion }}</td>
+          <td>{{ solicitud.estado }}</td>
+          <td>
+            <div *ngIf="esAdministrador()">
+              <button
+                class="btn btn-success"
+                [disabled]="solicitud.estado !== 'pendiente'"
+                (click)="abrirPopup(solicitud, 'aprobar')"
+              >
+                Aprobar
+              </button>
+              <button
+                class="btn btn-danger"
+                [disabled]="solicitud.estado !== 'pendiente'"
+                (click)="abrirPopup(solicitud, 'rechazar')"
+              >
+                Rechazar
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Popup de confirmación -->
+    <div class="popup" *ngIf="solicitudSeleccionada">
+      <div class="popup-content">
+        <h3>Confirmar Acción</h3>
+        <p>
+          ¿Estás seguro de que deseas
+          <strong>{{ accion === 'aprobar' ? 'aprobar' : 'rechazar' }}</strong> la
+          solicitud de {{ solicitudSeleccionada.usuarioSolicitante }}?
+        </p>
+        <div class="popup-buttons">
+          <button class="btn btn-primary" (click)="confirmarAccion()">Confirmar</button>
+          <button class="btn btn-secondary" (click)="cerrarPopup()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>

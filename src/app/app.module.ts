@@ -46,6 +46,7 @@ import { EditarusuarioComponent } from './components/editarusuario/editarusuario
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FiltroComponent } from './components/filtro/filtro.component';
 import { MiperfilComponent } from './components/miperfil/miperfil.component';
+import { AprobacionesComponent } from './components/aprobaciones/aprobaciones.component';
 
 
 registerLocaleData(localeEsCl, 'es-CL');
@@ -84,6 +85,7 @@ export const MY_DATE_FORMATS = {
     EditarusuarioComponent,
     FiltroComponent,
     MiperfilComponent,
+    AprobacionesComponent,
   ],
   imports: [
     MatProgressSpinnerModule,

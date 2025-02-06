@@ -51,7 +51,13 @@ export class SidebarComponent {
   iraAdmin(): void {
     this.router.navigate(['/admin']);
   }
+
   iraMiperfil(): void {
     this.router.navigate(['/miperfil']);
   }
+  
+  iraAprobaciones() {
+    this.router.navigate(['/aprobaciones']);
+  }
+  
 }

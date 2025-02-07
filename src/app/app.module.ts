@@ -75,6 +75,8 @@ export const MY_DATE_FORMATS = {
     SpinnerComponent,
     SidebarComponent,
     TareasComponent,
+
+    
     EditarproyectodialogComponent,
     HistorialCambiosDialogComponent,
 

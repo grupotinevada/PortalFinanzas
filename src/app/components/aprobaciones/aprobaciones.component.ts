@@ -1,30 +1,47 @@
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {MatButtonModule} from '@angular/material/button';
-import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import { Component, OnInit} from '@angular/core';
+import { ProyectoService } from '../../services/proyecto.service';
+
 
 @Component({
   selector: 'app-aprobaciones',
   templateUrl: './aprobaciones.component.html',
   styleUrls: ['./aprobaciones.component.css']
 })
-export class AprobacionesComponent {
+
+
+
+
+
+export class AprobacionesComponent implements OnInit{
   // Placeholder para las solicitudes (simulando datos desde un endpoint)
-  solicitudes = [
-    {
-      id: 1,
-      usuarioSolicitante: 'Juan Pérez',
-      cambioSolicitado: 'Fecha de inicio',
-      descripcion: 'Cambio de fecha debido a retraso en recursos.',
-      estado: 'pendiente' // Estados posibles: 'pendiente', 'aprobado', 'rechazado'
-    },
-    {
-      id: 2,
-      usuarioSolicitante: 'María López',
-      cambioSolicitado: 'Fecha de fin',
-      descripcion: 'Extensión del proyecto por falta de personal.',
-      estado: 'pendiente'
-    }
-  ];
+  showSpinner = false;
+  constructor(private proyectoService: ProyectoService){}
+  solicitudes: any[] = [];
+
+  
+  ngOnInit(): void {
+    this.obtenerSolicitudes();
+  }
+  
+  obtenerSolicitudes(): void {
+    this.showSpinner = true;
+    this.proyectoService.obtenerCambiosSolicitudes().subscribe(
+      (response) => {
+        this.solicitudes = response.cambios;
+        this.showSpinner = false;
+      },
+      (error) => {
+        console.error('Error al obtener solicitudes:', error);
+        this.showSpinner = false;
+      }
+    );
+  }
+  getKeys(obj: any): string[] {
+    return obj ? Object.keys(obj) : [];
+  }
+
+
+
 
   // Variables para el popup
   solicitudSeleccionada: any = null;

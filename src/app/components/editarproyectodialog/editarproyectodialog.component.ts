@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProyectoService, Proyecto } from '../../services/proyecto.service';
 import { AuthService } from '../../services/auth.service';
+import { response } from 'express';
 
 
 
@@ -158,6 +159,7 @@ export class EditarproyectodialogComponent implements OnInit {
             ...solicitudEnviada,
             cambios: detallesCambios,
         };
+        console.log(payload)
 
         if (!this.data.idProyecto) {
             console.error('Error: idProyecto es undefined');
@@ -174,7 +176,8 @@ export class EditarproyectodialogComponent implements OnInit {
             (error) => {
                 console.error('Error al enviar solicitud', error);
                 this.showSpinner = false;
-            }
+                
+              }
         );
     } else {
         this.mostrarAlerta();

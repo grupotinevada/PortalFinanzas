@@ -84,8 +84,8 @@ export class ProyectoService {
     return this.http.put(`${this.apiBase}/proyecto/${idProyecto}/solicitud`, data);
 }
   // Obtener solicitudes pendientes
-  obtenerSolicitudes() {
-    return this.http.get(`${this.apiBase}/solicitudes-pendientes`);
+  obtenerCambiosSolicitudes(): Observable<any> {
+    return this.http.get(`${this.apiBase}/solicitudes/cambios`);
   }
   // Aprobar solicitud (Aplica cambios en PROYECTO y actualiza LOG)
   aprobarSolicitud(idAprobacion: number, estadoSolicitud: number) {

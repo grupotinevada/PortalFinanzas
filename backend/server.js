@@ -722,6 +722,57 @@ app.put('/aprobacion/:id', (req, res) => {
     });
 });
 
+// Endpoint para obtener las solicitudes pendientes con comparación de cambios
+app.get('/solicitudes/cambios', (req, res) => {
+    const query = `
+        SELECT 
+            A.idAprobacion,
+            U.nombre AS nombreSolicitante,
+            A.fechaSolicitud,
+            A.descripcionAprobacion AS descripcionSolicitud,
+            A.idEstadoSolicitud,
+            E.nombre AS estadoSolicitud,
+            P.* AS proyectoOriginal,
+            A.* AS aprobacion
+        FROM APROBACION A
+        JOIN USUARIO U ON A.idSolicitante = U.idUsuario
+        JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
+        JOIN PROYECTO P ON A.idProyecto = P.idProyecto
+        WHERE A.idEstadoSolicitud = 3
+    `;
+
+    pool.query(query, (err, results) => {
+        if (err) {
+            console.error('Error al obtener solicitudes:', err);
+            return res.status(500).json({ success: false, message: 'Error al obtener solicitudes' });
+        }
+
+        const solicitudes = results.map((row) => {
+            const cambios = {};
+            const camposAComparar = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance'];
+
+            camposAComparar.forEach((campo) => {
+                if (row[`P.${campo}`] !== row[`A.${campo}`]) {
+                    cambios[campo] = {
+                        anterior: row[`P.${campo}`],
+                        nuevo: row[`A.${campo}`]
+                    };
+                }
+            });
+
+            return {
+                nombreSolicitante: row.nombreSolicitante,
+                fechaSolicitud: row.fechaSolicitud,
+                descripcionSolicitud: row.descripcionSolicitud,
+                cambios,
+                estadoSolicitud: row.estadoSolicitud
+            };
+        });
+
+        res.json(solicitudes);
+    });
+});
+
 
 // Endpoint para obtener el historial de cambios
 app.get('/proyecto/:id/log', (req, res) => {

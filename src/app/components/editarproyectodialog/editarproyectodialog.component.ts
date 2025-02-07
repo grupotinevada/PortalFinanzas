@@ -161,6 +161,8 @@ export class EditarproyectodialogComponent implements OnInit {
         };
         console.log(payload)
 
+        console.log(payload);
+
         if (!this.data.idProyecto) {
             console.error('Error: idProyecto es undefined');
             this.showSpinner = false;

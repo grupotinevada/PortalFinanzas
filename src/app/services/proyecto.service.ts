@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 
 
 export interface Proyecto {
+  habilitado: number;
   idProyecto: number;
   nombreProyecto: string;
   descripcion: string;
@@ -107,6 +108,12 @@ export class ProyectoService {
   deleteProyecto(idProyecto: number): Observable<any> {
     return this.http.delete(`${this.apiBase}/proyectos/${idProyecto}`, { responseType: 'text' });
   }
+
+  // Método para deshabilitar un proyecto (en lugar de eliminarlo)
+  deshabilitarProyecto(idProyecto: number): Observable<any> {
+    return this.http.put(`${this.apiBase}/proyectos/deshabilitar/${idProyecto}`, {}, { responseType: 'text' });
+  }
+
 
   //metodo para agregar proyecto
   addProyecto(proyecto: Partial<Proyecto>): Observable<any> {

@@ -589,6 +589,13 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+const APP_URL = process.env.NODE_ENV === 'production' 
+    ? process.env.APP_URL_PROD 
+    : process.env.APP_URL_DEV;
+
+const linkAprobaciones = `${APP_URL}/aprobaciones`;
+
+
 // Endpoint para solicitar un cambio en un proyecto
 app.put('/proyecto/:id/solicitud', (req, res) => {
     const idProyecto = req.params.id;
@@ -683,7 +690,11 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                         to: correoSolicitante,
                         subject: 'Solicitud de Cambio en Proyecto',
                         text: `Tu solicitud de cambio para el proyecto "${nombre}" ha sido registrada y está pendiente de aprobación.`,
-                        html: `<p>Tu solicitud de cambio para el proyecto "<b>${nombre}</b>" ha sido registrada y está <b>pendiente de aprobación</b>.</p>`
+                        html: `
+                        <p>Tu solicitud de cambio para el proyecto "<b>${nombre}</b>" ha sido registrada y está <b>pendiente de aprobación</b>.</p>
+                        <p>Puedes revisar el estado de tu solicitud en el siguiente enlace:</p>
+                        <p><a href="${linkAprobaciones}" target="_blank">${linkAprobaciones}</a></p>
+                    `
                     };
 
                     // Enviar correo al solicitante
@@ -702,8 +713,12 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                             to: correosAdmins.join(','), // Enviar a todos los administradores
                             subject: 'Nueva Solicitud de Cambio en Proyecto',
                             text: `Se ha registrado una nueva solicitud de cambio en el proyecto "${nombre}". Por favor, revisarla y aprobar o rechazar según corresponda.`,
-                            html: `<p>Se ha registrado una nueva solicitud de cambio en el proyecto "<b>${nombre}</b>".</p>
-                                   <p>Por favor, revisarla y aprobar o rechazar según corresponda.</p>`
+                            html: `
+                            <p>Se ha registrado una nueva solicitud de cambio en el proyecto "<b>${nombre}</b>".</p>
+                            <p>Por favor, revisarla y aprobar o rechazar según corresponda.</p>
+                            <p>Accede directamente desde el siguiente enlace:</p>
+                            <p><a href="${linkAprobaciones}" target="_blank">${linkAprobaciones}</a></p>
+                        `
                         };
 
                         // Enviar correo a los administradores
@@ -1094,6 +1109,7 @@ app.get('/proyectos-completos', (req, res) => {
             p.porcentajeAvance,
             p.fechaCreacion,
             p.fechaModificacion,
+            p.habilitado
             u.idUsuario,
             u.nombre AS nombreUsuario,
             u.correo AS correoUsuario,
@@ -1775,6 +1791,29 @@ app.delete('/proyectos/:idProyecto', (req, res) => {
                     }
                 }
             );
+        }
+    );
+});
+
+// Endpoint para deshabilitar un proyecto (en lugar de eliminarlo)
+app.put('/proyectos/deshabilitar/:idProyecto', (req, res) => {
+    const idProyecto = req.params.idProyecto;
+
+    pool.query(
+        'UPDATE PROYECTO SET habilitado = 0 WHERE idProyecto = ?',
+        [idProyecto],
+        (err, resultado) => {
+            if (err) {
+                console.error('Error al deshabilitar el proyecto:', err);
+                return res.status(500).send({ message: 'Error al deshabilitar el proyecto' });
+            }
+
+            if (resultado.affectedRows === 0) {
+                return res.status(404).send({ message: 'Proyecto no encontrado' });
+            }
+
+            console.log(`Proyecto ${idProyecto} deshabilitado exitosamente`);
+            res.status(200).send({ message: 'Proyecto deshabilitado exitosamente' });
         }
     );
 });

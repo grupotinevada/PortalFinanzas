@@ -20,7 +20,7 @@ import { FiltroComponent } from '../filtro/filtro.component';
 
 
 export class ProyectoComponent {
-  
+  todosLosProyectos: Proyecto[] = []; // Aquí almacenamos todos los proyectos sin filtrar
   showSpinner: boolean = false;
   proyectos: Proyecto[] = [];
   area: string = '';
@@ -71,22 +71,24 @@ asignarArea() {
 cargarProyectos(): void {
   this.showSpinner = true;
   const usuario = this.authService.getUsuario(); // Usuario actual
-  //console.log('usuario: ', usuario)
-  const idUsuario = usuario.id; // Id del usuario actual
-  //console.log('id: ', idUsuario)
-  const idAreaUsuario = usuario.idArea; // Área del usuario actual
-  //console.log('idarea: ', idAreaUsuario)
+  const idUsuario = usuario.id;
+  const idAreaUsuario = usuario.idArea;
 
   if (idUsuario && idAreaUsuario) {
     this.proyectoService.getProyectos().subscribe(
       (proyectos) => {
-        // Marcar proyectos como editables si pertenecen al usuario actual o a su área
-        this.proyectos = proyectos.map((proyecto) => ({
-          ...proyecto,
-          editable: proyecto.idUsuario === idUsuario || proyecto.idArea === idAreaUsuario || usuario.idRol === 1,
-        }));
+        // Guardamos todos los proyectos sin filtrar (por si los necesitamos después)
+        this.todosLosProyectos = proyectos;
 
-        // Ordenar proyectos como antes
+        // Filtramos solo los proyectos habilitados para mostrar
+        this.proyectos = this.todosLosProyectos
+          .filter((proyecto) => proyecto.habilitado === 1) // Aquí filtramos solo los habilitados
+          .map((proyecto) => ({
+            ...proyecto,
+            editable: proyecto.idUsuario === idUsuario || proyecto.idArea === idAreaUsuario || usuario.idRol === 1,
+          }));
+
+        // Ordenamos los proyectos como antes
         this.proyectos.sort((a, b) => {
           if (a.editable !== b.editable) {
             return a.editable ? -1 : 1; // Editables primero
@@ -98,7 +100,7 @@ cargarProyectos(): void {
           return fechaA - fechaB;
         });
 
-        this.dataSource.data = this.proyectos; // Actualizar MatTableDataSource
+        this.dataSource.data = this.proyectos;
         this.showSpinner = false;
       },
       (error) => {
@@ -110,32 +112,30 @@ cargarProyectos(): void {
     console.error('No se pudo obtener el id del usuario o área del usuario');
   }
 }
+// Método para deshabilitar un proyecto
+eliminarProyecto(idProyecto: number): void {
+  const confirmacion = confirm(
+    `¿Estás seguro de que deseas deshabilitar el proyecto con ID ${idProyecto}?`
+  );
 
-  // Método para eliminar un proyecto
-  eliminarProyecto(idProyecto: number): void {
-    const confirmacion = confirm(
-      `¿Estás seguro de que deseas eliminar el proyecto con ID ${idProyecto}?`
-    );
-
-    if (!confirmacion) {
-      return;
-    }
-
-    this.proyectoService.deleteProyecto(idProyecto).subscribe({
-      next: (response) => {
-        alert('Proyecto eliminado con éxito.');
-        console.log(response);
-
-        // Actualiza la lista de proyectos (opcional)
-        this.cargarProyectos()
-      },
-      error: (error) => {
-        console.error('Error al eliminar el proyecto:', error);
-        alert('Hubo un error al intentar eliminar el proyecto.');
-      },
-    });
+  if (!confirmacion) {
+    return;
   }
-  
+
+  this.proyectoService.deshabilitarProyecto(idProyecto).subscribe({
+    next: (response) => {
+      alert('Proyecto deshabilitado con éxito.');
+      console.log(response);
+
+      // Actualiza la lista de proyectos
+      this.cargarProyectos();
+    },
+    error: (error) => {
+      console.error('Error al deshabilitar el proyecto:', error);
+      alert('Hubo un error al intentar deshabilitar el proyecto.');
+    },
+  });
+}
 
   // Método para manejar el archivo seleccionado y leer toda la tabla
   validateFile(event: any): void {

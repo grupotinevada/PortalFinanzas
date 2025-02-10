@@ -691,10 +691,50 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                         subject: 'Solicitud de Cambio en Proyecto',
                         text: `Tu solicitud de cambio para el proyecto "${nombre}" ha sido registrada y está pendiente de aprobación.`,
                         html: `
-                        <p>Tu solicitud de cambio para el proyecto "<b>${nombre}</b>" ha sido registrada y está <b>pendiente de aprobación</b>.</p>
-                        <p>Puedes revisar el estado de tu solicitud en el siguiente enlace:</p>
-                        <p><a href="${linkAprobaciones}" target="_blank">${linkAprobaciones}</a></p>
-                    `
+                        <!DOCTYPE html>
+                        <html lang="es">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Solicitud de Cambio en Proyecto</title>
+                        </head>
+                        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4;">
+                                <tr>
+                                    <td align="center" style="padding: 20px 0;">
+                                        <!-- Contenedor principal -->
+                                        <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                            <tr>
+                                                <td align="center" style="padding: 20px;">
+                                                    <!-- Logo -->
+                                                    <img src="https://i.ibb.co/N6sgbdpr/nevadaicon.png" alt="PortalFinanzas" style="max-width: 150px; margin-bottom: 20px;" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 0 20px 20px 20px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                                    <!-- Contenido -->
+                                                    <p style="margin: 0 0 15px;">Tu solicitud de cambio para el proyecto "<b>${nombre}</b>" ha sido registrada y está <b>pendiente de aprobación</b>.</p>
+                                                    <p style="margin: 0 0 15px;">Puedes revisar el estado de tu solicitud en el siguiente enlace:</p>
+                                                    <p style="margin: 0;">
+                                                        <a href="${linkAprobaciones}" target="_blank" style="color: #ffffff; background-color: #007bff; text-decoration: none; padding: 10px 15px; border-radius: 5px; display: inline-block;">
+                                                            Ver Estado de la Solicitud
+                                                        </a>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="padding: 20px; background-color: #f9f9f9; border-radius: 0 0 8px 8px; font-size: 12px; color: #777777;">
+                                                    <!-- Pie de página -->
+                                                    <p style="margin: 0;">Este correo fue enviado automáticamente desde el PortalFinanzas. No responda a este mensaje.</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </body>
+                        </html>
+                        `
                     };
 
                     // Enviar correo al solicitante
@@ -714,11 +754,51 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                             subject: 'Nueva Solicitud de Cambio en Proyecto',
                             text: `Se ha registrado una nueva solicitud de cambio en el proyecto "${nombre}". Por favor, revisarla y aprobar o rechazar según corresponda.`,
                             html: `
-                            <p>Se ha registrado una nueva solicitud de cambio en el proyecto "<b>${nombre}</b>".</p>
-                            <p>Por favor, revisarla y aprobar o rechazar según corresponda.</p>
-                            <p>Accede directamente desde el siguiente enlace:</p>
-                            <p><a href="${linkAprobaciones}" target="_blank">${linkAprobaciones}</a></p>
-                        `
+                            <!DOCTYPE html>
+                            <html lang="es">
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Nueva Solicitud de Cambio en Proyecto</title>
+                            </head>
+                            <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4;">
+                                    <tr>
+                                        <td align="center" style="padding: 20px 0;">
+                                            <!-- Contenedor principal -->
+                                            <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                                <tr>
+                                                    <td align="center" style="padding: 20px;">
+                                                        <!-- Logo -->
+                                                        <img src="https://i.ibb.co/N6sgbdpr/nevadaicon.png" alt="PortalFinanzas" style="max-width: 150px; margin-bottom: 20px;" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 0 20px 20px 20px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                                        <!-- Contenido -->
+                                                        <p style="margin: 0 0 15px;">Se ha registrado una nueva solicitud de cambio en el proyecto "<b>${nombre}</b>".</p>
+                                                        <p style="margin: 0 0 15px;">Por favor, revisarla y aprobar o rechazar según corresponda.</p>
+                                                        <p style="margin: 0 0 15px;">Accede directamente desde el siguiente enlace:</p>
+                                                        <p style="margin: 0;">
+                                                            <a href="${linkAprobaciones}" target="_blank" style="color: #ffffff; background-color: #007bff; text-decoration: none; padding: 10px 15px; border-radius: 5px; display: inline-block;">
+                                                                Ver Solicitud
+                                                            </a>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="center" style="padding: 20px; background-color: #f9f9f9; border-radius: 0 0 8px 8px; font-size: 12px; color: #777777;">
+                                                        <!-- Pie de página -->
+                                                        <p style="margin: 0;">Este correo fue enviado automáticamente desde el PortalFinanzas. No responda a este mensaje.</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </body>
+                            </html>
+                            `
                         };
 
                         // Enviar correo a los administradores
@@ -1006,7 +1086,8 @@ app.post('/proyecto', (req, res) => {
         porcentajeAvance,
         idUsuario,
         idArea,
-        idEstado
+        idEstado,
+        habilitado
     } = req.body;
 
     const query = `
@@ -1019,11 +1100,12 @@ app.post('/proyecto', (req, res) => {
             porcentajeAvance,
             idUsuario,
             idArea,
-            idEstado
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            idEstado,
+            habilitado
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
 
-    pool.execute(query, [nombre, descripcion, fechaInicio, fechaFin, fechaReal, porcentajeAvance, idUsuario, idArea, idEstado], (err, result) => {
+    pool.execute(query, [nombre, descripcion, fechaInicio, fechaFin, fechaReal, porcentajeAvance, idUsuario, idArea, idEstado, habilitado], (err, result) => {
         if (err) {
             console.error('Database query error:', err);
             return res.status(500).json({ success: false, message: 'Error creating project' });
@@ -1149,7 +1231,8 @@ app.get('/areas-proyectos', (req, res) => {
             p.fechaInicio,
             p.fechaFin,
 	        p.fechaReal,
-	        p.porcentajeAvance
+	        p.porcentajeAvance,
+            p.habilitado
         FROM
             AREA a
         LEFT JOIN

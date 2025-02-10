@@ -75,35 +75,6 @@ export class ProyectoService {
     return this.http.get<Proyecto[]>(url);
   }
 
-
-
-
-
-  //metodo para modificar proyecto
-  // Solicitar cambio en un proyecto (Crea un registro en APROBACION)
-  solicitarCambioProyecto(idProyecto: number, data: any): Observable<any> {
-    return this.http.put(`${this.apiBase}/proyecto/${idProyecto}/solicitud`, data);
-}
-  // Obtener solicitudes pendientes
-  obtenerCambiosSolicitudes(): Observable<any> {
-    return this.http.get(`${this.apiBase}/solicitudes/cambios`);
-  }
-  // Aprobar solicitud (Aplica cambios en PROYECTO y actualiza LOG)
-  aprobarSolicitud(idAprobacion: number, estadoSolicitud: number) {
-    return this.http.put(`/aprobacion/${idAprobacion}`, {
-      idAprobador: this.authService.getUsuarioId(),
-      estadoSolicitud: estadoSolicitud
-    });
-  }
-
-  // Rechazar solicitud (Solo actualiza el estado de la solicitud)
-  rechazarSolicitud(idSolicitud: number, idAprobador: number, motivo: string) {
-    return this.http.put(`${this.apiBase}/rechazar-solicitud/${idSolicitud}`, { idAprobador, motivo });
-  }
-
-
-
-
   //metodo para eliminar proyecto
   deleteProyecto(idProyecto: number): Observable<any> {
     return this.http.delete(`${this.apiBase}/proyectos/${idProyecto}`, { responseType: 'text' });
@@ -113,7 +84,6 @@ export class ProyectoService {
   deshabilitarProyecto(idProyecto: number): Observable<any> {
     return this.http.put(`${this.apiBase}/proyectos/deshabilitar/${idProyecto}`, {}, { responseType: 'text' });
   }
-
 
   //metodo para agregar proyecto
   addProyecto(proyecto: Partial<Proyecto>): Observable<any> {

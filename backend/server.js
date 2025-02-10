@@ -32,7 +32,7 @@ const logger = createLogger({
         new transports.File({
             filename: 'logs/app.log',
             maxsize: 5 * 1024 * 1024, // 5 MB
-           // maxFiles: 5, // Mantiene un máximo de 5 archivos o más
+            // maxFiles: 5, // Mantiene un máximo de 5 archivos o más
         }),
     ],
 });
@@ -214,7 +214,7 @@ const authenticateToken = (req, res, next) => {
 // Configuración de Multer para guardar archivos en la carpeta "archivos"
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname,'archivos')); // Carpeta local "archivos"
+        cb(null, path.join(__dirname, 'archivos')); // Carpeta local "archivos"
     },
     filename: function (req, file, cb) {
         // Usamos solo el nombre original del archivo
@@ -411,7 +411,7 @@ app.get('/api/archivos/:id', (req, res) => {
 // GET /api/archivos/:idproyecto - Obtener archivos por proyecto
 app.get('/api/archivos/:idproyecto', (req, res) => {
     const { idproyecto } = req.params;
-    
+
     const query = `
         SELECT idarchivo, idproyecto, idarea, idusuario, 
                nombre AS nombre_completo, ruta, fechacreacion
@@ -589,8 +589,8 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const APP_URL = process.env.NODE_ENV === 'production' 
-    ? process.env.APP_URL_PROD 
+const APP_URL = process.env.NODE_ENV === 'production'
+    ? process.env.APP_URL_PROD
     : process.env.APP_URL_DEV;
 
 const linkAprobaciones = `${APP_URL}/aprobaciones`;
@@ -847,7 +847,7 @@ app.put('/aprobacion/:id', (req, res) => {
             `;
 
             pool.query(updateQuery, [
-                solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio, 
+                solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio,
                 solicitud.fechaFin, solicitud.fechaReal, solicitud.porcentajeAvance,
                 solicitud.idArea, solicitud.idEstado, solicitud.idProyecto
             ], (err) => {
@@ -914,23 +914,50 @@ app.put('/aprobacion/:id', (req, res) => {
 // Endpoint para obtener las solicitudes pendientes con comparación de cambios
 app.get('/solicitudes/cambios', (req, res) => {
     const query = `
-        SELECT 
-            A.idAprobacion,
-            U.nombre AS nombreSolicitante,
-            A.fechaSolicitud,
-            A.descripcionAprobacion AS descripcionSolicitud,
-            A.idEstadoSolicitud,
-            E.nombre AS estadoSolicitud,
-            P.* AS proyectoOriginal,
-            A.* AS aprobacion
-        FROM APROBACION A
-        JOIN USUARIO U ON A.idSolicitante = U.idUsuario
-        JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
-        JOIN PROYECTO P ON A.idProyecto = P.idProyecto
-        WHERE A.idEstadoSolicitud = 3
-    `;
+SELECT    
+    A.idAprobacion,
+    P.idProyecto,
+    U.nombre AS nombreSolicitante,
+    A.fechaSolicitud,
+    A.descripcionAprobacion AS descripcionSolicitud,
+    E.descripcion AS estadoSolicitud,
 
-    pool.query(query, (err, results) => {
+    
+    P.nombre AS proyectoOriginal_nombre,
+    P.descripcion AS proyectoOriginal_descripcion,
+    P.fechaInicio AS proyectoOriginal_fechaInicio,
+    P.fechaFin AS proyectoOriginal_fechaFin,
+    P.fechaReal AS proyectoOriginal_fechaReal,
+    P.porcentajeAvance AS proyectoOriginal_porcentajeAvance,
+    P.idEstado AS proyectoOriginal_idEstado,
+    P.idArea AS proyectoOriginal_idArea,
+
+    
+    A.nombre AS aprobacion_nombre,
+    A.descripcion AS aprobacion_descripcion,
+    A.fechaInicio AS aprobacion_fechaInicio,
+    A.fechaFin AS aprobacion_fechaFin,
+    A.fechaReal AS aprobacion_fechaReal,
+    A.porcentajeAvance AS aprobacion_porcentajeAvance,
+    A.idEstado AS aprobacion_idEstado,
+    A.idArea AS aprobacion_idArea,
+
+    
+    CASE WHEN P.nombre <> A.nombre THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_nombre,
+    CASE WHEN P.descripcion <> A.descripcion THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_descripcion,
+    CASE WHEN P.fechaInicio <> A.fechaInicio THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_fechaInicio,
+    CASE WHEN P.fechaFin <> A.fechaFin THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_fechaFin,
+    CASE WHEN P.fechaReal <> A.fechaReal THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_fechaReal,
+    CASE WHEN P.porcentajeAvance <> A.porcentajeAvance THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_porcentajeAvance,
+    CASE WHEN P.idEstado <> A.idEstado THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_idEstado,
+    CASE WHEN P.idArea <> A.idArea THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_idArea
+
+FROM APROBACION A
+JOIN USUARIO U ON A.idSolicitante = U.idUsuario
+JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
+JOIN PROYECTO P ON A.idProyecto = P.idProyecto;    `;
+
+pool.query(query, (err, results) => {
         if (err) {
             console.error('Error al obtener solicitudes:', err);
             return res.status(500).json({ success: false, message: 'Error al obtener solicitudes' });
@@ -938,82 +965,34 @@ app.get('/solicitudes/cambios', (req, res) => {
 
         const solicitudes = results.map((row) => {
             const cambios = {};
-            const camposAComparar = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance'];
+
+            // Recorrer solo los campos que pueden cambiar
+            const camposAComparar = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance', 'idEstado', 'idArea'];
 
             camposAComparar.forEach((campo) => {
-                if (row[`P.${campo}`] !== row[`A.${campo}`]) {
+                if (row[`cambio_${campo}`] === 'DIFERENTE') {
                     cambios[campo] = {
-                        anterior: row[`P.${campo}`],
-                        nuevo: row[`A.${campo}`]
+                        anterior: row[`proyectoOriginal_${campo}`],
+                        nuevo: row[`aprobacion_${campo}`]
                     };
                 }
             });
 
             return {
+                idAprobacion: row.idAprobacion,
+                idProyecto: row.idProyecto,
                 nombreSolicitante: row.nombreSolicitante,
+                nombreProyecto: row.proyectoOriginal_nombre,
                 fechaSolicitud: row.fechaSolicitud,
                 descripcionSolicitud: row.descripcionSolicitud,
-                cambios,
+                cambios: cambios, // Solo se guardan cambios reales
                 estadoSolicitud: row.estadoSolicitud
             };
         });
-
+	
         res.json(solicitudes);
     });
 });
-
-
-// Endpoint para obtener las solicitudes pendientes con comparación de cambios
-app.get('/solicitudes/cambios', (req, res) => {
-    const query = `
-        SELECT 
-            A.idAprobacion,
-            U.nombre AS nombreSolicitante,
-            A.fechaSolicitud,
-            A.descripcionAprobacion AS descripcionSolicitud,
-            A.idEstadoSolicitud,
-            E.nombre AS estadoSolicitud,
-            P.* AS proyectoOriginal,
-            A.* AS aprobacion
-        FROM APROBACION A
-        JOIN USUARIO U ON A.idSolicitante = U.idUsuario
-        JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
-        JOIN PROYECTO P ON A.idProyecto = P.idProyecto
-        WHERE A.idEstadoSolicitud = 3
-    `;
-
-    pool.query(query, (err, results) => {
-        if (err) {
-            console.error('Error al obtener solicitudes:', err);
-            return res.status(500).json({ success: false, message: 'Error al obtener solicitudes' });
-        }
-
-        const solicitudes = results.map((row) => {
-            const cambios = {};
-            const camposAComparar = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance'];
-
-            camposAComparar.forEach((campo) => {
-                if (row[`P.${campo}`] !== row[`A.${campo}`]) {
-                    cambios[campo] = {
-                        anterior: row[`P.${campo}`],
-                        nuevo: row[`A.${campo}`]
-                    };
-                }
-            });
-
-            return {
-                nombreSolicitante: row.nombreSolicitante,
-                fechaSolicitud: row.fechaSolicitud,
-                descripcionSolicitud: row.descripcionSolicitud,
-                cambios,
-                estadoSolicitud: row.estadoSolicitud
-            };
-        });
-
-        res.json(solicitudes);
-    });
-});
-
 
 
 
@@ -1704,8 +1683,8 @@ app.post('/usuarios', (req, res) => {
                     return res.status(500).json({ error: 'Error al crear el usuario' });
                 }
 
-                res.status(201).json({ 
-                    message: 'Usuario creado con éxito', 
+                res.status(201).json({
+                    message: 'Usuario creado con éxito',
                     usuario: { nombre, correo, idRol, idArea }
                 });
             });
@@ -1931,12 +1910,12 @@ app.post('/login', (req, res) => {
                 logger.warn(`Contraseña incorrecta para el correo: ${correo}`, { timestamp: new Date() });
                 return res.status(401).json({ message: 'Credenciales inválidas' });
             }
-        
+
             const sessionToken = sessionManager.createSession(
                 usuario.idUsuario,
                 deviceInfo || 'Unknown Device'
             );
-        
+
             const token = jwt.sign(
                 {
                     id: usuario.idUsuario,
@@ -1949,14 +1928,14 @@ app.post('/login', (req, res) => {
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
-        
+
             // Log con el nombre, correo y dispositivo
             logger.info(`Inicio de sesión exitoso para el usuario`, {
                 userName: usuario.nombre,
                 userEmail: usuario.correo,
                 deviceInfo: deviceInfo || 'Unknown Device'
             });
-        
+
             res.status(200).json({
                 message: 'Inicio de sesión exitoso',
                 token,
@@ -1997,7 +1976,7 @@ app.get('/active-sessions', authenticateToken, (req, res) => {
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    
-    
-    
+
+
+
 });

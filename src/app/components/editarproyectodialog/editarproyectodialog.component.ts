@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProyectoService, Proyecto } from '../../services/proyecto.service';
 import { AuthService } from '../../services/auth.service';
-import { response } from 'express';
+import { AprobacionesService } from '../../services/aprobaciones.service';
 
 
 
@@ -30,7 +30,8 @@ export class EditarproyectodialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { idProyecto: number; proyectoOriginal: any },
     private fb: FormBuilder,
     private proyectoService: ProyectoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private aprobacionesService: AprobacionesService
   ) {
     // Inicializar el formulario reactivo
     this.proyectoForm = this.fb.group({
@@ -48,8 +49,8 @@ export class EditarproyectodialogComponent implements OnInit {
         disabled: this.authService.getUsuario().idArea !== 5
       }, Validators.required],
       idEstado: ['', Validators.required],
-      idEstadoSolicitud: [3, Validators.required],
-      descripcionCambio: ['', [Validators.required, Validators.maxLength(250), Validators.pattern('^[a-zA-Z0-9 ]+$'), Validators.minLength(10)]]
+      idEstadoSolicitud: [1, Validators.required],
+      descripcionCambio: ['', [Validators.required, Validators.maxLength(250), Validators.pattern('^[a-zA-Z0-9áéíóúÁÉÍÓÚÑñ ]+$'), Validators.minLength(10)]]
     });
   }
 
@@ -87,9 +88,9 @@ export class EditarproyectodialogComponent implements OnInit {
                 this.proyectoForm.patchValue({
                     nombreProyecto: proyecto.nombreProyecto,
                     descripcion: proyecto.descripcion,
-                    fechaInicio: proyecto.fechaInicio || null, // Se usa directamente la fecha del backend
-                    fechaFin: proyecto.fechaFin || null,       // Se usa directamente la fecha del backend
-                    fechaReal: proyecto.fechaReal || null,     // Se usa directamente la fecha del backend
+                    fechaInicio: proyecto.fechaInicio || null, 
+                    fechaFin: proyecto.fechaFin || null,       
+                    fechaReal: proyecto.fechaReal || null,     
                     idEstado: proyecto.idEstado,
                     porcentajeAvance: proyecto.porcentajeAvance,
                     idArea: proyecto.idArea,
@@ -170,7 +171,7 @@ export class EditarproyectodialogComponent implements OnInit {
         }
 
         // Llamada al servicio para enviar la solicitud
-        this.proyectoService.solicitarCambioProyecto(this.data.idProyecto, payload).subscribe(
+        this.aprobacionesService.solicitarCambioProyecto(this.data.idProyecto, payload).subscribe(
             (response) => {
                 this.showSpinner = false;
                 this.dialogRef.close(response);

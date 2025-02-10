@@ -1,49 +1,64 @@
-<div class="container mx-auto p-4">
-  <h2 class="text-2xl font-bold mb-4 text-center">Solicitudes de Cambio</h2>
+<app-spinner [isLoading]="showSpinner"></app-spinner>
 
-  <div *ngIf="showSpinner" class="text-center">
-    <p>Cargando solicitudes...</p>
+<div class="bg-BEE7FB p-4 m-3 jumbotron">
+  <div class="text-center mb-3">
+    <h3 class="fw-bold text-dark">Gestión de Solicitudes</h3>
+    <p class="text-muted">Aquí puedes revisar y gestionar todas las solicitudes en curso.</p>
   </div>
 
-  <table *ngIf="!showSpinner && solicitudes.length" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-    <thead class="bg-gray-800 text-white">
-      <tr>
-        <th class="px-4 py-2">Solicitante</th>
-        <th class="px-4 py-2">Fecha de Solicitud</th>
-        <th class="px-4 py-2">Descripción</th>
-        <th class="px-4 py-2">Cambios</th>
-        <th class="px-4 py-2">Estado</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let solicitud of solicitudes" class="border-b">
-        <td class="px-4 py-2">{{ solicitud.nombreSolicitante }}</td>
-        <td class="px-4 py-2">{{ solicitud.fechaSolicitud | date: 'shortDate' }}</td>
-        <td class="px-4 py-2">{{ solicitud.descripcionSolicitud }}</td>
-        <td class="px-4 py-2">
-          <ul>
-            <li *ngFor="let key of getKeys(solicitud.cambios)">
-              <strong>{{ key }}:</strong> 
-              <span class="text-red-600">{{ solicitud.cambios[key].anterior }}</span> 
-              → 
-              <span class="text-green-600">{{ solicitud.cambios[key].nuevo }}</span>
-            </li>
-          </ul>
-        </td>
-        <td class="px-4 py-2">
-          <span [ngClass]="{
-            'text-green-500 font-bold': solicitud.estadoSolicitud === 'Aprobado',
-            'text-yellow-500 font-bold': solicitud.estadoSolicitud === 'Pendiente',
-            'text-red-500 font-bold': solicitud.estadoSolicitud === 'Rechazado'
-          }">
-            {{ solicitud.estadoSolicitud }}
-          </span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p *ngIf="!showSpinner && !solicitudes.length" class="text-center text-gray-500">
-    No hay solicitudes pendientes por mostrar.
-  </p>
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered shadow-sm rounded">
+      <thead class="table-success text-center">
+        <tr>
+          <th>Solicitante</th>
+          <th>Proyecto</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Cambios</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let solicitud of solicitudes" class="align-middle">
+          <td>{{ solicitud.nombreSolicitante }}</td>
+          <td>{{ solicitud.nombreProyecto }}</td>
+          <td>{{ solicitud.fechaSolicitud | date:'dd-MM-yyyy' }}</td>
+          <td>{{ solicitud.descripcionSolicitud }}</td>
+          <td class="text-center">
+            <span class="badge px-2 py-1" [ngClass]="getEstadoClase(solicitud.estadoSolicitud)">
+              {{ solicitud.estadoSolicitud }}
+            </span>
+          </td>
+          <td>
+            <ul class="list-unstyled mb-0 small">
+              <li *ngFor="let key of solicitud.cambios | keyvalue">
+                <strong>{{ key.key }}:</strong> 
+                <span class="text-danger">
+                  {{ esFecha(key.value.anterior) ? (key.value.anterior | date:'dd-MM-yyyy') : key.value.anterior }}
+                </span> → 
+                <span class="text-success">
+                  {{ esFecha(key.value.nuevo) ? (key.value.nuevo | date:'dd-MM-yyyy') : key.value.nuevo }}
+                </span>
+              </li>
+            </ul>
+          </td>
+          <td class="text-center">
+            <button class="btn btn-success btn-sm me-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+              </svg>
+            </button>
+            <button class="btn btn-danger btn-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

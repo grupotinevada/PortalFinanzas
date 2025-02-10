@@ -834,20 +834,29 @@ app.put('/aprobacion/:id', (req, res) => {
 // Endpoint para obtener las solicitudes pendientes con comparación de cambios
 app.get('/solicitudes/cambios', (req, res) => {
     const query = `
-        SELECT 
-            A.idAprobacion,
-            U.nombre AS nombreSolicitante,
-            A.fechaSolicitud,
-            A.descripcionAprobacion AS descripcionSolicitud,
-            A.idEstadoSolicitud,
-            E.nombre AS estadoSolicitud,
-            P.* AS proyectoOriginal,
-            A.* AS aprobacion
-        FROM APROBACION A
-        JOIN USUARIO U ON A.idSolicitante = U.idUsuario
-        JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
-        JOIN PROYECTO P ON A.idProyecto = P.idProyecto
-        WHERE A.idEstadoSolicitud = 3
+SELECT    
+    A.idAprobacion,
+    U.nombre AS nombreSolicitante,
+    A.fechaSolicitud,
+    A.descripcionAprobacion AS descripcionSolicitud,
+    A.idEstadoSolicitud,
+    E.descripcion AS estadoSolicitud,
+    P.nombre AS proyectoOriginal_nombre,
+    P.descripcion AS proyectoOriginal_descripcion,
+    P.fechaInicio AS proyectoOriginal_fechaInicio,
+    P.fechaFin AS proyectoOriginal_fechaFin,
+    P.fechaReal AS proyectoOriginal_fechaReal,
+    P.porcentajeAvance AS proyectoOriginal_porcentajeAvance,
+    A.nombre AS aprobacion_nombre,
+    A.descripcion AS aprobacion_descripcion,
+    A.fechaInicio AS aprobacion_fechaInicio,
+    A.fechaFin AS aprobacion_fechaFin,
+    A.fechaReal AS aprobacion_fechaReal,
+    A.porcentajeAvance AS aprobacion_porcentajeAvance
+FROM APROBACION A
+JOIN USUARIO U ON A.idSolicitante = U.idUsuario
+JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
+JOIN PROYECTO P ON A.idProyecto = P.idProyecto
     `;
 
     pool.query(query, (err, results) => {
@@ -861,19 +870,20 @@ app.get('/solicitudes/cambios', (req, res) => {
             const camposAComparar = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance'];
 
             camposAComparar.forEach((campo) => {
-                if (row[`P.${campo}`] !== row[`A.${campo}`]) {
+                if (row[`proyectoOriginal_${campo}`] !== row[`aprobacion_${campo}`]) {
                     cambios[campo] = {
-                        anterior: row[`P.${campo}`],
-                        nuevo: row[`A.${campo}`]
+                        anterior: row[`proyectoOriginal_${campo}`],
+                        nuevo: row[`aprobacion_${campo}`]
                     };
                 }
             });
 
             return {
                 nombreSolicitante: row.nombreSolicitante,
+                nombreProyecto: row.proyectoOriginal_nombre,
                 fechaSolicitud: row.fechaSolicitud,
                 descripcionSolicitud: row.descripcionSolicitud,
-                cambios,
+                cambios: cambios,
                 estadoSolicitud: row.estadoSolicitud
             };
         });
@@ -881,60 +891,6 @@ app.get('/solicitudes/cambios', (req, res) => {
         res.json(solicitudes);
     });
 });
-
-
-// Endpoint para obtener las solicitudes pendientes con comparación de cambios
-app.get('/solicitudes/cambios', (req, res) => {
-    const query = `
-        SELECT 
-            A.idAprobacion,
-            U.nombre AS nombreSolicitante,
-            A.fechaSolicitud,
-            A.descripcionAprobacion AS descripcionSolicitud,
-            A.idEstadoSolicitud,
-            E.nombre AS estadoSolicitud,
-            P.* AS proyectoOriginal,
-            A.* AS aprobacion
-        FROM APROBACION A
-        JOIN USUARIO U ON A.idSolicitante = U.idUsuario
-        JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
-        JOIN PROYECTO P ON A.idProyecto = P.idProyecto
-        WHERE A.idEstadoSolicitud = 3
-    `;
-
-    pool.query(query, (err, results) => {
-        if (err) {
-            console.error('Error al obtener solicitudes:', err);
-            return res.status(500).json({ success: false, message: 'Error al obtener solicitudes' });
-        }
-
-        const solicitudes = results.map((row) => {
-            const cambios = {};
-            const camposAComparar = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance'];
-
-            camposAComparar.forEach((campo) => {
-                if (row[`P.${campo}`] !== row[`A.${campo}`]) {
-                    cambios[campo] = {
-                        anterior: row[`P.${campo}`],
-                        nuevo: row[`A.${campo}`]
-                    };
-                }
-            });
-
-            return {
-                nombreSolicitante: row.nombreSolicitante,
-                fechaSolicitud: row.fechaSolicitud,
-                descripcionSolicitud: row.descripcionSolicitud,
-                cambios,
-                estadoSolicitud: row.estadoSolicitud
-            };
-        });
-
-        res.json(solicitudes);
-    });
-});
-
-
 
 
 // Endpoint para obtener el historial de cambios

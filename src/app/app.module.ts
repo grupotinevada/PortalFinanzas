@@ -31,7 +31,7 @@ import {MatSliderModule} from '@angular/material/slider';
 import { TareasComponent } from './components/tareas/tareas.component';
 import { EditarproyectodialogComponent } from './components/editarproyectodialog/editarproyectodialog.component';
 import { HistorialCambiosDialogComponent } from './components/historial-cambios-dialog/historial-cambios-dialog.component';
-import { MatSortModule } from '@angular/material/sort'; // Importa MatSortModule
+import { MatSortModule } from '@angular/material/sort';
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { registerLocaleData } from '@angular/common';
 import localeEsCl from '@angular/common/locales/es-CL';

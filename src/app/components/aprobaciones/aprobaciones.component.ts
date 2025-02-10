@@ -1,6 +1,5 @@
 import { Component, OnInit} from '@angular/core';
-import { ProyectoService } from '../../services/proyecto.service';
-
+import { AprobacionesService, Solicitud } from '../../services/aprobaciones.service';
 
 @Component({
   selector: 'app-aprobaciones',
@@ -9,69 +8,42 @@ import { ProyectoService } from '../../services/proyecto.service';
 })
 
 
-
-
-
 export class AprobacionesComponent implements OnInit{
-  // Placeholder para las solicitudes (simulando datos desde un endpoint)
+
+  solicitudes: Solicitud[] = [];
+
   showSpinner = false;
-  constructor(private proyectoService: ProyectoService){}
-  solicitudes: any[] = [];
 
-  
-  ngOnInit(): void {
-    this.obtenerSolicitudes();
-  }
-  
-  obtenerSolicitudes(): void {
-    this.showSpinner = true;
-    this.proyectoService.obtenerCambiosSolicitudes().subscribe(
-      (response) => {
-        this.solicitudes = response.cambios;
-        this.showSpinner = false;
+  constructor(private aprobacionService: AprobacionesService) { }
+
+  ngOnInit() {
+    this.showSpinner=true;
+    this.aprobacionService.obtenerCambiosSolicitudes().subscribe({
+      next: (data) => {
+        this.solicitudes = data as any[];
+        console.log('INFO: ', this.solicitudes)
+        this.showSpinner=false;
       },
-      (error) => {
-        console.error('Error al obtener solicitudes:', error);
-        this.showSpinner = false;
+      error: (error) => {
+        console.error('Error al obtener las solicitudes', error);
+        this.showSpinner=false;
       }
-    );
-  }
-  getKeys(obj: any): string[] {
-    return obj ? Object.keys(obj) : [];
+    });
   }
 
+esFecha(valor: any): boolean {
+  return !isNaN(Date.parse(valor)); // Devuelve `true` si es una fecha válida
+}
 
 
 
-  // Variables para el popup
-  solicitudSeleccionada: any = null;
-  accion: string = ''; // 'aprobar' o 'rechazar'
+getEstadoClase(estado: string) {
+  return {
+    'bg-warning text-dark': estado === 'Pendiente',
+    'bg-success text-light': estado === 'Aprobado',
+    'bg-danger text-light': estado === 'Rechazado'
+  };
+}
+  
 
-  // Función para abrir el popup
-  abrirPopup(solicitud: any, accion: string) {
-    this.solicitudSeleccionada = solicitud;
-    this.accion = accion;
-  }
-
-  // Función para cerrar el popup
-  cerrarPopup() {
-    this.solicitudSeleccionada = null;
-    this.accion = '';
-  }
-
-  // Función para confirmar la acción (aprobar/rechazar)
-  confirmarAccion() {
-    if (this.accion === 'aprobar') {
-      this.solicitudSeleccionada.estado = 'aprobado';
-    } else if (this.accion === 'rechazar') {
-      this.solicitudSeleccionada.estado = 'rechazado';
-    }
-    this.cerrarPopup();
-  }
-
-  // Verificar si el usuario actual es administrador (placeholder)
-  esAdministrador(): boolean {
-    // Aquí deberías implementar la lógica real para verificar roles
-    return true; // Simulamos que el usuario es administrador
-  }
 }

@@ -7,25 +7,47 @@
   </div>
 
   <div class="table-responsive">
-    <table class="table table-hover table-bordered shadow-sm rounded">
+    <table class="table table-hover table-striped table-borderless shadow-sm align-middle">
       <thead class="table-success text-center">
-        <tr>
-          <th>Solicitante</th>
-          <th>Proyecto</th>
-          <th>Fecha</th>
-          <th>Descripción</th>
-          <th>Estado</th>
-          <th>Cambios</th>
-          <th>Acción</th>
+        <tr >
+          <th scope="col" (click)="ordenarPor('idAprobacion')" style="cursor: pointer;">ID solicitud
+            <span *ngIf="ordenActual === 'idAprobacion'">
+              {{ direccionOrden === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+          <th scope="col" (click)="ordenarPor('nombreSolicitante')" style="cursor: pointer;">Solicitante
+            <span *ngIf="ordenActual === 'nombreSolicitante'">
+              {{ direccionOrden === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+          <th scope="col" (click)="ordenarPor('nombreProyecto')" style="cursor: pointer;">Proyecto
+            <span *ngIf="ordenActual === 'nombreProyecto'">
+              {{ direccionOrden === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+          <th scope="col" (click)="ordenarPor('fechaSolicitud')" style="cursor: pointer;">Fecha solicitud
+            <span *ngIf="ordenActual === 'fechaSolicitud'">
+              {{ direccionOrden === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+          <th>Descripción de cambios</th>
+          <th scope="col" (click)="ordenarPor('estadoSolicitud')" style="cursor: pointer;">Estado
+            <span *ngIf="ordenActual === 'estadoSolicitud'">
+              {{ direccionOrden === 'asc' ? '▲' : direccionOrden === 'desc' ? '▼' : '⭐' }}
+            </span>
+          </th>
+          <th>Cambios solicitados</th>
+          <th>Acciones</th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor="let solicitud of solicitudes" class="align-middle">
-          <td>{{ solicitud.nombreSolicitante }}</td>
-          <td>{{ solicitud.nombreProyecto }}</td>
-          <td>{{ solicitud.fechaSolicitud | date:'dd-MM-yyyy' }}</td>
-          <td>{{ solicitud.descripcionSolicitud }}</td>
-          <td class="text-center">
+      <tbody class="table-group-divider" >
+        <tr *ngFor="let solicitud of solicitudes" class="align-middle" >
+          <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{solicitud.idAprobacion}}</td>
+          <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{ solicitud.nombreSolicitante }}</td>
+          <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{ solicitud.nombreProyecto }}</td>
+          <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{ solicitud.fechaSolicitud | date:'dd-MM-yyyy' }}</td>
+          <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}">{{ solicitud.descripcionSolicitud }}</td>
+          <td class="text-center" (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}">
             <span class="badge px-2 py-1" [ngClass]="getEstadoClase(solicitud.estadoSolicitud)">
               {{ solicitud.estadoSolicitud }}
             </span>
@@ -35,10 +57,10 @@
               <li *ngFor="let key of solicitud.cambios | keyvalue">
                 <strong>{{ key.key }}:</strong> 
                 <span class="text-danger">
-                  {{ esFecha(key.value.anterior) ? (key.value.anterior | date:'dd-MM-yyyy') : key.value.anterior }}
+                  {{ esFecha(key.value.anterior) ? (key.value.anterior | date: 'dd-MM-yyyy') : key.value.anterior }}
                 </span> → 
                 <span class="text-success">
-                  {{ esFecha(key.value.nuevo) ? (key.value.nuevo | date:'dd-MM-yyyy') : key.value.nuevo }}
+                  {{ esFecha(key.value.nuevo) ? (key.value.nuevo | date: 'dd-MM-yyyy') : key.value.nuevo }}
                 </span>
               </li>
             </ul>

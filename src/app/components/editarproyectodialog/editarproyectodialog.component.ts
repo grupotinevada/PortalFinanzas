@@ -49,8 +49,8 @@ export class EditarproyectodialogComponent implements OnInit {
         disabled: this.authService.getUsuario().idArea !== 5
       }, Validators.required],
       idEstado: ['', Validators.required],
-      idEstadoSolicitud: [3, Validators.required],
-      descripcionCambio: ['', [Validators.required, Validators.maxLength(250), Validators.pattern('^[a-zA-Z0-9 ]+$'), Validators.minLength(10)]]
+      idEstadoSolicitud: [1, Validators.required],
+      descripcionCambio: ['', [Validators.required, Validators.maxLength(250), Validators.pattern('^[a-zA-Z0-9áéíóúÁÉÍÓÚÑñ ]+$'), Validators.minLength(10)]]
     });
   }
 

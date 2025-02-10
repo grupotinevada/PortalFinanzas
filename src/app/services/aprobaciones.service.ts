@@ -10,6 +10,8 @@ interface Cambio {
 }
 
 export interface Solicitud {
+  idAprobacion: number,
+  idProyecto: number,
   nombreSolicitante: string;
   nombreProyecto: string,
   fechaSolicitud: string;

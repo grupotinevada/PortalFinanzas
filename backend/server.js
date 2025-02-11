@@ -600,8 +600,8 @@ const linkAprobaciones = `${APP_URL}/aprobaciones`;
 app.put('/proyecto/:id/solicitud', (req, res) => {
     const idProyecto = req.params.id;
 
-    //console.log('🔹 ID Proyecto recibido:', idProyecto);
-    //console.log('🔹 Body recibido en Node:', req.body);
+    console.log('🔹 ID Proyecto recibido:', idProyecto);
+    console.log('🔹 Body recibido en Node:', req.body);
 
     const {
         nombre,
@@ -616,7 +616,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
         descripcionAprobacion
     } = req.body;
 
-    //console.log('🔹 idSolicitante extraído del body:', idSolicitante);
+    console.log('🔹 idSolicitante extraído del body:', idSolicitante);
 
     if (!idSolicitante) {
         console.error('⚠️ ERROR: idSolicitante no recibido en el backend.');
@@ -633,27 +633,41 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
             return res.status(404).json({ success: false, message: 'Proyecto no encontrado' });
         }
 
-        //console.log('✅ Proyecto encontrado, insertando solicitud...');
+        console.log('✅ Proyecto encontrado, insertando solicitud...');
+        const proyectoActual = results[0];
+
+        // Detectar cambios
+        const cambios = {};
+        const campos = { nombre, descripcion, fechaInicio, fechaFin, fechaReal, porcentajeAvance, idArea, idEstado };
+
+        for (const campo in campos) {
+            if (campos[campo] !== undefined && campos[campo] !== proyectoActual[campo]) {
+                cambios[campo] = {
+                    anterior: proyectoActual[campo],
+                    nuevo: campos[campo]
+                };
+            }
+        }
 
         const insertQuery = `
             INSERT INTO APROBACION (
                 idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal, 
                 porcentajeAvance, idSolicitante, idArea, idEstado, idEstadoSolicitud, 
-                descripcionAprobacion
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                descripcionAprobacion, detalles
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
         `;
 
         pool.query(insertQuery, [
             idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal,
-            porcentajeAvance, idSolicitante, idArea, idEstado, 3, // Estado inicial de la solicitud
-            descripcionAprobacion
+            porcentajeAvance, idSolicitante, idArea, idEstado, 1, // Estado inicial de la solicitud
+            descripcionAprobacion, JSON.stringify(cambios)
         ], (err) => {
             if (err) {
                 console.error('⚠️ Error al registrar solicitud:', err);
                 return res.status(500).json({ success: false, message: 'Error al registrar solicitud' });
             }
 
-            //console.log('✅ Solicitud insertada correctamente en la BD');
+            console.log('✅ Solicitud insertada correctamente en la BD');
 
             // Obtener el correo del solicitante
             pool.query('SELECT correo FROM USUARIO WHERE idUsuario = ?', [idSolicitante], (err, results) => {
@@ -667,7 +681,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                 }
 
                 const correoSolicitante = results[0].correo;
-                //console.log('📧 Correo del solicitante:', correoSolicitante);
+                console.log('📧 Correo del solicitante:', correoSolicitante);
 
                 // Obtener correos de todos los administradores (idRol = 1)
                 pool.query('SELECT correo FROM USUARIO WHERE idRol = 1', (err, adminResults) => {
@@ -682,7 +696,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
 
                     // Extraer los correos de los administradores
                     const correosAdmins = adminResults.map(row => row.correo);
-                    //console.log('📧 Correos de administradores:', correosAdmins);
+                    console.log('📧 Correos de administradores:', correosAdmins);
 
                     // Crear el correo para el solicitante
                     const mailOptionsSolicitante = {
@@ -691,10 +705,50 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                         subject: 'Solicitud de Cambio en Proyecto',
                         text: `Tu solicitud de cambio para el proyecto "${nombre}" ha sido registrada y está pendiente de aprobación.`,
                         html: `
-                        <p>Tu solicitud de cambio para el proyecto "<b>${nombre}</b>" ha sido registrada y está <b>pendiente de aprobación</b>.</p>
-                        <p>Puedes revisar el estado de tu solicitud en el siguiente enlace:</p>
-                        <p><a href="${linkAprobaciones}" target="_blank">${linkAprobaciones}</a></p>
-                    `
+                        <!DOCTYPE html>
+                        <html lang="es">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Solicitud de Cambio en Proyecto</title>
+                        </head>
+                        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4;">
+                                <tr>
+                                    <td align="center" style="padding: 20px 0;">
+                                        <!-- Contenedor principal -->
+                                        <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                            <tr>
+                                                <td align="center" style="padding: 20px;">
+                                                    <!-- Logo -->
+                                                    <img src="https://i.ibb.co/N6sgbdpr/nevadaicon.png" alt="PortalFinanzas" style="max-width: 150px; margin-bottom: 20px;" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 0 20px 20px 20px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                                    <!-- Contenido -->
+                                                    <p style="margin: 0 0 15px;">Tu solicitud de cambio para el proyecto "<b>${nombre}</b>" ha sido registrada y está <b>pendiente de aprobación</b>.</p>
+                                                    <p style="margin: 0 0 15px;">Puedes revisar el estado de tu solicitud en el siguiente enlace:</p>
+                                                    <p style="margin: 0;">
+                                                        <a href="${linkAprobaciones}" target="_blank" style="color: #ffffff; background-color: #007bff; text-decoration: none; padding: 10px 15px; border-radius: 5px; display: inline-block;">
+                                                            Ver Estado de la Solicitud
+                                                        </a>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="padding: 20px; background-color: #f9f9f9; border-radius: 0 0 8px 8px; font-size: 12px; color: #777777;">
+                                                    <!-- Pie de página -->
+                                                    <p style="margin: 0;">Este correo fue enviado automáticamente desde el PortalFinanzas. No responda a este mensaje.</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </body>
+                        </html>
+                        `
                     };
 
                     // Enviar correo al solicitante
@@ -702,7 +756,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                         if (err) {
                             console.error('⚠️ Error al enviar correo al solicitante:', err);
                         } else {
-                            //console.log('✅ Correo enviado al solicitante:', info.response);
+                            console.log('✅ Correo enviado al solicitante:', info.response);
                         }
                     });
 
@@ -714,11 +768,51 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                             subject: 'Nueva Solicitud de Cambio en Proyecto',
                             text: `Se ha registrado una nueva solicitud de cambio en el proyecto "${nombre}". Por favor, revisarla y aprobar o rechazar según corresponda.`,
                             html: `
-                            <p>Se ha registrado una nueva solicitud de cambio en el proyecto "<b>${nombre}</b>".</p>
-                            <p>Por favor, revisarla y aprobar o rechazar según corresponda.</p>
-                            <p>Accede directamente desde el siguiente enlace:</p>
-                            <p><a href="${linkAprobaciones}" target="_blank">${linkAprobaciones}</a></p>
-                        `
+                            <!DOCTYPE html>
+                            <html lang="es">
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Nueva Solicitud de Cambio en Proyecto</title>
+                            </head>
+                            <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4;">
+                                    <tr>
+                                        <td align="center" style="padding: 20px 0;">
+                                            <!-- Contenedor principal -->
+                                            <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                                <tr>
+                                                    <td align="center" style="padding: 20px;">
+                                                        <!-- Logo -->
+                                                        <img src="https://i.ibb.co/N6sgbdpr/nevadaicon.png" alt="PortalFinanzas" style="max-width: 150px; margin-bottom: 20px;" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 0 20px 20px 20px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                                        <!-- Contenido -->
+                                                        <p style="margin: 0 0 15px;">Se ha registrado una nueva solicitud de cambio en el proyecto "<b>${nombre}</b>".</p>
+                                                        <p style="margin: 0 0 15px;">Por favor, revisarla y aprobar o rechazar según corresponda.</p>
+                                                        <p style="margin: 0 0 15px;">Accede directamente desde el siguiente enlace:</p>
+                                                        <p style="margin: 0;">
+                                                            <a href="${linkAprobaciones}" target="_blank" style="color: #ffffff; background-color: #007bff; text-decoration: none; padding: 10px 15px; border-radius: 5px; display: inline-block;">
+                                                                Ver Solicitud
+                                                            </a>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="center" style="padding: 20px; background-color: #f9f9f9; border-radius: 0 0 8px 8px; font-size: 12px; color: #777777;">
+                                                        <!-- Pie de página -->
+                                                        <p style="margin: 0;">Este correo fue enviado automáticamente desde el PortalFinanzas. No responda a este mensaje.</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </body>
+                            </html>
+                            `
                         };
 
                         // Enviar correo a los administradores
@@ -726,7 +820,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                             if (err) {
                                 console.error('⚠️ Error al enviar correo a administradores:', err);
                             } else {
-                                //console.log('✅ Correo enviado a administradores:', info.response);
+                                console.log('✅ Correo enviado a administradores:', info.response);
                             }
                         });
                     }
@@ -739,94 +833,84 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
 });
 
 
+
 // Endpoint para aprobar o rechazar una solicitud de cambio
 app.put('/aprobacion/:id', (req, res) => {
     const idAprobacion = req.params.id;
-    const { idAprobador, estadoSolicitud } = req.body; // estadoSolicitud: 2 (Aprobado), 3 (Rechazado)
+    const { idAprobador, estadoSolicitud } = req.body;
 
     // Obtener la solicitud pendiente
     pool.query('SELECT * FROM APROBACION WHERE idAprobacion = ?', [idAprobacion], (err, results) => {
-        if (err) {
-            console.error('Error al obtener solicitud:', err);
-            return res.status(500).json({ success: false, message: 'Error al obtener solicitud' });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
-        }
+        if (err) return res.status(500).json({ success: false, message: 'Error al obtener solicitud' });
+        if (results.length === 0) return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
 
         const solicitud = results[0];
 
-        // Si se aprueba, actualizar la tabla PROYECTO
         if (estadoSolicitud === 2) { // Aprobado
-            const updateQuery = `
-                UPDATE PROYECTO
-                SET nombre = ?, descripcion = ?, fechaInicio = ?, fechaFin = ?, fechaReal = ?, 
-                    porcentajeAvance = ?, idArea = ?, idEstado = ?
-                WHERE idProyecto = ?;
-            `;
+            // Obtener datos actuales del proyecto
+            pool.query('SELECT * FROM PROYECTO WHERE idProyecto = ?', [solicitud.idProyecto], (err, projectResults) => {
+                if (err) return res.status(500).json({ success: false, message: 'Error al obtener proyecto' });
 
-            pool.query(updateQuery, [
-                solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio,
-                solicitud.fechaFin, solicitud.fechaReal, solicitud.porcentajeAvance,
-                solicitud.idArea, solicitud.idEstado, solicitud.idProyecto
-            ], (err) => {
-                if (err) {
-                    console.error('Error al actualizar proyecto:', err);
-                    return res.status(500).json({ success: false, message: 'Error al actualizar proyecto' });
-                }
+                const proyectoActual = projectResults[0];
 
-                // Registrar en LOG_PROYECTO
-                const detalles = JSON.stringify({
-                    nombre: solicitud.nombre,
-                    descripcion: solicitud.descripcion,
-                    fechaInicio: solicitud.fechaInicio,
-                    fechaFin: solicitud.fechaFin,
-                    fechaReal: solicitud.fechaReal,
-                    porcentajeAvance: solicitud.porcentajeAvance,
-                    idArea: solicitud.idArea,
-                    idEstado: solicitud.idEstado
+                // Comparar valores antiguos y nuevos
+                const cambios = {};
+                const campos = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance', 'idArea', 'idEstado'];
+
+                campos.forEach(campo => {
+                    if (proyectoActual[campo] !== solicitud[campo]) {
+                        cambios[campo] = {
+                            anterior: proyectoActual[campo],
+                            nuevo: solicitud[campo]
+                        };
+                    }
                 });
 
-                const logQuery = `
-                    INSERT INTO LOG_PROYECTO (idProyecto, idUsuario, accion, detalles) 
-                    VALUES (?, ?, 'APROBADO', ?);
+                // Actualizar el proyecto
+                const updateQuery = `
+                    UPDATE PROYECTO
+                    SET nombre = ?, descripcion = ?, fechaInicio = ?, fechaFin = ?, fechaReal = ?, 
+                        porcentajeAvance = ?, idArea = ?, idEstado = ?
+                    WHERE idProyecto = ?;
                 `;
 
-                pool.query(logQuery, [solicitud.idProyecto, idAprobador, detalles], (err) => {
-                    if (err) {
-                        console.error('Error al registrar log:', err);
-                        return res.status(500).json({ success: false, message: 'Error al registrar log' });
-                    }
+                pool.query(updateQuery, [
+                    solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio,
+                    solicitud.fechaFin, solicitud.fechaReal, solicitud.porcentajeAvance,
+                    solicitud.idArea, solicitud.idEstado, solicitud.idProyecto
+                ], (err) => {
+                    if (err) return res.status(500).json({ success: false, message: 'Error al actualizar proyecto' });
 
-                    // Marcar la solicitud como aprobada
-                    const updateAprobacionQuery = `
-                        UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?;
+                    // Registrar cambios en LOG_PROYECTO
+                    const logQuery = `
+                        INSERT INTO LOG_PROYECTO (idProyecto, idUsuario, accion, detalles, fechaAccion) 
+                        VALUES (?, ?, 'APROBADO', ?, NOW());
                     `;
 
-                    pool.query(updateAprobacionQuery, [idAprobador, estadoSolicitud, idAprobacion], (err) => {
-                        if (err) {
-                            console.error('Error al actualizar estado de aprobación:', err);
-                            return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
-                        }
+                    pool.query(logQuery, [solicitud.idProyecto, idAprobador, JSON.stringify(cambios)], (err) => {
+                        if (err) return res.status(500).json({ success: false, message: 'Error al registrar log' });
 
-                        res.json({ success: true, message: 'Solicitud aprobada y cambios aplicados' });
+                        // Actualizar el estado de la solicitud
+                        pool.query(
+                            'UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?',
+                            [idAprobador, estadoSolicitud, idAprobacion],
+                            (err) => {
+                                if (err) return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
+                                res.json({ success: true, message: 'Solicitud aprobada y cambios aplicados' });
+                            }
+                        );
                     });
                 });
             });
         } else { // Rechazado
-            const updateAprobacionQuery = `
-                UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?;
-            `;
-
-            pool.query(updateAprobacionQuery, [idAprobador, estadoSolicitud, idAprobacion], (err) => {
-                if (err) {
-                    console.error('Error al actualizar estado de solicitud:', err);
-                    return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
+            pool.query(
+                'UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?',
+                [idAprobador, estadoSolicitud, idAprobacion],
+                (err) => {
+                    if (err) return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
+                    res.json({ success: true, message: 'Solicitud rechazada' });
                 }
-
-                res.json({ success: true, message: 'Solicitud rechazada' });
-            });
+            );
         }
     });
 });
@@ -834,69 +918,44 @@ app.put('/aprobacion/:id', (req, res) => {
 // Endpoint para obtener las solicitudes pendientes con comparación de cambios
 app.get('/solicitudes/cambios', (req, res) => {
     const query = `
-SELECT    
-    A.idAprobacion,
-    P.idProyecto,
-    U.nombre AS nombreSolicitante,
-    A.fechaSolicitud,
-    A.descripcionAprobacion AS descripcionSolicitud,
-    E.descripcion AS estadoSolicitud,
+    SELECT    
+        A.idAprobacion,
+        P.idProyecto,
+        U.nombre AS nombreSolicitante,
+        A.fechaSolicitud,
+        A.descripcionAprobacion AS descripcionSolicitud,
+        E.descripcion AS estadoSolicitud,
+        P.nombre AS proyectoOriginal_nombre,
+        P.descripcion AS proyectoOriginal_descripcion,
+        P.fechaInicio AS proyectoOriginal_fechaInicio,
+        P.fechaFin AS proyectoOriginal_fechaFin,
+        P.fechaReal AS proyectoOriginal_fechaReal,
+        P.porcentajeAvance AS proyectoOriginal_porcentajeAvance,
+        P.idEstado AS proyectoOriginal_idEstado,
+        P.idArea AS proyectoOriginal_idArea,
+        A.nombre AS aprobacion_nombre,
+        A.descripcion AS aprobacion_descripcion,
+        A.fechaInicio AS aprobacion_fechaInicio,
+        A.fechaFin AS aprobacion_fechaFin,
+        A.fechaReal AS aprobacion_fechaReal,
+        A.porcentajeAvance AS aprobacion_porcentajeAvance,
+        A.idEstado AS aprobacion_idEstado,
+        A.idArea AS aprobacion_idArea,
+        A.detalles AS detallesCambios  -- Traemos el campo detalles
+    FROM APROBACION A
+    JOIN USUARIO U ON A.idSolicitante = U.idUsuario
+    JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
+    JOIN PROYECTO P ON A.idProyecto = P.idProyecto;
+    `;
 
-    
-    P.nombre AS proyectoOriginal_nombre,
-    P.descripcion AS proyectoOriginal_descripcion,
-    P.fechaInicio AS proyectoOriginal_fechaInicio,
-    P.fechaFin AS proyectoOriginal_fechaFin,
-    P.fechaReal AS proyectoOriginal_fechaReal,
-    P.porcentajeAvance AS proyectoOriginal_porcentajeAvance,
-    P.idEstado AS proyectoOriginal_idEstado,
-    P.idArea AS proyectoOriginal_idArea,
-
-    
-    A.nombre AS aprobacion_nombre,
-    A.descripcion AS aprobacion_descripcion,
-    A.fechaInicio AS aprobacion_fechaInicio,
-    A.fechaFin AS aprobacion_fechaFin,
-    A.fechaReal AS aprobacion_fechaReal,
-    A.porcentajeAvance AS aprobacion_porcentajeAvance,
-    A.idEstado AS aprobacion_idEstado,
-    A.idArea AS aprobacion_idArea,
-
-    
-    CASE WHEN P.nombre <> A.nombre THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_nombre,
-    CASE WHEN P.descripcion <> A.descripcion THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_descripcion,
-    CASE WHEN P.fechaInicio <> A.fechaInicio THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_fechaInicio,
-    CASE WHEN P.fechaFin <> A.fechaFin THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_fechaFin,
-    CASE WHEN P.fechaReal <> A.fechaReal THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_fechaReal,
-    CASE WHEN P.porcentajeAvance <> A.porcentajeAvance THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_porcentajeAvance,
-    CASE WHEN P.idEstado <> A.idEstado THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_idEstado,
-    CASE WHEN P.idArea <> A.idArea THEN 'DIFERENTE' ELSE 'IGUAL' END AS cambio_idArea
-
-FROM APROBACION A
-JOIN USUARIO U ON A.idSolicitante = U.idUsuario
-JOIN ESTADO_SOLICITUD E ON A.idEstadoSolicitud = E.idEstadoSolicitud
-JOIN PROYECTO P ON A.idProyecto = P.idProyecto;    `;
-
-pool.query(query, (err, results) => {
+    pool.query(query, (err, results) => {
         if (err) {
             console.error('Error al obtener solicitudes:', err);
             return res.status(500).json({ success: false, message: 'Error al obtener solicitudes' });
         }
 
         const solicitudes = results.map((row) => {
-            const cambios = {};
-
-            // Recorrer solo los campos que pueden cambiar
-            const camposAComparar = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance', 'idEstado', 'idArea'];
-
-            camposAComparar.forEach((campo) => {
-                if (row[`cambio_${campo}`] === 'DIFERENTE') {
-                    cambios[campo] = {
-                        anterior: row[`proyectoOriginal_${campo}`],
-                        nuevo: row[`aprobacion_${campo}`]
-                    };
-                }
-            });
+            const cambios = JSON.parse(row.detallesCambios); // Parseamos el JSON de los cambios
 
             return {
                 idAprobacion: row.idAprobacion,
@@ -905,11 +964,11 @@ pool.query(query, (err, results) => {
                 nombreProyecto: row.proyectoOriginal_nombre,
                 fechaSolicitud: row.fechaSolicitud,
                 descripcionSolicitud: row.descripcionSolicitud,
-                cambios: cambios, // Solo se guardan cambios reales
+                cambios: cambios, // Mostramos los cambios con detalles
                 estadoSolicitud: row.estadoSolicitud
             };
         });
-	
+
         res.json(solicitudes);
     });
 });

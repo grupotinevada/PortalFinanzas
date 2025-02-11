@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProyectoService, Proyecto } from '../../services/proyecto.service';
 import { AuthService } from '../../services/auth.service';
 import { AprobacionesService } from '../../services/aprobaciones.service';
+import { Notyf } from 'notyf';
 
 
 
@@ -119,6 +120,7 @@ export class EditarproyectodialogComponent implements OnInit {
   }
 
   enviarSolicitud(): void {
+    const notyf = new Notyf();
     if (this.proyectoForm.valid) {
         this.showSpinner = true;
 
@@ -175,11 +177,12 @@ export class EditarproyectodialogComponent implements OnInit {
             (response) => {
                 this.showSpinner = false;
                 this.dialogRef.close(response);
+                notyf.success('Solicitud de cambio enviada');
             },
             (error) => {
                 console.error('Error al enviar solicitud', error);
                 this.showSpinner = false;
-                
+                notyf.success('Error al enviar solicitud')
               }
         );
     } else {

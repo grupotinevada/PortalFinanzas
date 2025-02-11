@@ -41,14 +41,17 @@ export class AprobacionesService {
     return this.http.get(`${this.apiBase}/solicitudes/cambios`);
   }
   // Aprobar solicitud (Aplica cambios en PROYECTO y actualiza LOG)
-  aprobarSolicitud(idAprobacion: number, estadoSolicitud: number) {
-    return this.http.put(`/aprobacion/${idAprobacion}`, {
+  aprobarSolicitud(idAprobacion: number) {
+    return this.http.put(`${this.apiBase}/aprobacion/${idAprobacion}`, {
       idAprobador: this.authService.getUsuarioId(),
-      estadoSolicitud: estadoSolicitud
+      estadoSolicitud: 2 // 2 = Aprobado
     });
   }
-  // Rechazar solicitud (Solo actualiza el estado de la solicitud)
-  rechazarSolicitud(idSolicitud: number, idAprobador: number, motivo: string) {
-    return this.http.put(`${this.apiBase}/rechazar-solicitud/${idSolicitud}`, { idAprobador, motivo });
+  
+  rechazarSolicitud(idAprobacion: number) {
+    return this.http.put(`${this.apiBase}/aprobacion/${idAprobacion}`, {
+      idAprobador: this.authService.getUsuarioId(),
+      estadoSolicitud: 3 // 3 = Rechazado
+    });
   }
 }

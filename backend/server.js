@@ -289,6 +289,10 @@ app.get('/uploads/:filename/:idProyecto', (req, res) => {
 });
 
 
+// Verificar si la carpeta base existe, si no, crearla
+if (!fs.existsSync(RUTA_BASE_ARCHIVOS)) {
+    fs.mkdirSync(RUTA_BASE_ARCHIVOS, { recursive: true });
+}
 
 // Endpoint para archivos
 app.post('/api/archivos', upload.single('archivo'), (req, res) => {
@@ -645,7 +649,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
 
         pool.query(insertQuery, [
             idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal,
-            porcentajeAvance, idSolicitante, idArea, idEstado, 3, // Estado inicial de la solicitud
+            porcentajeAvance, idSolicitante, idArea, idEstado, 1, // Estado inicial de la solicitud
             descripcionAprobacion
         ], (err) => {
             if (err) {

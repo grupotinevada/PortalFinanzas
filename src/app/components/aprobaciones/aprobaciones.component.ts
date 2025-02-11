@@ -3,6 +3,8 @@ import { AprobacionesService, Solicitud } from '../../services/aprobaciones.serv
 import { Router } from '@angular/router';
 import { ProyectoService } from '../../services/proyecto.service';
 import { forkJoin } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { Notyf } from 'notyf';
 
 @Component({
   selector: 'app-aprobaciones',
@@ -17,21 +19,25 @@ export class AprobacionesComponent implements OnInit{
   ordenActual: string = '';
   direccionOrden: 'asc' | 'desc' | 'prioridad' = 'asc';
   showSpinner = false;
+  idAprobacion: any;
 
   constructor(
     private aprobacionService: AprobacionesService,
     private router : Router,
-    private proyectoService: ProyectoService
+    private proyectoService: ProyectoService,
+    private authService: AuthService
 
   ) { }
 
   ngOnInit() {
     this.cargarSolicitudes();
+    this.idAprobacion = this.authService.getUsuarioId();
+    console.log(this.idAprobacion)
   }
 
   cargarSolicitudes() {
     this.showSpinner = true;
-  
+    
     forkJoin({
       estados: this.proyectoService.getEstado(),
       areas: this.proyectoService.getArea() 
@@ -89,24 +95,12 @@ export class AprobacionesComponent implements OnInit{
           this.showSpinner = false;
         }
       });
-    });
-  }
+    }
+  );
+  this.showSpinner = false;  
+}
 
-  esFecha(value: any): boolean {
-    // Verifica si es una instancia de Date válida
-    if (value instanceof Date) {
-      return !isNaN(value.getTime());
-    }
-  
-    // Verifica si es una cadena que puede ser parseada a una fecha
-    if (typeof value === 'string') {
-      const parsedDate = Date.parse(value);
-      return !isNaN(parsedDate) && !isNaN(Date.parse(value));
-    }
-  
-    // Si es un número, no lo consideramos una fecha
-    return false;
-  }
+
   
   prioridadEstados: { [key: string]: number } = {
     'Pendiente': 1,
@@ -160,6 +154,49 @@ getEstadoClase(estado: string) {
     'bg-danger text-light': estado === 'Rechazado'
   };
 }
-  
+
+aprobarSolicitud(idAprobacion: number) {
+  const notyf = new Notyf();
+  if (this.idAprobacion) {
+    this.aprobacionService.aprobarSolicitud(idAprobacion)
+      .subscribe({
+        next: (response) => {
+          console.log('Solicitud aprobada:', response),
+          notyf.success('Solicitud aprobada')
+          this.cargarSolicitudes()
+        },
+        error: (error) => {
+          console.error('Error al aprobar solicitud:', error)
+          notyf.error('Hubo un problema con tu solicitud, intentelo más tarde')
+          this.cargarSolicitudes()
+        }
+            
+      });
+  } else {
+    notyf.error('Hubo un problema con tu solicitud, intentelo más tarde')
+    console.warn('Debe ingresar un ID de aprobación válido.');
+    this.cargarSolicitudes()
+  }
+}
+
+rechazarSolicitud(idAprobacion: number) {
+  const notyf = new Notyf();
+  if (this.idAprobacion) {
+    this.aprobacionService.rechazarSolicitud(idAprobacion)
+      .subscribe({
+        next: (response) => {
+          console.log('Solicitud rechazada:', response),
+          notyf.success('Solicitud rechazada con éxito')
+        },
+        error: (error) => {
+          console.error('Error al rechazar solicitud:', error)
+          notyf.error('Hubo un problema con tu solicitud, intentelo más tarde')
+        }
+      });
+  } else {
+    notyf.error('Hubo un problema con tu solicitud, intentelo más tarde')
+    console.warn('Debe ingresar un ID de aprobación válido.');
+  }
+}
 
 }

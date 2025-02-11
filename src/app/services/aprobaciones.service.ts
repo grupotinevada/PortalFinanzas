@@ -12,6 +12,7 @@ interface Cambio {
 export interface Solicitud {
   idAprobacion: number,
   idProyecto: number,
+  idSolicitante: number,
   nombreSolicitante: string;
   nombreProyecto: string,
   fechaSolicitud: string;

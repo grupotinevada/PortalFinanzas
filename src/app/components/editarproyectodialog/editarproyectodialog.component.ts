@@ -5,6 +5,7 @@ import { ProyectoService, Proyecto } from '../../services/proyecto.service';
 import { AuthService } from '../../services/auth.service';
 import { AprobacionesService } from '../../services/aprobaciones.service';
 import { Notyf } from 'notyf';
+import { DatePipe } from '@angular/common';
 
 
 
@@ -32,7 +33,8 @@ export class EditarproyectodialogComponent implements OnInit {
     private fb: FormBuilder,
     private proyectoService: ProyectoService,
     private authService: AuthService,
-    private aprobacionesService: AprobacionesService
+    private aprobacionesService: AprobacionesService,
+    private datePipe: DatePipe
   ) {
     // Inicializar el formulario reactivo
     this.proyectoForm = this.fb.group({
@@ -82,16 +84,16 @@ export class EditarproyectodialogComponent implements OnInit {
         (proyectos: Proyecto[]) => {
             if (proyectos.length > 0) {
                 const proyecto = proyectos[0]; // Acceder al primer objeto del arreglo
-                //console.log('Datos del proyecto procesado:', proyecto);
+                console.log('Datos del proyecto procesado:', proyecto);
                 this.nombreArea = proyecto.nombreArea;
 
                 // Usar fechas como cadenas directamente, sin convertir a objetos Date
                 this.proyectoForm.patchValue({
                     nombreProyecto: proyecto.nombreProyecto,
                     descripcion: proyecto.descripcion,
-                    fechaInicio: proyecto.fechaInicio || null, 
-                    fechaFin: proyecto.fechaFin || null,       
-                    fechaReal: proyecto.fechaReal || null,     
+                    fechaInicio: [proyecto.fechaInicio ? this.datePipe.transform(proyecto.fechaInicio, 'yyyy-MM-dd') : null],
+                    fechaFin: [proyecto.fechaFin ? this.datePipe.transform(proyecto.fechaFin, 'yyyy-MM-dd') : null],
+                    fechaReal: [proyecto.fechaReal ? this.datePipe.transform(proyecto.fechaReal, 'yyyy-MM-dd') : null],
                     idEstado: proyecto.idEstado,
                     porcentajeAvance: proyecto.porcentajeAvance,
                     idArea: proyecto.idArea,
@@ -128,10 +130,15 @@ export class EditarproyectodialogComponent implements OnInit {
 
         // Convertir fechas al formato 'yyyy-MM-dd'
         const fechas: Record<string, string | null> = {};
+
         ['fechaInicio', 'fechaReal', 'fechaFin'].forEach((key) => {
-            fechas[key] = solicitud[key]
-                ? new Date(solicitud[key]).toISOString().split('T')[0]
-                : null;
+            const valor = solicitud[key];
+        
+            if (valor && !isNaN(Date.parse(valor))) {
+                fechas[key] = new Date(valor).toISOString().split('T')[0]; // Formato 'yyyy-MM-dd'
+            } else {
+                fechas[key] = null;
+            }
         });
 
         // Armar el objeto para enviar al backend

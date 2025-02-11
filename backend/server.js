@@ -921,6 +921,7 @@ app.get('/solicitudes/cambios', (req, res) => {
     SELECT    
         A.idAprobacion,
         P.idProyecto,
+	U.idUsuario AS idSolicitante,
         U.nombre AS nombreSolicitante,
         A.fechaSolicitud,
         A.descripcionAprobacion AS descripcionSolicitud,
@@ -954,19 +955,42 @@ app.get('/solicitudes/cambios', (req, res) => {
             return res.status(500).json({ success: false, message: 'Error al obtener solicitudes' });
         }
 
-        const solicitudes = results.map((row) => {
-            const cambios = JSON.parse(row.detallesCambios); // Parseamos el JSON de los cambios
+const formatFecha = (fecha) => {
+    if (!fecha) return null; // Evita errores con valores null o undefined
+    const date = new Date(fecha);
+    return isNaN(date.getTime()) ? fecha : date.toISOString().split('T')[0]; // Si no es fecha válida, devuelve el valor original
+};
 
-            return {
-                idAprobacion: row.idAprobacion,
-                idProyecto: row.idProyecto,
-                nombreSolicitante: row.nombreSolicitante,
-                nombreProyecto: row.proyectoOriginal_nombre,
-                fechaSolicitud: row.fechaSolicitud,
-                descripcionSolicitud: row.descripcionSolicitud,
-                cambios: cambios, // Mostramos los cambios con detalles
-                estadoSolicitud: row.estadoSolicitud
-            };
+const solicitudes = results.map((row) => {
+    let cambios;
+
+    try {
+        cambios = typeof row.detallesCambios === 'string' ? JSON.parse(row.detallesCambios) : row.detallesCambios;
+
+        // Normalizar fechas en el objeto cambios
+        ['fechaInicio', 'fechaReal', 'fechaFin'].forEach((campo) => {
+            if (cambios?.[campo]) {
+                cambios[campo].nuevo = formatFecha(cambios[campo].nuevo);
+                cambios[campo].anterior = formatFecha(cambios[campo].anterior);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al parsear detallesCambios:', error, 'Valor recibido:', row.detallesCambios);
+        cambios = null;
+    }
+
+    return {
+        idAprobacion: row.idAprobacion,
+        idProyecto: row.idProyecto,
+	    idSolicitante: row.idSolicitante,
+        nombreSolicitante: row.nombreSolicitante,
+        nombreProyecto: row.proyectoOriginal_nombre,
+        fechaSolicitud: row.fechaSolicitud,
+        descripcionSolicitud: row.descripcionSolicitud,
+        cambios: cambios,
+        estadoSolicitud: row.estadoSolicitud
+    };
         });
 
         res.json(solicitudes);

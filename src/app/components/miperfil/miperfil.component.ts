@@ -68,6 +68,7 @@ export class MiperfilComponent implements OnInit {
     }
     this.cargarProyectos();
     this.tienesDatos = this.totalProyectos > 0;
+
   }
 
   cargarProyectos(): void {
@@ -80,6 +81,7 @@ export class MiperfilComponent implements OnInit {
     //console.log('idarea: ', idAreaUsuario)
   
     if (idUsuario) {
+      this.showSpinner = true;
       this.proyectoService.getProyectos().subscribe(
         (proyectos) => {
           const hoy = new Date();
@@ -128,6 +130,7 @@ export class MiperfilComponent implements OnInit {
   }
 
   private cargarUsuario(): void {
+
     this.usuario = this.authService.getUsuario();
   }
 

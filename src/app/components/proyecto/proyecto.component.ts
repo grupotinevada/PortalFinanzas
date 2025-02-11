@@ -184,8 +184,8 @@ eliminarProyecto(idProyecto: number): void {
         const dialogRef = this.dialog.open(EditarproyectodialogComponent, {
           width: '100%',
           maxWidth: '800px',
-          height: 'auto',
-          maxHeight: '50vh',
+          height: '100%',
+          maxHeight: '55vh',
           data: { idProyecto, proyectoOriginal }, // Pasar proyecto original al diálogo
         });
   

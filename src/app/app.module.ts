@@ -47,7 +47,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FiltroComponent } from './components/filtro/filtro.component';
 import { MiperfilComponent } from './components/miperfil/miperfil.component';
 import { AprobacionesComponent } from './components/aprobaciones/aprobaciones.component';
-
+import { DatePipe } from '@angular/common';
 
 registerLocaleData(localeEsCl, 'es-CL');
 
@@ -127,6 +127,7 @@ export const MY_DATE_FORMATS = {
     { provide: MAT_DATE_LOCALE, useValue: 'es-CL' }, // Establecer la región de Chile
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
     { provide: LOCALE_ID, useValue: 'es-CL' },
+    [DatePipe],
     [FiltroComponent],
     provideHttpClient(withFetch()), provideAnimationsAsync(),provideNativeDateAdapter()],
   bootstrap: [AppComponent]

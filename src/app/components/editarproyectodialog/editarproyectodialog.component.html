@@ -1,102 +1,76 @@
-<div class="dialog-container">
+<div class="container p-4 border rounded">
     <h6>Editar Proyecto - {{ nombreArea }}</h6>
 
     <app-spinner [isLoading]="showSpinner"></app-spinner>
 
     <form [formGroup]="proyectoForm" (ngSubmit)="enviarSolicitud()">
-        <div class="form-grid">
+        <div class="row g-3">
             <!-- Nombre del proyecto -->
-            <mat-form-field appearance="fill">
-                <mat-label>Nombre del Proyecto</mat-label>
-                <input matInput id="nombreProyecto" formControlName="nombreProyecto"
-                    placeholder="Ingrese el nombre del proyecto"  maxlength="30"/>
-                <mat-error *ngIf="proyectoForm.get('nombreProyecto')?.hasError('required')">
+            <div class="col-md-6">
+                <label for="nombreProyecto" class="form-label">Nombre del Proyecto</label>
+                <input type="text" class="form-control" id="nombreProyecto" formControlName="nombreProyecto" placeholder="Ingrese el nombre del proyecto" maxlength="30" />
+                <div class="invalid-feedback" *ngIf="proyectoForm.get('nombreProyecto')?.hasError('required')">
                     El nombre del proyecto es obligatorio.
-                </mat-error>
-            </mat-form-field>
+                </div>
+            </div>
 
             <!-- Descripción -->
-            <mat-form-field appearance="fill">
-                <mat-label>Descripción</mat-label>
-                <input matInput id="descripcion" formControlName="descripcion"
-                    placeholder="Ingrese la descripción del proyecto"  maxlength="30"/>
-                <mat-error *ngIf="proyectoForm.get('descripcion')?.hasError('required')">
+            <div class="col-md-6">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <input type="text" class="form-control" id="descripcion" formControlName="descripcion" placeholder="Ingrese la descripción del proyecto" maxlength="30" />
+                <div class="invalid-feedback" *ngIf="proyectoForm.get('descripcion')?.hasError('required')">
                     La descripción es obligatoria.
-                </mat-error>
-            </mat-form-field>
+                </div>
+            </div>
 
             <!-- Estado -->
-            <mat-form-field appearance="fill">
-                <mat-label>Estado</mat-label>
-                <mat-select formControlName="idEstado">
-                    <mat-option *ngFor="let estado of estados" [value]="estado.idEstado">
-                        {{ estado.descripcion }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+            <div class="col-md-6">
+                <label for="idEstado" class="form-label">Estado</label>
+                <select class="form-select" formControlName="idEstado">
+                    <option *ngFor="let estado of estados" [value]="estado.idEstado">{{ estado.descripcion }}</option>
+                </select>
+            </div>
 
-                  <!-- Campo Grupo (idArea) -->
-            <mat-form-field appearance="fill">
-                <mat-label>Grupo</mat-label>
-                <mat-select formControlName="idArea">
-                <mat-option *ngFor="let area of areas" [value]="area.idArea">
-                    {{ area.descripcion }}
-                </mat-option>
-                </mat-select>
-                <mat-error *ngIf="proyectoForm.get('idArea')?.touched && proyectoForm.get('idArea')?.hasError('required')">
-                Este campo es obligatorio.
-                </mat-error>
-            </mat-form-field>
-      
-            <!-- Fecha de inicio -->
-            <mat-form-field appearance="fill">
-                <mat-label>Fecha de Inicio</mat-label>
-                <input matInput [matDatepicker]="picker1" id="fechaInicio" formControlName="fechaInicio" />
-                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-                <mat-datepicker #picker1></mat-datepicker>
-                <mat-error
-                    *ngIf="proyectoForm.get('fechaReal')?.touched && proyectoForm.get('fechaReal')?.hasError('required')">
-                    La fecha de compromiso es obligatoria.
-                </mat-error>
-            </mat-form-field>
-            <!-- Fecha de compromiso -->
-            <mat-form-field appearance="fill">
-                <mat-label>Fecha de Compromiso</mat-label>
-                <input matInput [matDatepicker]="picker2" id="fechaReal" formControlName="fechaReal" />
-                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                <mat-datepicker #picker2></mat-datepicker>
-                <mat-error
-                    *ngIf="proyectoForm.get('fechaReal')?.touched && proyectoForm.get('fechaReal')?.hasError('required')">
-                    La fecha de compromiso es obligatoria.
-                </mat-error>
-            </mat-form-field>
-            <!-- Fecha de fin -->
-            <mat-form-field appearance="fill">
-                <mat-label>Fecha de Finalización</mat-label>
-                <input matInput [matDatepicker]="picker3" id="fechaFin" formControlName="fechaFin" />
-                <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
-                <mat-datepicker #picker3></mat-datepicker>
-                <mat-error
-                    *ngIf="proyectoForm.get('fechaFin')?.touched && proyectoForm.get('fechaFin')?.hasError('required')">
-                    La fecha de compromiso es obligatoria.
-                </mat-error>
-            </mat-form-field>
+            <!-- Grupo (idArea) -->
+            <div class="col-md-6">
+                <label for="idArea" class="form-label">Grupo</label>
+                <select class="form-select" formControlName="idArea">
+                    <option *ngFor="let area of areas" [value]="area.idArea">{{ area.descripcion }}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="proyectoForm.get('idArea')?.hasError('required')">
+                    Este campo es obligatorio.
+                </div>
+            </div>
 
-            <mat-form-field appearance="fill">
-                <mat-label>Descripción del cambio:</mat-label>
-                <textarea matInput id="descripcionCambio" formControlName="descripcionCambio"></textarea>
-                <mat-error *ngIf="proyectoForm.get('descripcionCambio')?.hasError('required')">
-                    <p>El minimo de caracteres es 10 y/o ingresa caracteres validos.</p>
-                </mat-error>
-            </mat-form-field>
+            <!-- Fechas -->
+            <div class="col-md-4">
+                <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+                <input type="date" class="form-control" id="fechaInicio" formControlName="fechaInicio" />
+            </div>
 
+            <div class="col-md-4">
+                <label for="fechaReal" class="form-label">Fecha de Compromiso</label>
+                <input type="date" class="form-control" id="fechaReal" formControlName="fechaReal" />
+            </div>
 
+            <div class="col-md-4">
+                <label for="fechaFin" class="form-label">Fecha de Finalización</label>
+                <input type="date" class="form-control" id="fechaFin" formControlName="fechaFin" />
+            </div>
 
-            <div class="buttons">
-                <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-                <button mat-raised-button color="primary" type="submit">Editar</button>
+            <!-- Descripción del cambio -->
+            <div class="col-12">
+                <label for="descripcionCambio" class="form-label">Descripción del cambio</label>
+                <textarea class="form-control" id="descripcionCambio" formControlName="descripcionCambio" rows="3"></textarea>
+                <div class="invalid-feedback" *ngIf="proyectoForm.get('descripcionCambio')?.hasError('required')">
+                    El mínimo de caracteres es 10 y/o ingresa caracteres válidos.
+                </div>
             </div>
         </div>
-    </form>
 
+        <div class="mt-3 d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="onCancel()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Editar</button>
+        </div>
+    </form>
 </div>

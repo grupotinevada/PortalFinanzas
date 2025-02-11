@@ -1,6 +1,6 @@
 <app-spinner [isLoading]="showSpinner"></app-spinner>
 
-<div class="bg-BEE7FB p-4 m-3 jumbotron">
+<div class="bg-BEE7FB p-4 m-3 jumbotron" *ngIf="rol === 1">
   <div class="text-center mb-3">
     <h3 class="fw-bold text-dark">Gestión de Solicitudes</h3>
     <p class="text-muted">Aquí puedes revisar y gestionar todas las solicitudes en curso.</p>
@@ -31,7 +31,7 @@
             </span>
           </th>
           <th>Descripción de cambios</th>
-          <th scope="col" (click)="ordenarPor('estadoSolicitud')" style="cursor: pointer;">Estado
+          <th scope="col" (click)="ordenarPor('estadoSolicitud')" style="cursor: pointer;">Estado solicitud
             <span *ngIf="ordenActual === 'estadoSolicitud'">
               {{ direccionOrden === 'asc' ? '▲' : direccionOrden === 'desc' ? '▼' : '⭐' }}
             </span>
@@ -45,7 +45,7 @@
           <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{solicitud.idAprobacion}}</td>
           <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{ solicitud.nombreSolicitante }}</td>
           <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{ solicitud.nombreProyecto }}</td>
-          <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{ solicitud.fechaSolicitud | date:'dd-MM-yyyy - h:mm ' }}</td>
+          <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}" class="text-center">{{ solicitud.fechaSolicitud | date:'d-MM-yyyy - H:mm ' }}</td>
           <td (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}">{{ solicitud.descripcionSolicitud }}</td>
           <td class="text-center" (click)="verProyecto(solicitud.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitud.nombreProyecto}}">
             <span class="badge px-2 py-1" [ngClass]="getEstadoClase(solicitud.estadoSolicitud)">
@@ -78,6 +78,77 @@
                 <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
               </svg>
             </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="bg-BEE7FB p-4 m-3 jumbotron" *ngIf="rol === 2">
+  <div class="text-center mb-3">
+    <h3 class="fw-bold text-dark">Mis solicitudes</h3>
+    <p class="text-muted">Aquí puedes revisar el estado de todas tus solicitudes en curso.</p>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-striped table-borderless shadow-sm align-middle">
+      <thead class="table-success text-center">
+        <tr >
+          <th scope="col" (click)="ordenarPor('idAprobacion')" style="cursor: pointer;">ID solicitud
+            <span *ngIf="ordenActual === 'idAprobacion'">
+              {{ direccionOrden === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+          <th scope="col" (click)="ordenarPor('nombreSolicitante')" style="cursor: pointer;">Solicitante
+            <span *ngIf="ordenActual === 'nombreSolicitante'">
+              {{ direccionOrden === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+          <th scope="col" (click)="ordenarPor('nombreProyecto')" style="cursor: pointer;">Proyecto
+            <span *ngIf="ordenActual === 'nombreProyecto'">
+              {{ direccionOrden === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+          <th scope="col" (click)="ordenarPor('fechaSolicitud')" style="cursor: pointer;">Fecha solicitud
+            <span *ngIf="ordenActual === 'fechaSolicitud'">
+              {{ direccionOrden === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+          <th>Descripción de cambios</th>
+          <th>Cambios solicitados</th>
+          <th scope="col" (click)="ordenarPor('estadoSolicitud')" style="cursor: pointer;">Estado solicitud
+            <span *ngIf="ordenActual === 'estadoSolicitud'">
+              {{ direccionOrden === 'asc' ? '▲' : direccionOrden === 'desc' ? '▼' : '⭐' }}
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider" >
+        <tr *ngFor="let solicitudFiltrada of solicitudesFiltrado" class="align-middle" >  
+          <td (click)="verProyecto(solicitudFiltrada.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitudFiltrada.nombreProyecto}}" class="text-center">{{solicitudFiltrada.idAprobacion}}</td>
+          <td (click)="verProyecto(solicitudFiltrada.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitudFiltrada.nombreProyecto}}" class="text-center">{{ solicitudFiltrada.nombreSolicitante }}</td>
+          <td (click)="verProyecto(solicitudFiltrada.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitudFiltrada.nombreProyecto}}" class="text-center">{{ solicitudFiltrada.nombreProyecto }}</td>
+          <td (click)="verProyecto(solicitudFiltrada.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitudFiltrada.nombreProyecto}}" class="text-center">{{ solicitudFiltrada.fechaSolicitud | date:'d-MM-yyyy - H:mm  ' }}</td>
+          <td (click)="verProyecto(solicitudFiltrada.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitudFiltrada.nombreProyecto}}">{{ solicitudFiltrada.descripcionSolicitud }}</td>
+
+          <td>
+            <ul class="list-unstyled mb-0 small">
+              <li *ngFor="let key of solicitudFiltrada.cambios | keyvalue">
+                <strong>{{ key.key }}:</strong> 
+                <span class="text-danger">
+                  {{ key.value.anterior }}
+                </span> → 
+                <span class="text-success">
+                  {{ key.value.nuevo }}
+                </span>
+              </li>
+            </ul>
+          </td>          <td class="text-center" (click)="verProyecto(solicitudFiltrada.idProyecto)" style="cursor: pointer;" title="Ir al proyecto {{solicitudFiltrada.nombreProyecto}}">
+            <span class="badge px-2 py-1" [ngClass]="getEstadoClase(solicitudFiltrada.estadoSolicitud)">
+              {{ solicitudFiltrada.estadoSolicitud }}
+            </span>
           </td>
         </tr>
       </tbody>

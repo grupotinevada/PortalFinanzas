@@ -16,11 +16,12 @@ import { Notyf } from 'notyf';
 export class AprobacionesComponent implements OnInit{
 
   solicitudes: Solicitud[] = [];
+  solicitudesFiltrado: Solicitud[] = [];
   ordenActual: string = '';
   direccionOrden: 'asc' | 'desc' | 'prioridad' = 'asc';
   showSpinner = false;
-  idAprobacion: any;
-
+  idUsuario: any;
+  rol: number = 0;
   constructor(
     private aprobacionService: AprobacionesService,
     private router : Router,
@@ -30,24 +31,29 @@ export class AprobacionesComponent implements OnInit{
   ) { }
 
   ngOnInit() {
+
     this.cargarSolicitudes();
-    this.idAprobacion = this.authService.getUsuarioId();
-    console.log(this.idAprobacion)
+    this.idUsuario = this.authService.getUsuarioId();
+    this.rol = this.authService.getUsuario().idRol;
+    
   }
 
   cargarSolicitudes() {
-    this.showSpinner = true;
+    
     
     forkJoin({
+      
       estados: this.proyectoService.getEstado(),
-      areas: this.proyectoService.getArea() 
+      areas: this.proyectoService.getArea(),
     }).subscribe(({ estados, areas }) => {
+      this.showSpinner = true;
       this.aprobacionService.obtenerCambiosSolicitudes().subscribe({
         next: (data) => {
+          
           this.solicitudes = (data as any[]).map((solicitud) => {
             const cambios = { ...solicitud.cambios };
             const cambiosMapeados: any = {};
-  
+            const cambiosMapeadosFiltrado: any = {};
             // Definir un mapa de nombres amigables
             const nombresAmigables: { [key: string]: string } = {
               idArea: 'Área',
@@ -78,27 +84,33 @@ export class AprobacionesComponent implements OnInit{
               }
   
               // Guardar el cambio con la nueva clave
-              cambiosMapeados[nombresAmigables[key] || key] = valor;
+              cambiosMapeados[nombresAmigables[key] || key] = valor;       
             });
   
             return {
               ...solicitud,
               cambios: cambiosMapeados
             };
+            
           });
   
-          console.log('INFO: ', this.solicitudes);
-          this.showSpinner = false;
-        },
-        error: (error) => {
-          console.error('Error al obtener las solicitudes', error);
-          this.showSpinner = false;
-        }
-      });
-    }
-  );
-  this.showSpinner = false;  
-}
+           // Filtrar solicitudes solo del usuario actual
+           this.solicitudesFiltrado = this.solicitudes.filter(solicitud => solicitud.idSolicitante === this.idUsuario);
+
+           console.log('INFO: Todas las solicitudes:', this.solicitudes);
+           console.log('INFO: Solicitudes del usuario actual:', this.solicitudesFiltrado);
+ 
+           this.showSpinner = false;
+         },
+         error: (error) => {
+           console.error('Error al obtener las solicitudes', error);
+           this.showSpinner = false;
+         }
+       });
+     });
+ 
+     this.showSpinner = false;
+ }
 
 
   
@@ -157,7 +169,7 @@ getEstadoClase(estado: string) {
 
 aprobarSolicitud(idAprobacion: number) {
   const notyf = new Notyf();
-  if (this.idAprobacion) {
+  if (idAprobacion) {
     this.aprobacionService.aprobarSolicitud(idAprobacion)
       .subscribe({
         next: (response) => {
@@ -181,7 +193,7 @@ aprobarSolicitud(idAprobacion: number) {
 
 rechazarSolicitud(idAprobacion: number) {
   const notyf = new Notyf();
-  if (this.idAprobacion) {
+  if (idAprobacion) {
     this.aprobacionService.rechazarSolicitud(idAprobacion)
       .subscribe({
         next: (response) => {

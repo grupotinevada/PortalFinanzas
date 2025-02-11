@@ -289,6 +289,10 @@ app.get('/uploads/:filename/:idProyecto', (req, res) => {
 });
 
 
+// Verificar si la carpeta base existe, si no, crearla
+if (!fs.existsSync(RUTA_BASE_ARCHIVOS)) {
+    fs.mkdirSync(RUTA_BASE_ARCHIVOS, { recursive: true });
+}
 
 // Endpoint para archivos
 app.post('/api/archivos', upload.single('archivo'), (req, res) => {
@@ -600,8 +604,8 @@ const linkAprobaciones = `${APP_URL}/aprobaciones`;
 app.put('/proyecto/:id/solicitud', (req, res) => {
     const idProyecto = req.params.id;
 
-    console.log('🔹 ID Proyecto recibido:', idProyecto);
-    console.log('🔹 Body recibido en Node:', req.body);
+    //console.log('🔹 ID Proyecto recibido:', idProyecto);
+    //console.log('🔹 Body recibido en Node:', req.body);
 
     const {
         nombre,
@@ -616,7 +620,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
         descripcionAprobacion
     } = req.body;
 
-    console.log('🔹 idSolicitante extraído del body:', idSolicitante);
+    //console.log('🔹 idSolicitante extraído del body:', idSolicitante);
 
     if (!idSolicitante) {
         console.error('⚠️ ERROR: idSolicitante no recibido en el backend.');
@@ -633,7 +637,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
             return res.status(404).json({ success: false, message: 'Proyecto no encontrado' });
         }
 
-        console.log('✅ Proyecto encontrado, insertando solicitud...');
+        //console.log('✅ Proyecto encontrado, insertando solicitud...');
         const proyectoActual = results[0];
 
         // Detectar cambios
@@ -667,7 +671,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                 return res.status(500).json({ success: false, message: 'Error al registrar solicitud' });
             }
 
-            console.log('✅ Solicitud insertada correctamente en la BD');
+            //console.log('✅ Solicitud insertada correctamente en la BD');
 
             // Obtener el correo del solicitante
             pool.query('SELECT correo FROM USUARIO WHERE idUsuario = ?', [idSolicitante], (err, results) => {
@@ -696,7 +700,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
 
                     // Extraer los correos de los administradores
                     const correosAdmins = adminResults.map(row => row.correo);
-                    console.log('📧 Correos de administradores:', correosAdmins);
+                    //console.log('📧 Correos de administradores:', correosAdmins);
 
                     // Crear el correo para el solicitante
                     const mailOptionsSolicitante = {
@@ -756,7 +760,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                         if (err) {
                             console.error('⚠️ Error al enviar correo al solicitante:', err);
                         } else {
-                            console.log('✅ Correo enviado al solicitante:', info.response);
+                            //console.log('✅ Correo enviado al solicitante:', info.response);
                         }
                     });
 
@@ -820,7 +824,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                             if (err) {
                                 console.error('⚠️ Error al enviar correo a administradores:', err);
                             } else {
-                                console.log('✅ Correo enviado a administradores:', info.response);
+                                //console.log('✅ Correo enviado a administradores:', info.response);
                             }
                         });
                     }
@@ -840,78 +844,152 @@ app.put('/aprobacion/:id', (req, res) => {
     const { idAprobador, estadoSolicitud } = req.body;
 
     // Obtener la solicitud pendiente
-    pool.query('SELECT * FROM APROBACION WHERE idAprobacion = ?', [idAprobacion], (err, results) => {
+    pool.query('SELECT * FROM APROBACION WHERE idAprobacion = ?', [idAprobacion], async (err, results) => {
         if (err) return res.status(500).json({ success: false, message: 'Error al obtener solicitud' });
         if (results.length === 0) return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
 
         const solicitud = results[0];
 
-        if (estadoSolicitud === 2) { // Aprobado
-            // Obtener datos actuales del proyecto
-            pool.query('SELECT * FROM PROYECTO WHERE idProyecto = ?', [solicitud.idProyecto], (err, projectResults) => {
-                if (err) return res.status(500).json({ success: false, message: 'Error al obtener proyecto' });
+        // Obtener el correo del solicitante
+        pool.query('SELECT correo FROM USUARIO WHERE idUsuario = ?', [solicitud.idSolicitante], async (err, userResults) => {
+            if (err) return res.status(500).json({ success: false, message: 'Error al obtener correo del solicitante' });
+            if (userResults.length === 0) return res.status(404).json({ success: false, message: 'Solicitante no encontrado' });
 
-                const proyectoActual = projectResults[0];
+            const correoSolicitante = userResults[0].correo;
 
-                // Comparar valores antiguos y nuevos
-                const cambios = {};
-                const campos = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance', 'idArea', 'idEstado'];
+            // Determinar el estado de la solicitud
+            const estadoTexto = estadoSolicitud === 2 ? 'aprobada' : 'rechazada';
+            const asuntoCorreo = `Solicitud de Cambio en Proyecto - Estado: ${estadoTexto.toUpperCase()}`;
+            const mensajeCorreo = estadoSolicitud === 2
+                ? `Tu solicitud de cambio para el proyecto "<b>${solicitud.nombre}</b>" ha sido <b>aprobada</b>.`
+                : `Tu solicitud de cambio para el proyecto "<b>${solicitud.nombre}</b>" ha sido <b>rechazada</b>.`;
 
-                campos.forEach(campo => {
-                    if (proyectoActual[campo] !== solicitud[campo]) {
-                        cambios[campo] = {
-                            anterior: proyectoActual[campo],
-                            nuevo: solicitud[campo]
-                        };
-                    }
-                });
+            // Crear el correo para el solicitante
+            const mailOptionsSolicitante = {
+                from: '"PortalFinanzas" <noreply@inevada.cl>',
+                to: correoSolicitante,
+                subject: asuntoCorreo,
+                text: `${mensajeCorreo} Puedes revisar el estado de tu solicitud en el siguiente enlace: ${linkAprobaciones}`,
+                html: `
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Solicitud de Cambio en Proyecto</title>
+                </head>
+                <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4;">
+                        <tr>
+                            <td align="center" style="padding: 20px 0;">
+                                <!-- Contenedor principal -->
+                                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                    <tr>
+                                        <td align="center" style="padding: 20px;">
+                                            <!-- Logo -->
+                                            <img src="https://i.ibb.co/N6sgbdpr/nevadaicon.png" alt="PortalFinanzas" style="max-width: 150px; margin-bottom: 20px;" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0 20px 20px 20px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                            <!-- Contenido -->
+                                            <p style="margin: 0 0 15px;">${mensajeCorreo}</p>
+                                            <p style="margin: 0 0 15px;">Ingresa al PortalFinanzas con el siguiente enlace:</p>
+                                            <p style="margin: 0;">
+                                                <a href="${linkAprobaciones}" target="_blank" style="color: #ffffff; background-color: #007bff; text-decoration: none; padding: 10px 15px; border-radius: 5px; display: inline-block;">
+                                                    Ver Estado de la Solicitud
+                                                </a>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" style="padding: 20px; background-color: #f9f9f9; border-radius: 0 0 8px 8px; font-size: 12px; color: #777777;">
+                                            <!-- Pie de página -->
+                                            <p style="margin: 0;">Este correo fue enviado automáticamente desde el PortalFinanzas. No responda a este mensaje.</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
+                `
+            };
 
-                // Actualizar el proyecto
-                const updateQuery = `
-                    UPDATE PROYECTO
-                    SET nombre = ?, descripcion = ?, fechaInicio = ?, fechaFin = ?, fechaReal = ?, 
-                        porcentajeAvance = ?, idArea = ?, idEstado = ?
-                    WHERE idProyecto = ?;
-                `;
+            try {
+                // Enviar el correo
+                await transporter.sendMail(mailOptionsSolicitante);
+                //console.log(`Correo enviado al solicitante (${correoSolicitante})`);
+            } catch (emailErr) {
+                console.error('Error al enviar correo:', emailErr);
+                return res.status(500).json({ success: false, message: 'Error al enviar correo al solicitante' });
+            }
 
-                pool.query(updateQuery, [
-                    solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio,
-                    solicitud.fechaFin, solicitud.fechaReal, solicitud.porcentajeAvance,
-                    solicitud.idArea, solicitud.idEstado, solicitud.idProyecto
-                ], (err) => {
-                    if (err) return res.status(500).json({ success: false, message: 'Error al actualizar proyecto' });
+            // Procesar la solicitud según el estado
+            if (estadoSolicitud === 2) { // Aprobado
+                // Obtener datos actuales del proyecto
+                pool.query('SELECT * FROM PROYECTO WHERE idProyecto = ?', [solicitud.idProyecto], (err, projectResults) => {
+                    if (err) return res.status(500).json({ success: false, message: 'Error al obtener proyecto' });
+                    const proyectoActual = projectResults[0];
 
-                    // Registrar cambios en LOG_PROYECTO
-                    const logQuery = `
-                        INSERT INTO LOG_PROYECTO (idProyecto, idUsuario, accion, detalles, fechaAccion) 
-                        VALUES (?, ?, 'APROBADO', ?, NOW());
+                    // Comparar valores antiguos y nuevos
+                    const cambios = {};
+                    const campos = ['nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'fechaReal', 'porcentajeAvance', 'idArea', 'idEstado'];
+                    campos.forEach(campo => {
+                        if (proyectoActual[campo] !== solicitud[campo]) {
+                            cambios[campo] = {
+                                anterior: proyectoActual[campo],
+                                nuevo: solicitud[campo]
+                            };
+                        }
+                    });
+
+                    // Actualizar el proyecto
+                    const updateQuery = `
+                        UPDATE PROYECTO
+                        SET nombre = ?, descripcion = ?, fechaInicio = ?, fechaFin = ?, fechaReal = ?, 
+                            porcentajeAvance = ?, idArea = ?, idEstado = ?
+                        WHERE idProyecto = ?;
                     `;
+                    pool.query(updateQuery, [
+                        solicitud.nombre, solicitud.descripcion, solicitud.fechaInicio,
+                        solicitud.fechaFin, solicitud.fechaReal, solicitud.porcentajeAvance,
+                        solicitud.idArea, solicitud.idEstado, solicitud.idProyecto
+                    ], (err) => {
+                        if (err) return res.status(500).json({ success: false, message: 'Error al actualizar proyecto' });
 
-                    pool.query(logQuery, [solicitud.idProyecto, idAprobador, JSON.stringify(cambios)], (err) => {
-                        if (err) return res.status(500).json({ success: false, message: 'Error al registrar log' });
+                        // Registrar cambios en LOG_PROYECTO
+                        const logQuery = `
+                            INSERT INTO LOG_PROYECTO (idProyecto, idUsuario, accion, detalles, fechaAccion) 
+                            VALUES (?, ?, 'APROBADO', ?, NOW());
+                        `;
+                        pool.query(logQuery, [solicitud.idProyecto, idAprobador, JSON.stringify(cambios)], (err) => {
+                            if (err) return res.status(500).json({ success: false, message: 'Error al registrar log' });
 
-                        // Actualizar el estado de la solicitud
-                        pool.query(
-                            'UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?',
-                            [idAprobador, estadoSolicitud, idAprobacion],
-                            (err) => {
-                                if (err) return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
-                                res.json({ success: true, message: 'Solicitud aprobada y cambios aplicados' });
-                            }
-                        );
+                            // Actualizar el estado de la solicitud
+                            pool.query(
+                                'UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?',
+                                [idAprobador, estadoSolicitud, idAprobacion],
+                                (err) => {
+                                    if (err) return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
+                                    res.json({ success: true, message: 'Solicitud aprobada y cambios aplicados' });
+                                }
+                            );
+                        });
                     });
                 });
-            });
-        } else { // Rechazado
-            pool.query(
-                'UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?',
-                [idAprobador, estadoSolicitud, idAprobacion],
-                (err) => {
-                    if (err) return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
-                    res.json({ success: true, message: 'Solicitud rechazada' });
-                }
-            );
-        }
+            } else { // Rechazado
+                pool.query(
+                    'UPDATE APROBACION SET idAprobador = ?, idEstadoSolicitud = ? WHERE idAprobacion = ?',
+                    [idAprobador, estadoSolicitud, idAprobacion],
+                    (err) => {
+                        if (err) return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
+                        res.json({ success: true, message: 'Solicitud rechazada' });
+                    }
+                );
+            }
+        });
     });
 });
 

@@ -81,9 +81,9 @@ export class AgregarproyectodialogComponent implements OnInit {
   // Método para enviar el proyecto al servicio
   anadirProyecto(): void {
     if (this.proyectoForm.valid) {
-      //console.log('Formulario válido:', this.proyectoForm.value);
+      console.log('Formulario válido:', this.proyectoForm.value);
       // Obtenemos los valores del formulario
-      const proyectoData = this.proyectoForm.value;
+      const proyectoData = this.proyectoForm.getRawValue();
   
       // Asegurarnos de que las fechas sean tipo Date o formato correcto para enviar al backend
       proyectoData.fechaInicio = this.formatDate(proyectoData.fechaInicio);
@@ -95,6 +95,7 @@ export class AgregarproyectodialogComponent implements OnInit {
       proyectoData.idUsuario = Number(proyectoData.idUsuario);
       proyectoData.idArea = Number(proyectoData.idArea);
       proyectoData.idEstado = Number(proyectoData.idEstado);
+      proyectoData.habilitado = 1;
 
       this.showSpinner = true
       // Llamar al servicio para añadir el proyecto

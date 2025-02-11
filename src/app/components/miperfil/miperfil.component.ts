@@ -148,7 +148,7 @@ export class MiperfilComponent implements OnInit {
   // Método para obtener el color del progreso
   getProgressColor(proyecto: Proyecto): string {
     const hoy = new Date();
-    const fechaReal = new Date(proyecto.fechaReal);
+    const fechaReal = proyecto.fechaReal ? new Date(proyecto.fechaReal) : new Date();
     let clase = '';
 
     switch (true) {

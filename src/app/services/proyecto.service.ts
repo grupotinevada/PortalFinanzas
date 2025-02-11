@@ -12,7 +12,7 @@ export interface Proyecto {
   idProyecto: number;
   nombreProyecto: string;
   descripcion: string;
-  fechaInicio: Date;
+  fechaInicio: Date | null;
   fechaFin: Date | null;
   porcentajeAvance: number; // Cambiar a number
   idUsuario: number;
@@ -21,10 +21,10 @@ export interface Proyecto {
   idArea: number;
   nombreArea: string;
   idEstado: number;
-  fechaReal: Date;
+  fechaReal: Date | null;
   descripcionEstado: string;
-  fechaCreacion: Date;
-  fechaModificacion: Date;
+  fechaCreacion: Date | null;
+  fechaModificacion: Date | null;
   editable?: boolean;
 }
 export interface Area {

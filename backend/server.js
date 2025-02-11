@@ -1044,7 +1044,8 @@ app.post('/proyecto', (req, res) => {
         porcentajeAvance,
         idUsuario,
         idArea,
-        idEstado
+        idEstado,
+        habilitado
     } = req.body;
 
     const query = `
@@ -1057,11 +1058,12 @@ app.post('/proyecto', (req, res) => {
             porcentajeAvance,
             idUsuario,
             idArea,
-            idEstado
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            idEstado,
+            habilitado
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
 
-    pool.execute(query, [nombre, descripcion, fechaInicio, fechaFin, fechaReal, porcentajeAvance, idUsuario, idArea, idEstado], (err, result) => {
+    pool.execute(query, [nombre, descripcion, fechaInicio, fechaFin, fechaReal, porcentajeAvance, idUsuario, idArea, idEstado, habilitado], (err, result) => {
         if (err) {
             console.error('Database query error:', err);
             return res.status(500).json({ success: false, message: 'Error creating project' });
@@ -1187,7 +1189,8 @@ app.get('/areas-proyectos', (req, res) => {
             p.fechaInicio,
             p.fechaFin,
 	        p.fechaReal,
-	        p.porcentajeAvance
+	        p.porcentajeAvance,
+            p.habilitado
         FROM
             AREA a
         LEFT JOIN

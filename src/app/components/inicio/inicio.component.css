@@ -218,3 +218,15 @@ body {
 .titulo-bg-warning { background-color: rgb(250, 205, 120); }
 .titulo-bg-secondary { background-color: rgb(252, 95, 95); }
 .titulo-bg-light { background-color: rgb(255, 235, 235); }
+
+
+.no-projects-message {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 18px;
+  color: #6c757d; /* Color gris suave */
+}
+
+.no-projects-message p {
+  font-weight: bold;
+}

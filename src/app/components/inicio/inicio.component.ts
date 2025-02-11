@@ -49,37 +49,68 @@ export class InicioComponent implements OnInit {
         return [];
       })
     ).subscribe((data: any[]) => {
+      console.log("Datos desde api: ", data);
+  
       if (data && data.length) {
-        this.areas = data.reduce((result, item) => {
-          let area = result.find((a: Area) => a.id === item.idArea);
-          if (!area) {
-            area = { id: item.idArea, nombre: item.nombreArea, proyectos: [] };
-            result.push(area);
+        // Crear un mapa temporal para agrupar áreas y proyectos
+        const areasMap = new Map<number, Area>();
+  
+        data.forEach(item => {
+          // Verificar si el área ya existe en el mapa
+          if (!areasMap.has(item.idArea)) {
+            // Si no existe, crearla con una lista vacía de proyectos
+            areasMap.set(item.idArea, {
+              id: item.idArea,
+              nombre: item.nombreArea,
+              proyectos: []
+            });
           }
-          area.proyectos.push({
-            idProyecto: item.idProyecto,
-            nombreProyecto: item.nombreProyecto,
-            descripcion: item.descripcionProyecto,
-            fechaInicio: new Date(item.fechaInicio),
-            fechaReal: item.fechaReal ? new Date(item.fechaReal) : null,
-            fechaFin: item.fechaFin ? new Date(item.fechaFin) : null,
-            porcentajeAvance: parseFloat(item.porcentajeAvance),
-            idEstado: item.idEstado
-          });
-          return result;
-        }, []);
+  
+          // Obtener la referencia al área actual
+          const area = areasMap.get(item.idArea)!;
+  
+          // Agregar solo proyectos habilitados
+          if (item.habilitado === 1 && item.idProyecto) {
+            const proyecto = {
+              idProyecto: item.idProyecto,
+              nombreProyecto: item.nombreProyecto,
+              descripcion: item.descripcionProyecto,
+              fechaInicio: item.fechaInicio ? new Date(item.fechaInicio): null,
+              fechaReal: item.fechaReal ? new Date(item.fechaReal) : null,
+              fechaFin: item.fechaFin ? new Date(item.fechaFin) : null,
+              porcentajeAvance: parseFloat(item.porcentajeAvance),
+              idEstado: item.idEstado,
+              habilitado: item.habilitado,
+              idUsuario: item.idUsuario,
+              nombreUsuario: item.nombreUsuario,
+              correoUsuario: item.correoUsuario,
+              idArea: item.idArea,
+              nombreArea: item.nombreArea,
+              descripcionEstado: item.descripcionEstado,
+              fechaCreacion: item.fechaCreacion ? new Date(item.fechaCreacion) : null,
+              fechaModificacion: item.fechaModificacion ? new Date(item.fechaModificacion) : null
+            };
+  
+            area.proyectos.push(proyecto);
+          }
+        });
+  
+        // Convertir el mapa a un array de áreas
+        this.areas = Array.from(areasMap.values());
       } else {
         console.warn('No hay datos para cargar áreas y proyectos.');
         this.areas = [];
       }
-
+  
       // Generar los trimestres dinámicamente basado en las fechas de compromiso
       this.trimestres = this.generarTrimestresPorProyectos();
-
+  
       this.cdr.detectChanges();
       this.showSpinner = false;
     });
   }
+  
+  
   // Generar trimestres dinámicos basados en las fechas de los proyectos
   generarTrimestresPorProyectos(): string[] {
     const trimestresSet = new Set<string>();

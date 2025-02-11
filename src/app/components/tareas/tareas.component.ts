@@ -21,7 +21,7 @@ import { ArchivoProyecto } from '../../model/archivo.interface';
 export class TareasComponent implements OnInit, AfterViewInit {
 
   archivosProyecto: any[] = [];
-loading: boolean = false;
+  loading: boolean = false;
   cambiosRevisados: boolean = true;
   tieneCambios: boolean = false;
   cambios: any[] = [];

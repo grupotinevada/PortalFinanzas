@@ -1,101 +1,90 @@
-<div class="dialog-container">
+<div class="container p-4 border rounded">
   <h4>Agregar Proyecto</h4>
   <app-spinner [isLoading]="showSpinner"></app-spinner>
 
   <form [formGroup]="proyectoForm" (ngSubmit)="anadirProyecto()">
-    <div class="form-grid">
-
+    <div class="row g-3">
       <!-- Campo Nombre del Proyecto -->
-      <mat-form-field appearance="fill">
-        <mat-label>Nombre del Proyecto</mat-label>
-        <input matInput id="nombre" formControlName="nombre" maxlength="30" />
-        <mat-error *ngIf="proyectoForm.get('nombre')?.touched && proyectoForm.get('nombre')?.hasError('required')">
+      <div class="col-md-6">
+        <label for="nombre" class="form-label">Nombre del Proyecto</label>
+        <input type="text" class="form-control" id="nombre" formControlName="nombre" maxlength="30">
+        <div class="text-danger" *ngIf="proyectoForm.get('nombre')?.touched && proyectoForm.get('nombre')?.hasError('required')">
           Este campo es obligatorio.
-        </mat-error>
-        <mat-error *ngIf="proyectoForm.get('nombre')?.hasError('maxlength')">
+        </div>
+        <div class="text-danger" *ngIf="proyectoForm.get('nombre')?.hasError('maxlength')">
           El nombre no puede superar los 30 caracteres.
-        </mat-error>
-      </mat-form-field>
-
+        </div>
+      </div>
+      
       <!-- Campo Descripción -->
-      <mat-form-field appearance="fill">
-        <mat-label>Descripción</mat-label>
-        <input matInput formControlName="descripcion" maxlength="30" />
-        <mat-error
-          *ngIf="proyectoForm.get('descripcion')?.touched && proyectoForm.get('descripcion')?.hasError('required')">
+      <div class="col-md-6">
+        <label for="descripcion" class="form-label">Descripción</label>
+        <input type="text" class="form-control" id="descripcion" formControlName="descripcion" maxlength="30">
+        <div class="text-danger" *ngIf="proyectoForm.get('descripcion')?.touched && proyectoForm.get('descripcion')?.hasError('required')">
           Este campo es obligatorio.
-        </mat-error>
-        <mat-error *ngIf="proyectoForm.get('descripcion')?.hasError('maxlength')">
+        </div>
+        <div class="text-danger" *ngIf="proyectoForm.get('descripcion')?.hasError('maxlength')">
           La descripción no puede superar los 30 caracteres.
-        </mat-error>
-      </mat-form-field>
+        </div>
+      </div>
 
       <!-- Campo Estado del Proyecto -->
-      <mat-form-field appearance="fill">
-        <mat-label>Estado del proyecto</mat-label>
-        <mat-select formControlName="idEstado">
-          <mat-option *ngFor="let proyecto of proyectos" [value]="proyecto.idEstado">
+      <div class="col-md-6">
+        <label for="idEstado" class="form-label">Estado del Proyecto</label>
+        <select class="form-select" id="idEstado" formControlName="idEstado">
+          <option *ngFor="let proyecto of proyectos" [value]="proyecto.idEstado">
             {{ proyecto.descripcion }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="proyectoForm.get('idEstado')?.touched && proyectoForm.get('idEstado')?.hasError('required')">
+          </option>
+        </select>
+        <div class="text-danger" *ngIf="proyectoForm.get('idEstado')?.touched && proyectoForm.get('idEstado')?.hasError('required')">
           El estado del proyecto es obligatorio.
-        </mat-error>
-      </mat-form-field>
+        </div>
+      </div>
+
       <!-- Campo Grupo (idArea) -->
-      <mat-form-field appearance="fill">
-        <mat-label>Grupo</mat-label>
-        <mat-select formControlName="idArea">
-          <mat-option *ngFor="let area of areas" [value]="area.idArea">
+      <div class="col-md-6">
+        <label for="idArea" class="form-label">Grupo</label>
+        <select class="form-select" id="idArea" formControlName="idArea">
+          <option *ngFor="let area of areas" [value]="area.idArea">
             {{ area.descripcion }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="proyectoForm.get('idArea')?.touched && proyectoForm.get('idArea')?.hasError('required')">
+          </option>
+        </select>
+        <div class="text-danger" *ngIf="proyectoForm.get('idArea')?.touched && proyectoForm.get('idArea')?.hasError('required')">
           Este campo es obligatorio.
-        </mat-error>
-      </mat-form-field>
+        </div>
+      </div>
+
       <!-- Campo Fecha de Inicio -->
-      <mat-form-field>
-        <mat-label>Fecha de inicio</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="fechaInicio">
-        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
-        <mat-error
-          *ngIf="proyectoForm.get('fechaInicio')?.touched && proyectoForm.get('fechaInicio')?.hasError('required')">
+      <div class="col-md-4">
+        <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+        <input type="date" class="form-control" id="fechaInicio" formControlName="fechaInicio">
+        <div class="text-danger" *ngIf="proyectoForm.get('fechaInicio')?.touched && proyectoForm.get('fechaInicio')?.hasError('required')">
           Este campo es obligatorio.
-        </mat-error>
-      </mat-form-field>
+        </div>
+      </div>
 
       <!-- Campo Fecha de Compromiso -->
-      <mat-form-field>
-        <mat-label>Fecha de Compromiso</mat-label>
-        <input matInput [matDatepicker]="picker2" formControlName="fechaReal">
-        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
-        <mat-error
-          *ngIf="proyectoForm.get('fechaReal')?.touched && proyectoForm.get('fechaReal')?.hasError('required')">
+      <div class="col-md-4">
+        <label for="fechaReal" class="form-label">Fecha de Compromiso</label>
+        <input type="date" class="form-control" id="fechaReal" formControlName="fechaReal">
+        <div class="text-danger" *ngIf="proyectoForm.get('fechaReal')?.touched && proyectoForm.get('fechaReal')?.hasError('required')">
           La fecha de compromiso es obligatoria.
-        </mat-error>
-      </mat-form-field>
+        </div>
+      </div>
 
       <!-- Campo Fecha de Finalización -->
-      <mat-form-field appearance="fill">
-        <mat-label>Fecha de finalización</mat-label>
-        <input matInput [matDatepicker]="picker3" formControlName="fechaFin">
-        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
-        <mat-datepicker #picker3></mat-datepicker>
-        <mat-error *ngIf="proyectoForm.get('fechaFin')?.hasError('required') && proyectoForm.get('fechaFin')?.touched">
+      <div class="col-md-4">
+        <label for="fechaFin" class="form-label">Fecha de Finalización</label>
+        <input type="date" class="form-control" id="fechaFin" formControlName="fechaFin">
+        <div class="text-danger" *ngIf="proyectoForm.get('fechaFin')?.touched && proyectoForm.get('fechaFin')?.hasError('required')">
           La fecha de finalización es obligatoria cuando el estado es "Finalizado".
-        </mat-error>
-      </mat-form-field>
-
-
-
+        </div>
+      </div>
     </div>
 
-    <div class="buttons">
-      <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-      <button mat-raised-button color="primary" type="submit">Agregar</button>
+    <div class="d-flex justify-content-end mt-4">
+      <button type="button" class="btn btn-secondary me-2" (click)="onCancel()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Agregar</button>
     </div>
   </form>
 </div>

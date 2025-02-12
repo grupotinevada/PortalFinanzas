@@ -69,20 +69,24 @@ export class AprobacionesComponent implements OnInit{
             Object.keys(cambios).forEach((key) => {
               let valor = cambios[key];
   
-              if (key === 'idEstado' && typeof valor === 'object') {
+              if (key === 'idEstado' && valor?.anterior !== undefined && valor?.nuevo !== undefined) {
                 valor = {
-                  anterior: estados.find(e => e.idEstado === valor.anterior)?.descripcion || valor.anterior,
-                  nuevo: estados.find(e => e.idEstado === valor.nuevo)?.descripcion || valor.nuevo
+                  anterior: estados.find(e => e.idEstado === Number(valor.anterior))?.descripcion || `ID ${valor.anterior} (Desconocido)`,
+                  nuevo: estados.find(e => e.idEstado === Number(valor.nuevo))?.descripcion || `ID ${valor.nuevo} (Desconocido)`
                 };
               }
   
-              if (key === 'idArea' && typeof valor === 'object') {
+  
+              if (key === 'idArea' &&  typeof valor === 'object' || typeof valor === 'number' || typeof valor === 'string') {
                 valor = {
-                  anterior: areas.find((a:any) => a.idArea === valor.anterior)?.nombre || valor.anterior,
-                  nuevo: areas.find((a:any) => a.idArea === valor.nuevo)?.nombre || valor.nuevo
+                  anterior: areas.find((a:any) => a.idArea === Number(valor.anterior))?.nombre || valor.anterior,
+                  nuevo: areas.find((a:any) => a.idArea === Number(valor.nuevo))?.nombre || valor.nuevo
                 };
               }
   
+
+
+
               // Guardar el cambio con la nueva clave
               cambiosMapeados[nombresAmigables[key] || key] = valor;       
             });
@@ -199,15 +203,18 @@ rechazarSolicitud(idAprobacion: number) {
         next: (response) => {
           console.log('Solicitud rechazada:', response),
           notyf.success('Solicitud rechazada con éxito')
+          this.cargarSolicitudes()
         },
         error: (error) => {
           console.error('Error al rechazar solicitud:', error)
-          notyf.error('Hubo un problema con tu solicitud, intentelo más tarde')
+          notyf.error('Hubo un problema con tu solicitud, intentelo más tarde');
+          this.cargarSolicitudes()
         }
       });
   } else {
     notyf.error('Hubo un problema con tu solicitud, intentelo más tarde')
     console.warn('Debe ingresar un ID de aprobación válido.');
+    this.cargarSolicitudes()
   }
 }
 

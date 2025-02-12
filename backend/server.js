@@ -1260,7 +1260,7 @@ app.get('/proyectos-completos', (req, res) => {
             p.porcentajeAvance,
             p.fechaCreacion,
             p.fechaModificacion,
-            p.habilitado
+            p.habilitado,
             u.idUsuario,
             u.nombre AS nombreUsuario,
             u.correo AS correoUsuario,

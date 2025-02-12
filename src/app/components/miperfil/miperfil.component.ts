@@ -72,7 +72,7 @@ export class MiperfilComponent implements OnInit {
   }
 
   cargarProyectos(): void {
-    this.showSpinner = true;
+
     const usuario = this.authService.getUsuario(); // Usuario actual
     //console.log('usuario: ', usuario)
     const idUsuario = usuario.id; // Id del usuario actual

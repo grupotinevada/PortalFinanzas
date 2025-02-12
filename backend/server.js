@@ -599,6 +599,10 @@ const APP_URL = process.env.NODE_ENV === 'production'
 
 const linkAprobaciones = `${APP_URL}/aprobaciones`;
 
+const formatDate = (date) => {
+    if (!date) return null;
+    return new Date(date).toISOString().split('T')[0]; // Formato "YYYY-MM-DD"
+};
 
 // Endpoint para solicitar un cambio en un proyecto
 app.put('/proyecto/:id/solicitud', (req, res) => {
@@ -640,16 +644,21 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
         //console.log('✅ Proyecto encontrado, insertando solicitud...');
         const proyectoActual = results[0];
 
-        // Detectar cambios
+        // Detectar cambios y formatear fechas correctamente
         const cambios = {};
         const campos = { nombre, descripcion, fechaInicio, fechaFin, fechaReal, porcentajeAvance, idArea, idEstado };
 
         for (const campo in campos) {
-            if (campos[campo] !== undefined && campos[campo] !== proyectoActual[campo]) {
-                cambios[campo] = {
-                    anterior: proyectoActual[campo],
-                    nuevo: campos[campo]
-                };
+            if (campos[campo] !== undefined) {
+                const valorAnterior = campo.includes("fecha") ? formatDate(proyectoActual[campo]) : proyectoActual[campo];
+                const valorNuevo = campo.includes("fecha") ? formatDate(campos[campo]) : campos[campo];
+
+                if (valorNuevo !== valorAnterior) {
+                    cambios[campo] = {
+                        anterior: valorAnterior,
+                        nuevo: valorNuevo
+                    };
+                }
             }
         }
 
@@ -658,7 +667,7 @@ app.put('/proyecto/:id/solicitud', (req, res) => {
                 idProyecto, nombre, descripcion, fechaInicio, fechaFin, fechaReal, 
                 porcentajeAvance, idSolicitante, idArea, idEstado, idEstadoSolicitud, 
                 descripcionAprobacion, detalles
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
 
         pool.query(insertQuery, [
@@ -999,7 +1008,7 @@ app.get('/solicitudes/cambios', (req, res) => {
     SELECT    
         A.idAprobacion,
         P.idProyecto,
-	U.idUsuario AS idSolicitante,
+	    U.idUsuario AS idSolicitante,
         U.nombre AS nombreSolicitante,
         A.fechaSolicitud,
         A.descripcionAprobacion AS descripcionSolicitud,

@@ -1,4 +1,4 @@
-import { Component, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ProyectoService, Proyecto } from '../../services/proyecto.service';
@@ -19,7 +19,7 @@ import { FiltroComponent } from '../filtro/filtro.component';
 })
 
 
-export class ProyectoComponent {
+export class ProyectoComponent implements OnInit{
   todosLosProyectos: Proyecto[] = []; // Aquí almacenamos todos los proyectos sin filtrar
   showSpinner: boolean = false;
   proyectos: Proyecto[] = [];
@@ -79,7 +79,7 @@ cargarProyectos(): void {
       (proyectos) => {
         // Guardamos todos los proyectos sin filtrar (por si los necesitamos después)
         this.todosLosProyectos = proyectos;
-
+        console.log(proyectos)
         // Filtramos solo los proyectos habilitados para mostrar
         this.proyectos = this.todosLosProyectos
           .filter((proyecto) => proyecto.habilitado === 1) // Aquí filtramos solo los habilitados
@@ -112,6 +112,7 @@ cargarProyectos(): void {
     console.error('No se pudo obtener el id del usuario o área del usuario');
   }
 }
+
 // Método para deshabilitar un proyecto
 eliminarProyecto(idProyecto: number): void {
   const confirmacion = confirm(

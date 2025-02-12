@@ -11,7 +11,7 @@ const rateLimit = require('express-rate-limit');
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
-RUTA_BASE_ARCHIVOS = '/home/coval/Escritorio/portalFinanzas/backend/archivos/';
+RUTA_BASE_ARCHIVOS = '/home/soporte/Escritorio/portalFinanzas/backend/archivos/';
 
 
 //REGISTROS LOG -------------------------------------

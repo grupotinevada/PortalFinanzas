@@ -1631,10 +1631,36 @@ app.post('/actualizarContrasena', (req, res) => {
 app.put('/usuarios/actualizarPerfilCompleto', (req, res) => {
     const { idUsuario, nombre, correo, contrasenaActual, nuevaContrasena } = req.body;
 
-    if (!idUsuario || !nombre || !correo || !contrasenaActual) {
-        return res.status(400).send({ message: 'Todos los campos son obligatorios' });
+    // Validaciones iniciales
+    if (!idUsuario || !nombre || !correo) {
+        return res.status(400).send({ message: 'Los campos idUsuario, nombre y correo son obligatorios' });
     }
 
+    // Si quiere cambiar la contraseña, debe proporcionar la actual
+    if (nuevaContrasena && !contrasenaActual) {
+        return res.status(400).send({ message: 'Debe proporcionar la contraseña actual para cambiarla' });
+    }
+
+    // Promesa para actualizar perfil sin tocar la contraseña
+    const actualizarPerfil = new Promise((resolve, reject) => {
+        const query = `UPDATE USUARIO SET nombre = ?, correo = ? WHERE idUsuario = ?`;
+        pool.execute(query, [nombre, correo, idUsuario], (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
+
+    // Si no hay nueva contraseña, solo actualizamos el perfil
+    if (!nuevaContrasena) {
+        return actualizarPerfil
+            .then(() => res.status(200).send({ message: 'Perfil actualizado correctamente' }))
+            .catch((err) => {
+                console.error('Error al actualizar el perfil:', err);
+                res.status(500).send({ message: 'Error al actualizar el perfil' });
+            });
+    }
+
+    // Si hay nueva contraseña, verificamos la actual antes de actualizarla
     const queryObtenerUsuario = `SELECT passHash FROM USUARIO WHERE idUsuario = ?`;
     pool.execute(queryObtenerUsuario, [idUsuario], (err, results) => {
         if (err) {
@@ -1648,45 +1674,30 @@ app.put('/usuarios/actualizarPerfilCompleto', (req, res) => {
 
         const passHash = results[0].passHash;
 
+        // Verificar si la contraseña actual es correcta
         bcrypt.compare(contrasenaActual, passHash, (err, match) => {
             if (err || !match) {
                 return res.status(401).send({ message: 'La contraseña actual es incorrecta' });
             }
 
-            const tareas = [
-                new Promise((resolve, reject) => {
-                    const queryActualizarPerfil = `UPDATE USUARIO SET nombre = ?, correo = ? WHERE idUsuario = ?`;
-                    pool.execute(queryActualizarPerfil, [nombre, correo, idUsuario], (err) => {
-                        if (err) reject(err);
-                        else resolve();
-                    });
-                }),
-            ];
+            // Hash de la nueva contraseña y actualización
+            bcrypt.hash(nuevaContrasena, 10, (err, hash) => {
+                if (err) {
+                    console.error('Error al encriptar la nueva contraseña:', err);
+                    return res.status(500).send({ message: 'Error al procesar la nueva contraseña' });
+                }
 
-            // Si hay una nueva contraseña, agregar la tarea para actualizarla
-            if (nuevaContrasena) {
-                tareas.push(
-                    new Promise((resolve, reject) => {
-                        bcrypt.hash(nuevaContrasena, 10, (err, hash) => {
-                            if (err) reject(err);
-                            else {
-                                const queryActualizarContrasena = `UPDATE USUARIO SET passHash = ? WHERE idUsuario = ?`;
-                                pool.execute(queryActualizarContrasena, [hash, idUsuario], (err) => {
-                                    if (err) reject(err);
-                                    else resolve();
-                                });
-                            }
-                        });
-                    })
-                );
-            }
+                const queryActualizarContrasena = `UPDATE USUARIO SET passHash = ? WHERE idUsuario = ?`;
+                pool.execute(queryActualizarContrasena, [hash, idUsuario], (err) => {
+                    if (err) {
+                        console.error('Error al actualizar la contraseña:', err);
+                        return res.status(500).send({ message: 'Error al actualizar la contraseña' });
+                    }
 
-            Promise.all(tareas)
-                .then(() => res.status(200).send({ message: 'Perfil actualizado correctamente' }))
-                .catch((err) => {
-                    console.error('Error al actualizar el perfil:', err);
-                    res.status(500).send({ message: 'Error al actualizar el perfil' });
+                    // Si todo salió bien, respondemos éxito
+                    res.status(200).send({ message: 'Perfil y contraseña actualizados correctamente' });
                 });
+            });
         });
     });
 });

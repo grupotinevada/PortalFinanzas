@@ -144,7 +144,7 @@
               [(ngModel)]="perfil.nombre"
               name="nombre"
               placeholder="Nombre actual"
-              required
+              
             />
           </div>
 
@@ -157,7 +157,7 @@
               [(ngModel)]="perfil.correo"
               name="correo"
               placeholder="Correo nuevo"
-              required
+              
               disabled="true" 
             />
           </div>
@@ -172,7 +172,7 @@
                 [(ngModel)]="perfil.contrasenaActual"
                 name="contrasenaActual"
                 placeholder="Contraseña actual"
-                required
+                
               />
               <button type="button" class="btn-mostrar" (click)="toggleMostrarContrasena()">
                 {{ mostrarContrasena ? 'Ocultar' : 'Mostrar' }}

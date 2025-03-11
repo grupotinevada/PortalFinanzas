@@ -15,6 +15,7 @@ export class AdminComponent implements OnInit {
   roles: any[] = [];
   areas: any[] = [];
   usuarios: any[] = [];
+  showSpinner = false;
   dataSource = new MatTableDataSource<any>(this.usuarios);
 
   columnas: string[] = ['idUsuario', 'nombre', 'correo', 'descripcionRol', 'nombreArea', 'habilitado', 'acciones'];
@@ -28,10 +29,13 @@ export class AdminComponent implements OnInit {
   }
 
   cargarUsuarios(): void {
+    this.showSpinner=true;
     this.adminService.obtenerDetallesUsuarios().subscribe((usuarios: any[]) => {
       this.usuarios = usuarios;
       this.dataSource.data = this.usuarios;
+      this.showSpinner = false;
     });
+
   }
 
   cargarRoles(): void {

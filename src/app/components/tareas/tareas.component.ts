@@ -190,29 +190,78 @@ allowedFileTypes: string[] = [
   subirArchivo(): void {
     if (!this.archivoSeleccionado || !this.idProyecto || !this.usuario) return;
   
+    const nombreArchivo = this.archivoSeleccionado.name;
+
+    const idproyectoactual = this.idProyecto;
+  
+    // Verificar si el archivo ya existe antes de enviarlo
+    this.tareaService.verificarArchivo(nombreArchivo, this.idProyecto).subscribe({
+      next: (respuesta) => {
+        console.log('Respuesta del servidor:', respuesta);
+        if (respuesta.existe) {
+          // Si el archivo ya existe, preguntar si desea reemplazarlo
+          const confirmar = confirm("El archivo ya existe. ¿Deseas reemplazarlo?");
+          if (!confirmar) return;
+    
+          if (respuesta.idArchivo !== null) {
+            const idArchivo = respuesta.idArchivo as number;
+            console.log('Procediendo a eliminar archivo con id:', idArchivo);
+            this.tareaService.eliminarArchivo(idArchivo, idproyectoactual).subscribe({
+              next: () => {
+                console.log('Archivo eliminado correctamente, procediendo con la subida.');
+                this.subirNuevoArchivo();
+              },
+              error: (error: HttpErrorResponse) => {
+                console.error('Error al eliminar el archivo:', error);
+                alert('Error al eliminar el archivo existente.');
+              },
+            });
+          } else {
+            alert('No se encontró el archivo para eliminar.');
+          }
+        } else {
+          // Si el archivo no existe, simplemente subirlo
+          this.subirNuevoArchivo();
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error("Error al verificar archivo:", error);
+        alert("Error al verificar el archivo en el servidor");
+      },
+    });
+    
+  }
+  
+    
+  
+  subirNuevoArchivo(): void {
     const formData = new FormData();
-    formData.append('archivo', this.archivoSeleccionado);
-    formData.append('idproyecto', this.idProyecto.toString());
-    formData.append('idarea', this.usuario.idArea.toString());
-    formData.append('idusuario', this.usuario.id.toString());  // Asegúrate de usar el nombre correcto
-    formData.append('nombre', this.archivoSeleccionado.name);
+    if (this.archivoSeleccionado) {
+      formData.append('archivo', this.archivoSeleccionado);
+      formData.append("nombre", this.archivoSeleccionado.name);
+    }
+    if (this.idProyecto) {
+      formData.append('idproyecto', this.idProyecto.toString());
+    }
+    formData.append("idarea", this.usuario.idArea.toString());
+    formData.append("idusuario", this.usuario.id.toString());
   
     this.loading = true;
     this.tareaService.subirArchivo(formData).subscribe({
-      next: (response) => {
+      next: () => {
         this.cargarArchivosProyecto();
         this.archivoSeleccionado = null;
         this.loading = false;
-        
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error al subir archivo:', error);
+        console.error("Error al subir archivo:", error);
         this.loading = false;
-        alert('Error al subir el archivo');
-      }
+        alert("Error al subir el archivo");
+      },
     });
   }
-
+  
+  
 
   confirmarEliminarArchivo(idArchivo: number, idProyecto: number): void {
     if (confirm('¿Estás seguro de que deseas eliminar este archivo?')) {

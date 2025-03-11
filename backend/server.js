@@ -11,7 +11,7 @@ const rateLimit = require('express-rate-limit');
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
-RUTA_BASE_ARCHIVOS = '/home/soporte/Escritorio/portalFinanzas/backend/archivos/';
+RUTA_BASE_ARCHIVOS = '/home/coval/Escritorio/PortalFinanzas/backend/archivos/';
 
 
 //REGISTROS LOG -------------------------------------
@@ -354,7 +354,42 @@ app.post('/api/archivos', upload.single('archivo'), (req, res) => {
     });
 });
 
+app.get("/api/archivos/verificar", (req, res) => {
+    const { nombre, idproyecto } = req.query;
 
+    if (!nombre || !idproyecto) {
+        return res.status(400).send({ message: "Faltan parámetros" });
+    }
+
+    const query = `
+        SELECT idarchivo, COUNT(*) AS total 
+        FROM archivos_proyecto 
+        WHERE nombre = ? AND idproyecto = ? 
+        GROUP BY idarchivo;
+    `;
+
+    const valores = [nombre, idproyecto];
+
+    pool.execute(query, valores, (err, result) => {
+        if (err) {
+            console.error("Error en la consulta de verificación:", err);
+            return res.status(500).send({ message: "Error al verificar archivo", error: err });
+        }
+
+        const existe = result.length > 0;
+        if (existe) {
+            res.send({
+                existe: true,
+                idArchivo: result[0].idarchivo // Devuelve el id del archivo
+            });
+        } else {
+            res.send({
+                existe: false,
+                idArchivo: null // Asegúrate de enviar 'idArchivo: null' en caso de que no exista
+            });
+        }
+    });
+});
 
 app.get('/api/archivos/:idproyecto', (req, res) => {
     const idProyecto = req.params.idproyecto;
@@ -1630,17 +1665,14 @@ app.post('/actualizarContrasena', (req, res) => {
 
 app.put('/usuarios/actualizarPerfilCompleto', (req, res) => {
     const { idUsuario, nombre, correo, contrasenaActual, nuevaContrasena } = req.body;
-
     // Validaciones iniciales
     if (!idUsuario || !nombre || !correo) {
         return res.status(400).send({ message: 'Los campos idUsuario, nombre y correo son obligatorios' });
     }
-
     // Si quiere cambiar la contraseña, debe proporcionar la actual
     if (nuevaContrasena && !contrasenaActual) {
         return res.status(400).send({ message: 'Debe proporcionar la contraseña actual para cambiarla' });
     }
-
     // Promesa para actualizar perfil sin tocar la contraseña
     const actualizarPerfil = new Promise((resolve, reject) => {
         const query = `UPDATE USUARIO SET nombre = ?, correo = ? WHERE idUsuario = ?`;
@@ -1649,7 +1681,6 @@ app.put('/usuarios/actualizarPerfilCompleto', (req, res) => {
             else resolve();
         });
     });
-
     // Si no hay nueva contraseña, solo actualizamos el perfil
     if (!nuevaContrasena) {
         return actualizarPerfil
@@ -1659,7 +1690,6 @@ app.put('/usuarios/actualizarPerfilCompleto', (req, res) => {
                 res.status(500).send({ message: 'Error al actualizar el perfil' });
             });
     }
-
     // Si hay nueva contraseña, verificamos la actual antes de actualizarla
     const queryObtenerUsuario = `SELECT passHash FROM USUARIO WHERE idUsuario = ?`;
     pool.execute(queryObtenerUsuario, [idUsuario], (err, results) => {
@@ -1667,33 +1697,29 @@ app.put('/usuarios/actualizarPerfilCompleto', (req, res) => {
             console.error('Error al consultar el usuario:', err);
             return res.status(500).send({ message: 'Error al consultar el usuario' });
         }
-
+ 
         if (results.length === 0) {
             return res.status(404).send({ message: 'Usuario no encontrado' });
         }
-
+ 
         const passHash = results[0].passHash;
-
         // Verificar si la contraseña actual es correcta
         bcrypt.compare(contrasenaActual, passHash, (err, match) => {
             if (err || !match) {
                 return res.status(401).send({ message: 'La contraseña actual es incorrecta' });
             }
-
             // Hash de la nueva contraseña y actualización
             bcrypt.hash(nuevaContrasena, 10, (err, hash) => {
                 if (err) {
                     console.error('Error al encriptar la nueva contraseña:', err);
                     return res.status(500).send({ message: 'Error al procesar la nueva contraseña' });
                 }
-
                 const queryActualizarContrasena = `UPDATE USUARIO SET passHash = ? WHERE idUsuario = ?`;
                 pool.execute(queryActualizarContrasena, [hash, idUsuario], (err) => {
                     if (err) {
                         console.error('Error al actualizar la contraseña:', err);
                         return res.status(500).send({ message: 'Error al actualizar la contraseña' });
                     }
-
                     // Si todo salió bien, respondemos éxito
                     res.status(200).send({ message: 'Perfil y contraseña actualizados correctamente' });
                 });
@@ -1701,6 +1727,7 @@ app.put('/usuarios/actualizarPerfilCompleto', (req, res) => {
         });
     });
 });
+ 
 
 app.get('/usuarios/detalles', (req, res) => {
     const query = `

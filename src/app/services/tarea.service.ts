@@ -52,6 +52,19 @@ descargarArchivo(filename: string, idProyecto: number): Observable<Blob> {
 subirArchivo(formData: FormData): Observable<any> {
   return this.http.post(`${this.apiUrl}/api/archivos`, formData);
 }
+
+verificarArchivo(nombreArchivo: string, idProyecto: number): Observable<{ existe: boolean, idArchivo: number | null }> {
+  return this.http.get<{ existe: boolean, idArchivo: number | null }>(`${this.apiUrl}/api/archivos/verificar`, 
+    { params: { nombre: nombreArchivo, idproyecto: idProyecto.toString() } }); // Cambié 'nombreArchivo' a 'nombre'
+}
+
+
+/*verificarArchivo(nombre: string, idproyecto: number): Observable<{ existe: boolean }> {
+  return this.http.get<{ existe: boolean }>(`${this.apiUrl}/api/archivos/verificar`, {
+    params: { nombre, idproyecto: idproyecto.toString() }
+  });
+}*/
+
 eliminarArchivo(idArchivo: number, idProyecto: number): Observable<any> {
   return this.http.delete<any>(`${this.apiUrl}/api/archivos/${idArchivo}/${idProyecto}`);
 }

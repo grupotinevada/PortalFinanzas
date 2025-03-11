@@ -1,55 +1,173 @@
-.custom-bg-nevada {
-  background: var(--nevada);
-}
-.icon-bar {
-  width: 80px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  padding-top: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+:host {
+  display: block;
 }
 
-.logo-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
+/* Main container */
+.sidebar-container {
+  min-height: 100vh;
 }
 
+/* Icon sidebar */
+.icon-sidebar {
+  width: 70px;
+  z-index: 1030;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* Company logo */
 .company-logo {
-  width: 60px; /* Ajusta el tamaño según tu preferencia */
+  width: 50px;
   height: auto;
+  transition: all 0.3s ease;
 }
 
-.icon-bar button {
-  width: 60px;
-  height: 60px;
+/* Navigation links */
+.nav-link {
+  color: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  margin: 0 auto;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease-in-out;
 }
 
-.user-icon {
+.nav-link:hover {
+  color: rgb(0, 0, 0);
+}
+
+
+.nav-link mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  
+}
+
+/* Toggle sidebar button */
+.toggle-sidebar-btn {
+  color: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.toggle-sidebar-btn:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Offcanvas sidebar */
+.offcanvas {
+  width: 280px !important;
+  border-right: none;
+}
+
+.offcanvas .offcanvas-header {
+  padding: 1rem;
+}
+
+.offcanvas .offcanvas-header .company-logo {
+  width: 40px;
+}
+
+.offcanvas .user-info .user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  filter: invert(100%);
+  background-color: #f0f0f0;
 }
 
-.offcanvas {
-  width: 250px;
+.offcanvas .user-info .user-avatar mat-icon {
+  color: #666;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
 }
 
-.offcanvas-header {
-  padding-bottom: 0;
+.offcanvas .nav-item {
+  margin-bottom: 5px;
+}
+.offcanvas .nav-link{
+  width: 100%;
+  height: auto;
+  padding: 0.75rem 1rem;
+  color: #333;
+  border-radius: 8px;
+  display: flex;
+  align-items: start;
+  justify-content: start;
+  transition: all 0.2s ease-in-out;
+}
+.offcanvas .nav-item k {
+  width: 100%;
+  height: auto;
+  padding: 0.75rem 1rem;
+  color: #333;
+  border-radius: 8px;
+  
 }
 
-.offcanvas-body ul li {
-  margin-bottom: 10px; /* Espaciado entre elementos */
+.offcanvas .nav-item .nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: rgb(52, 52, 52);
 }
 
-.offcanvas .btn-close {
-  position: relative;
-  bottom: 0;
+.offcanvas .nav-item .nav-link.active {
+  background-color: var(--nevada);
+  color: white;
 }
+
+.offcanvas .nav-item .nav-link.active mat-icon {
+  color: rgb(104, 103, 103);
+}
+
+/* Content container */
+.content-container {
+  margin-left: 70px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+  
+}
+
+/* Custom Nevada background */
+.custom-bg-nevada {
+  background: var(--nevada);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .icon-sidebar {
+    width: 60px;
+  }
+
+  .company-logo {
+    width: 40px;
+  }
+
+  .offcanvas {
+    width: 240px !important;
+  }
+
+  .content-container {
+    margin-left: 60px;
+    padding: 15px;
+  }
+
+  .nav-link {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nav-link mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+

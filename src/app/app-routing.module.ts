@@ -9,17 +9,19 @@ import { RecuperarContrasenaComponent } from './components/recuperar-contrasena/
 import { AdminComponent } from './components/admin/admin.component';
 import { MiperfilComponent } from './components/miperfil/miperfil.component';
 import { AprobacionesComponent } from './components/aprobaciones/aprobaciones.component';
+import { ResumenTareasComponent } from './components/resumen-tareas/resumen-tareas.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'inicio', component: InicioComponent, canActivate:[AuthGuard]},  // Verifica que esta ruta esté definida
+  { path: 'inicio', component: InicioComponent, canActivate:[AuthGuard]},
   { path: 'proyecto', component: ProyectoComponent, canActivate:[AuthGuard]},
   { path: 'tareas/:idProyecto', component: TareasComponent, canActivate:[AuthGuard]},
   { path: 'recuperar-contrasena', component: RecuperarContrasenaComponent},
   { path: 'admin', component: AdminComponent, canActivate:[AuthGuard]},
   { path: 'miperfil', component: MiperfilComponent, canActivate:[AuthGuard]},
-  { path: 'aprobaciones', component: AprobacionesComponent, canActivate:[AuthGuard]}
+  { path: 'aprobaciones', component: AprobacionesComponent, canActivate:[AuthGuard]},
+  { path: 'resumenTareas', component: ResumenTareasComponent, canActivate:[AuthGuard]}
 ];
 
 @NgModule({

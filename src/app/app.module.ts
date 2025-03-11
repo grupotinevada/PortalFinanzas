@@ -48,6 +48,7 @@ import { FiltroComponent } from './components/filtro/filtro.component';
 import { MiperfilComponent } from './components/miperfil/miperfil.component';
 import { AprobacionesComponent } from './components/aprobaciones/aprobaciones.component';
 import { DatePipe } from '@angular/common';
+import { ResumenTareasComponent } from './components/resumen-tareas/resumen-tareas.component';
 
 registerLocaleData(localeEsCl, 'es-CL');
 
@@ -65,6 +66,9 @@ export const MY_DATE_FORMATS = {
 
 @NgModule({
   declarations: [
+    SpinnerComponent,
+    SidebarComponent,
+    
     AppComponent,
     LoginComponent,
     InicioComponent,
@@ -72,22 +76,18 @@ export const MY_DATE_FORMATS = {
     NavbarComponent,
     AgregarproyectodialogComponent,
     DownloadExcelComponent,
-    SpinnerComponent,
-    SidebarComponent,
     TareasComponent,
-
-    
     EditarproyectodialogComponent,
     HistorialCambiosDialogComponent,
-
     RecuperarContrasenaComponent,
-
     AdminComponent,
     CrearUsuarioComponent,
     EditarusuarioComponent,
     FiltroComponent,
     MiperfilComponent,
     AprobacionesComponent,
+    ResumenTareasComponent,
+  
   ],
   imports: [
     MatProgressSpinnerModule,

@@ -38,6 +38,10 @@ export class SidebarComponent {
     this.router.navigate(['/inicio']);
   }
 
+  irResumenTareas(){
+    this.router.navigate(['/resumenTareas']);
+  }
+
   irAProyecto(): void {
     // Aquí puedes poner la redirección al proyecto (una vez creado)
     this.router.navigate(['/proyecto']);

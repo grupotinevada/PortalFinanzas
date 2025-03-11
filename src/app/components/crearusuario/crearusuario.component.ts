@@ -16,6 +16,7 @@ export class CrearUsuarioComponent implements OnInit {
   rolesSubject = new BehaviorSubject<any[]>([]);
   areasSubject = new BehaviorSubject<any[]>([]);
   usuarioForm!: FormGroup;
+  showSpinner = false;
 
   constructor(
     public dialogRef: MatDialogRef<CrearUsuarioComponent>,
@@ -30,6 +31,7 @@ export class CrearUsuarioComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.usuarioForm = this.fb.group({
       nombre: ['', Validators.required],
       correo: ['', [Validators.required, Validators.email]],
@@ -53,7 +55,9 @@ export class CrearUsuarioComponent implements OnInit {
   }
 
   guardarUsuario(): void {
+
     if (this.usuarioForm.valid) {
+      this.showSpinner = true;
       //console.log('Valor habilitado:', this.usuarioForm.get('habilitado')?.value);
 
       
@@ -75,8 +79,10 @@ export class CrearUsuarioComponent implements OnInit {
           //console.log('Usuario creado exitosamente:', response);
           this.usuarioCreado.emit(nuevoUsuario); // Emitir el nuevo usuario
           this.dialogRef.close(nuevoUsuario);
+          this.showSpinner = false;
         },
         (error) => {
+          this.showSpinner = false;
           console.error('Error al crear el usuario:', error);
           if (error.status === 409) {
             const conflictMessage = error?.error?.message || 'Conflicto desconocido.';
@@ -96,6 +102,7 @@ export class CrearUsuarioComponent implements OnInit {
       console.log('Valores del formulario:', this.usuarioForm.value);
       console.log('Errores de validación:', this.usuarioForm.controls);
       console.groupEnd();
+      this.showSpinner = false;
     }
   }
   cancelar(): void {

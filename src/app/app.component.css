@@ -30,6 +30,5 @@
 
 /* Cuando el sidebar está oculto, el contenido ocupa todo el ancho */
 .main-content.full-width {
-  margin-left: 100px; /* Ancho reducido del sidebar cuando está oculto */
   width: 100%; /* Opción adicional para asegurar el ancho completo */
 }

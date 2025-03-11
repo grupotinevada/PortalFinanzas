@@ -1,0 +1,11 @@
+.jumbotron {
+  color:#4e5356;
+  text-align: start;
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+  border-radius: 10px;
+  border: solid white 1px;
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.142);
+  backdrop-filter: blur(90px);
+  zoom: 0.9;
+}

@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 })
 export class TareaService {
   private apiUrl = environment.apiBaseUrl;
- // private apiUrl = 'http://localhost:3000';
+
   constructor(private http: HttpClient) { }
   getTareasPorId(idProyecto: number): Observable<any> {
     const url = `${this.apiUrl}/proyecto/${idProyecto}/tareas`;
@@ -72,6 +72,6 @@ verificarTareasExistentes(idProyecto: number): Observable<boolean> {
   )
 }
   getTareas(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/tareas`); // Endpoint de tareas
+    return this.http.get<any[]>(`${this.apiUrl}/tarea`); // Endpoint de tareas
   }
 }

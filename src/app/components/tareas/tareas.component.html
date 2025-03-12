@@ -26,7 +26,7 @@
    
 <!-- Botón para abrir sidebar -->
 <!-- Botón para abrir sidebar -->
-<button  class="custom-button doc" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+<button  class="custom-button doc" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" style="margin-left: 0px;">
   <i class="fas fa-file-alt"></i> Documentos 📄
 </button>
 
@@ -235,9 +235,10 @@
           <div *ngFor="let archivo of archivosSeleccionados; let i = index" 
                class="selected-file d-flex justify-content-between align-items-center mb-2">
             <span class="text-muted">{{ truncarNombreArchivo(archivo.name) }}</span>
-            <button class="btn btn-outline-danger btn-sm" (click)="eliminarArchivo(i)">
-              <i class="fas fa-times"></i>
-            </button>
+            <!--<button type="button" class="btn btn-outline-danger" (click)="eliminarArchivo(i)">
+              <i class="fa fa-trash-o fa-lg"></i>
+            </button>-->
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="eliminarArchivo(i)">Cancelar</button>
           </div>
 
           <!-- Botón para subir todos los archivos -->

@@ -36,18 +36,20 @@ export class TareasComponent implements OnInit, AfterViewInit {
   tareas = new MatTableDataSource<any>([]);
   archivoSeleccionado: File | null = null;
   archivosSeleccionados: File[] = []; // Array para almacenar los archivos
+  uploadQueue: File[] = [];
+  subiendoArchivo = false; // Flag para controlar la carga secuencial
   showSidebar: boolean = false;
-maxFileSize: number = 25 * 1024 * 1024; // 25MB en bytes
-allowedFileTypes: string[] = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/vnd.ms-powerpoint',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'text/plain'
-];
+  maxFileSize: number = 25 * 1024 * 1024; // 25MB en bytes
+  allowedFileTypes: string[] = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'text/plain'
+  ];
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -174,7 +176,7 @@ allowedFileTypes: string[] = [
 
   onFilesSelected(event: Event): void {
     const element = event.target as HTMLInputElement;
-    
+  
     if (element.files) {
       for (let i = 0; i < element.files.length; i++) {
         const file = element.files[i];
@@ -189,9 +191,92 @@ allowedFileTypes: string[] = [
           continue;
         }
   
-        this.archivosSeleccionados.push(file); // Agrega el archivo a la lista
+        this.archivosSeleccionados.push(file);
+        this.uploadQueue.push(file); // Solo agregarlo a la lista, no subirlo aún
       }
     }
+  
+    //alert("Archivos seleccionados correctamente. Presiona 'Subir archivos' para comenzar la carga.");
+  }
+
+
+  procesarCola(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.subiendoArchivo || this.uploadQueue.length === 0) {
+        return resolve();
+      }
+  
+      this.subiendoArchivo = true;
+      const archivo = this.uploadQueue.shift()!; // Extrae el primer archivo de la cola
+  
+      this.verificarYSubirArchivo(archivo).finally(() => {
+        this.subiendoArchivo = false;
+        if (this.uploadQueue.length > 0) {
+          this.procesarCola().then(resolve); // Llamada recursiva hasta terminar
+        } else {
+          resolve(); // Finaliza cuando no quedan archivos
+        }
+      });
+    });
+  }
+
+
+  async verificarYSubirArchivo(archivo: File): Promise<void> {
+    if (!this.idProyecto) {
+      console.error("No se puede verificar el archivo porque idProyecto es null.");
+      alert("Error: No se puede verificar el archivo porque no hay un proyecto seleccionado.");
+      return;
+    }
+  
+    return new Promise((resolve) => {
+      this.tareaService.verificarArchivo(archivo.name, this.idProyecto!).subscribe({
+        next: (respuesta) => {
+          if (respuesta.existe) {
+            // Si el archivo ya existe, solo mostrar alerta y finalizar
+            alert(`El archivo "${archivo.name}" ya existe en el sistema. Si deseas reemplazarlo, elimínalo manualmente.`);
+            return resolve(); // No sube ni elimina el archivo, solo finaliza
+          } 
+          
+          // Si el archivo no existe, proceder con la subida
+          this.subirNuevoArchivo(archivo).finally(resolve);
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error(`Error al verificar el archivo "${archivo.name}":`, error);
+          alert(`Error al verificar el archivo "${archivo.name}" en el servidor.`);
+          resolve();
+        },
+      });
+    });
+  }
+  
+  
+  async subirNuevoArchivo(archivo: File): Promise<void> {
+    return new Promise((resolve) => {
+      const formData = new FormData();
+      formData.append('archivo', archivo);
+      formData.append("nombre", archivo.name);
+      if (this.idProyecto) {
+        formData.append('idproyecto', this.idProyecto.toString());
+      }
+      formData.append('idarea', this.usuario.idArea.toString());
+      formData.append('idusuario', this.usuario.id.toString());
+  
+      this.loading = true;
+      this.tareaService.subirArchivo(formData).subscribe({
+        next: () => {
+          console.log(`Archivo "${archivo.name}" subido correctamente.`);
+          this.cargarArchivosProyecto();
+          this.loading = false;
+          resolve();
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error(`Error al subir el archivo "${archivo.name}":`, error);
+          alert(`Error al subir el archivo "${archivo.name}".`);
+          this.loading = false;
+          resolve();
+        },
+      });
+    });
   }
 
   eliminarArchivo(index: number): void {
@@ -199,16 +284,24 @@ allowedFileTypes: string[] = [
   }
 
   subirArchivos(): void {
-    if (this.archivosSeleccionados.length === 0) {
+    if (this.uploadQueue.length === 0) {
       alert('No hay archivos para subir.');
       return;
     }
   
-    for (const archivo of this.archivosSeleccionados) {
-      this.subirArchivo(archivo);
-    }
+    this.procesarCola().then(() => {
+      // Limpiar archivos después de subirlos
+      this.archivosSeleccionados = [];
+      this.uploadQueue = [];
   
-    this.archivosSeleccionados = []; // Limpiar la lista después de subir
+      // Limpiar el input file para permitir nuevas selecciones
+      const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = ''; // Resetea la selección del input
+      }
+  
+      //alert('Todos los archivos han sido subidos correctamente.');
+    });
   }
   
   cargarArchivosProyecto(): void {
@@ -227,7 +320,7 @@ allowedFileTypes: string[] = [
     }
   }
 
-  subirArchivo(archivo: File): void {
+  /*subirArchivo(archivo: File): void {
     if (!archivo || !this.idProyecto || !this.usuario) return;
   
     const nombreArchivo = archivo.name;
@@ -237,7 +330,7 @@ allowedFileTypes: string[] = [
     this.tareaService.verificarArchivo(nombreArchivo, this.idProyecto).subscribe({
       next: (respuesta) => {
         if (respuesta.existe) {
-          const confirmar = confirm(`El archivo "${nombreArchivo}" ya existe. ¿Deseas reemplazarlo?`);
+          const confirmar = confirm(`El archivo "${nombreArchivo}" ya existe. ¿Deseas reemplazarlo 123?`);
           if (!confirmar) return;
   
           if (respuesta.idArchivo !== null) {
@@ -264,11 +357,11 @@ allowedFileTypes: string[] = [
         alert(`Error al verificar el archivo "${nombreArchivo}" en el servidor.`);
       },
     });
-  }
+  }*/
   
     
   
-  subirNuevoArchivo(archivo: File): void {
+  /*subirNuevoArchivo(archivo: File): void {
     const formData = new FormData();
     if (this.archivoSeleccionado) {
       formData.append('archivo', this.archivoSeleccionado);
@@ -292,7 +385,7 @@ allowedFileTypes: string[] = [
         alert(`Error al subir el archivo "${archivo.name}".`);
       },
     });
-  }
+  }*/
   
   
 

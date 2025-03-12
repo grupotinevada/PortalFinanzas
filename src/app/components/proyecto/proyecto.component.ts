@@ -52,8 +52,16 @@ export class ProyectoComponent implements OnInit{
 ngOnInit(): void {
   this.rol = this.authService.getUsuario().idRol;
   this.asignarArea();
+
+  const filtrosGuardados = localStorage.getItem('filtrosProyectos');
+  if (filtrosGuardados) {
+    this.filtrosAplicados = JSON.parse(filtrosGuardados);
+  }
+
+  // Cargar proyectos y aplicar filtros después de obtener los datos
   this.cargarProyectos();
 }
+
 
 asignarArea() {
   const usuario = this.authService.getUsuario(); // Obtén el usuario actual
@@ -77,18 +85,18 @@ cargarProyectos(): void {
   if (idUsuario && idAreaUsuario) {
     this.proyectoService.getProyectos().subscribe(
       (proyectos) => {
-        // Guardamos todos los proyectos sin filtrar (por si los necesitamos después)
+        // Guardamos todos los proyectos sin filtrar
         this.todosLosProyectos = proyectos;
-        console.log(proyectos)
-        // Filtramos solo los proyectos habilitados para mostrar
+
+        // Filtramos solo los proyectos habilitados
         this.proyectos = this.todosLosProyectos
-          .filter((proyecto) => proyecto.habilitado === 1) // Aquí filtramos solo los habilitados
+          .filter((proyecto) => proyecto.habilitado === 1)
           .map((proyecto) => ({
             ...proyecto,
             editable: proyecto.idUsuario === idUsuario || proyecto.idArea === idAreaUsuario || usuario.idRol === 1,
           }));
 
-        // Ordenamos los proyectos como antes
+        // Ordenamos los proyectos
         this.proyectos.sort((a, b) => {
           if (a.editable !== b.editable) {
             return a.editable ? -1 : 1; // Editables primero
@@ -100,8 +108,14 @@ cargarProyectos(): void {
           return fechaA - fechaB;
         });
 
+        // Asignamos los proyectos al dataSource
         this.dataSource.data = this.proyectos;
         this.showSpinner = false;
+
+        // 🔥 Aplicar filtros solo después de que los proyectos se hayan cargado
+        if (this.filtrosAplicados) {
+          this.aplicarFiltros(this.filtrosAplicados);
+        }
       },
       (error) => {
         console.error('Error al cargar proyectos:', error);
@@ -112,6 +126,7 @@ cargarProyectos(): void {
     console.error('No se pudo obtener el id del usuario o área del usuario');
   }
 }
+
 
 // Método para deshabilitar un proyecto
 eliminarProyecto(idProyecto: number): void {
@@ -226,6 +241,9 @@ eliminarProyecto(idProyecto: number): void {
 
   aplicarFiltros(filtros: any): void {
     this.filtrosAplicados = { ...filtros };
+
+    // Guardar en localStorage
+    localStorage.setItem('filtrosProyectos', JSON.stringify(this.filtrosAplicados));
   
     this.dataSource.data = this.proyectos.filter(proyecto => {
       const fechaDesdeFiltro = filtros.fechaDesde ? new Date(filtros.fechaDesde + 'T00:00:00') : null;
@@ -262,6 +280,9 @@ eliminarFiltro(filtro: string): void {
   if (this.filtroComponent) {
     this.filtroComponent.limpiarFiltros();
   }
+
+  // Actualizar localStorage
+  localStorage.setItem('filtrosProyectos', JSON.stringify(this.filtrosAplicados));
 
   // Reaplica los filtros con los valores actualizados
   this.aplicarFiltros(this.filtrosAplicados);

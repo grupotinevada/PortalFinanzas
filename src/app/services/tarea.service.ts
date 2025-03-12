@@ -3,6 +3,23 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable, catchError, throwError, of, map } from 'rxjs';
 import { ArchivoProyecto, ResponseArchivo } from '../model/archivo.interface';
 import { environment } from '../../environments/environment';
+export interface TareaResumen {
+  //tarea
+  idTarea: number;
+  nombreTarea: string;
+  fechaCompromisoTarea: Date;
+  idProyectoTarea: number;
+  porcentajeAvanceTarea: number;
+  descripcionEstado: string;
+  //proyecto
+  nombreProyecto: string;
+  porcentajeAvanceProyecto: number;
+  habilitado: number;
+  // usuario
+  nombreArea: string;
+  nombreUsuario: string;
+  correoUsuario: string;
+}
 
 @Injectable({
   providedIn: 'root'

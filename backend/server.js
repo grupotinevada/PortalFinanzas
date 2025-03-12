@@ -1269,16 +1269,16 @@ app.get('/tarea', (req, res) => {
 });
 
 
-app.get('/tarea', async (req, res) => {
-    const query = 'SELECT * FROM tarea';
-    try {
-        const [result] = await pool.execute(query);  // Usando async/await
-        res.json(result);
-    } catch (err) {
-        console.error('Database query error:', err);
-        res.status(500).send('Error retrieving tasks');
-    }
-});
+// app.get('/tarea', async (req, res) => {
+//     const query = 'SELECT * FROM tarea';
+//     try {
+//         const [result] = await pool.execute(query);  // Usando async/await
+//         res.json(result);
+//     } catch (err) {
+//         console.error('Database query error:', err);
+//         res.status(500).send('Error retrieving tasks');
+//     }
+// });
 
 
 

@@ -1258,7 +1258,44 @@ app.get('/rol', async (req, res) => {
 
 // Endpoint para obtener tareas sin autenticación JWT
 app.get('/tarea', (req, res) => {
-    const query = 'SELECT * FROM tarea';
+    const query = `
+    SELECT 
+        t.nombre AS nombreTarea,
+        t.descripcion AS descripcionTarea,
+        t.fechaInicio AS fechaInicioTarea,
+        t.fechaFin AS fechaFinTarea,
+        t.fechaCompromiso AS fechaCompromisoTarea, 
+        t.porcentajeAvance AS porcentajeAvanceTarea,
+        t.idProyecto AS idProyectoTarea,
+        t.idEstado AS idEstadoTarea,
+        p.nombre AS nombreProyecto, 
+        p.porcentajeAvance AS porcentajeAvanceProyecto, 
+        p.idArea, 
+        p.idUsuario, 
+        p.habilitado,
+        a.nombre AS nombreArea,
+        e.descripcion AS descripcionEstado,
+        u.nombre AS nombreUsuario,
+        u.correo AS correoUsuario
+
+    FROM 
+        TAREA t 
+    JOIN 
+        PROYECTO p 
+    ON 
+        t.idProyecto = p.idProyecto 
+    JOIN 
+        USUARIO u 
+    ON 
+        p.idUsuario = u.idUsuario 
+    JOIN 
+        AREA a 
+    ON 
+        p.idArea = a.idArea 
+    JOIN 
+        ESTADO e 
+    ON 
+        t.idEstado = e.idEstado`;
     pool.execute(query, (err, result) => {
         if (err) {
             console.error('Database query error:', err);

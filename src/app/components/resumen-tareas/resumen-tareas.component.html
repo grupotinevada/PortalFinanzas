@@ -1,0 +1,62 @@
+<div class="container mt-3">
+    <div class="d-flex justify-content-between">
+      <button class="btn btn-primary" (click)="prevMonth()">⏪ Anterior</button>
+      <h3>{{ currentDate | date: 'MMMM yyyy' }}</h3>
+      <button class="btn btn-primary" (click)="nextMonth()">Siguiente ⏩</button>
+    </div>
+  
+    <div class="mt-3">
+        <label for="filterProject" class="form-label">Filtrar por Proyecto:</label>
+        <select class="form-select" id="filterProject" [(ngModel)]="selectedProjectId" (change)="filterByProject()">
+          <option [ngValue]="null">Todos los Proyectos</option>
+          <option *ngFor="let proyecto of proyectos" [ngValue]="proyecto.id">{{ proyecto.nombre }}</option>
+        </select>
+      </div>
+  
+    <div class="accordion mt-3" id="weekAccordion">
+      <div *ngFor="let week of weeks" class="accordion-item">
+        <h2 class="accordion-header" id="{{ week.id }}">
+          <button 
+            class="accordion-button h1" 
+            type="button" 
+            [attr.data-bs-toggle]="'collapse'" 
+            [attr.data-bs-target]="'#' + week.id + '-collapse'" 
+            aria-expanded="true" 
+            [attr.aria-controls]="week.id + '-collapse'">
+            Semana del {{ week.start | date:" dd 'de' MMMM 'del' yyyy"  }}  al  {{ week.end | date: " dd 'de' MMMM 'del' yyyy" }}
+          </button>
+        </h2>
+        <div id="{{ week.id }}-collapse" class="accordion-collapse collapse show">
+          <div class="accordion-body">
+            <div *ngFor="let project of week.tareas | keyvalue">
+              <h5 class="text-primary">Proyecto: {{ project.value[0].nombreProyecto }}</h5>
+              <p>Avance del Proyecto: {{ project.value[0].porcentajeAvanceProyecto }}%</p>
+              
+              <ul class="list-group">
+                <li *ngFor="let tarea of project.value" class="list-group-item">
+                  <div>
+                    <strong>{{ tarea.nombreTarea }}</strong> - 
+                    <span class="text-muted">{{ tarea.fechaCompromisoTarea | date: 'dd/MM/yyyy' }}</span>
+                  </div>
+                  <div>
+                    <small>Estado: {{ tarea.descripcionEstado }}</small>
+                  </div>
+                  <div>
+                    <small>Avance: {{ tarea.porcentajeAvanceTarea }}%</small>
+                  </div>
+                  <div>
+                    <small>Responsable: {{ tarea.nombreUsuario }} ({{ tarea.correoUsuario }})</small>
+                  </div>
+                  <div>
+                    <small>Área: {{ tarea.nombreArea }}</small>
+                  </div>
+                </li>
+              </ul>
+  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

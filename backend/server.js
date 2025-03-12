@@ -234,7 +234,7 @@ app.get('/uploads/:filename/:idProyecto', (req, res) => {
     const encryptedName = req.params.filename;
     const idProyecto = req.params.idProyecto;
 
-    console.log('Recibido el request para descargar:', encryptedName, 'para el proyecto ID:', idProyecto);
+    //console.log('Recibido el request para descargar:', encryptedName, 'para el proyecto ID:', idProyecto);
 
     // Consulta a la base de datos para recuperar el nombre original y la ruta, incluyendo el filtro por idProyecto
     const query = `
@@ -243,45 +243,45 @@ app.get('/uploads/:filename/:idProyecto', (req, res) => {
         WHERE nombre = ? AND idproyecto = ?
     `;
 
-    console.log('Ejecutando consulta SQL:', query, 'con parámetros:', encryptedName, idProyecto);
+    //console.log('Ejecutando consulta SQL:', query, 'con parámetros:', encryptedName, idProyecto);
 
     pool.execute(query, [encryptedName, idProyecto], (err, results) => {
         if (err) {
-            console.error('Error al consultar la base de datos:', err);
+            //console.error('Error al consultar la base de datos:', err);
             return res.status(500).json({ message: 'Error al consultar la base de datos' });
         }
 
-        console.log('Resultados de la consulta:', results);
+        //console.log('Resultados de la consulta:', results);
 
         if (results.length === 0) {
-            console.warn('Archivo no encontrado en la base de datos para el nombre encriptado:', encryptedName);
+            //console.warn('Archivo no encontrado en la base de datos para el nombre encriptado:', encryptedName);
             return res.status(404).json({ message: 'Archivo no encontrado' });
         }
 
         const filePath = path.join(results[0].ruta); // Ruta física del archivo
         const originalName = results[0].nombre; // Nombre original del archivo
 
-        console.log('Ruta física del archivo:', filePath);
-        console.log('Nombre original del archivo:', originalName);
+        //console.log('Ruta física del archivo:', filePath);
+        //console.log('Nombre original del archivo:', originalName);
 
         // Verificar si el archivo existe en el sistema de archivos
         fs.exists(filePath, (exists) => {
             if (!exists) {
-                console.warn('Archivo no encontrado en el sistema de archivos:', filePath);
+                //console.warn('Archivo no encontrado en el sistema de archivos:', filePath);
                 return res.status(404).json({ message: 'Archivo no encontrado en el sistema de archivos' });
             }
 
             // Descargar el archivo con su nombre original
             res.download(filePath, originalName, (err) => {
                 if (err) {
-                    console.error('Error al descargar el archivo:', err);
+                    //console.error('Error al descargar el archivo:', err);
                     if (err.code === 'ENOENT') {
-                        console.warn('Archivo no encontrado en el sistema de archivos:', filePath);
+                        //console.warn('Archivo no encontrado en el sistema de archivos:', filePath);
                         return res.status(404).json({ message: 'Archivo no encontrado en el sistema de archivos' });
                     }
                     res.status(500).json({ message: 'Error al descargar el archivo' });
                 } else {
-                    console.log('Archivo descargado exitosamente:', originalName);
+                    //console.log('Archivo descargado exitosamente:', originalName);
                 }
             });
         });

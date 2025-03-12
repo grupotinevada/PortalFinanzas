@@ -35,6 +35,7 @@ export class TareasComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['idProyecto', 'nombre', 'descripcion', 'fechaInicio', 'fechaFin', 'porcentajeAvance'];
   tareas = new MatTableDataSource<any>([]);
   archivoSeleccionado: File | null = null;
+  archivosSeleccionados: File[] = []; // Array para almacenar los archivos
   showSidebar: boolean = false;
 maxFileSize: number = 25 * 1024 * 1024; // 25MB en bytes
 allowedFileTypes: string[] = [
@@ -170,6 +171,45 @@ allowedFileTypes: string[] = [
       this.archivoSeleccionado = file;
     }
   }
+
+  onFilesSelected(event: Event): void {
+    const element = event.target as HTMLInputElement;
+    
+    if (element.files) {
+      for (let i = 0; i < element.files.length; i++) {
+        const file = element.files[i];
+  
+        if (file.size > this.maxFileSize) {
+          alert(`El archivo "${file.name}" excede el tamaño máximo permitido de 25MB`);
+          continue;
+        }
+  
+        if (!this.allowedFileTypes.includes(file.type)) {
+          alert(`Tipo de archivo no permitido: ${file.name}`);
+          continue;
+        }
+  
+        this.archivosSeleccionados.push(file); // Agrega el archivo a la lista
+      }
+    }
+  }
+
+  eliminarArchivo(index: number): void {
+    this.archivosSeleccionados.splice(index, 1); // Elimina un archivo de la lista
+  }
+
+  subirArchivos(): void {
+    if (this.archivosSeleccionados.length === 0) {
+      alert('No hay archivos para subir.');
+      return;
+    }
+  
+    for (const archivo of this.archivosSeleccionados) {
+      this.subirArchivo(archivo);
+    }
+  
+    this.archivosSeleccionados = []; // Limpiar la lista después de subir
+  }
   
   cargarArchivosProyecto(): void {
     if (this.idProyecto) {
@@ -187,54 +227,48 @@ allowedFileTypes: string[] = [
     }
   }
 
-  subirArchivo(): void {
-    if (!this.archivoSeleccionado || !this.idProyecto || !this.usuario) return;
+  subirArchivo(archivo: File): void {
+    if (!archivo || !this.idProyecto || !this.usuario) return;
   
-    const nombreArchivo = this.archivoSeleccionado.name;
-
+    const nombreArchivo = archivo.name;
     const idproyectoactual = this.idProyecto;
   
     // Verificar si el archivo ya existe antes de enviarlo
     this.tareaService.verificarArchivo(nombreArchivo, this.idProyecto).subscribe({
       next: (respuesta) => {
-        console.log('Respuesta del servidor:', respuesta);
         if (respuesta.existe) {
-          // Si el archivo ya existe, preguntar si desea reemplazarlo
-          const confirmar = confirm("El archivo ya existe. ¿Deseas reemplazarlo?");
+          const confirmar = confirm(`El archivo "${nombreArchivo}" ya existe. ¿Deseas reemplazarlo?`);
           if (!confirmar) return;
-    
+  
           if (respuesta.idArchivo !== null) {
             const idArchivo = respuesta.idArchivo as number;
-            console.log('Procediendo a eliminar archivo con id:', idArchivo);
             this.tareaService.eliminarArchivo(idArchivo, idproyectoactual).subscribe({
               next: () => {
-                console.log('Archivo eliminado correctamente, procediendo con la subida.');
-                this.subirNuevoArchivo();
+                console.log(`Archivo "${nombreArchivo}" eliminado correctamente, procediendo con la subida.`);
+                this.subirNuevoArchivo(archivo);
               },
               error: (error: HttpErrorResponse) => {
-                console.error('Error al eliminar el archivo:', error);
-                alert('Error al eliminar el archivo existente.');
+                console.error(`Error al eliminar el archivo "${nombreArchivo}":`, error);
+                alert(`Error al eliminar el archivo existente "${nombreArchivo}".`);
               },
             });
           } else {
-            alert('No se encontró el archivo para eliminar.');
+            alert(`No se encontró el archivo "${nombreArchivo}" para eliminar.`);
           }
         } else {
-          // Si el archivo no existe, simplemente subirlo
-          this.subirNuevoArchivo();
+          this.subirNuevoArchivo(archivo);
         }
       },
       error: (error: HttpErrorResponse) => {
-        console.error("Error al verificar archivo:", error);
-        alert("Error al verificar el archivo en el servidor");
+        console.error(`Error al verificar el archivo "${nombreArchivo}":`, error);
+        alert(`Error al verificar el archivo "${nombreArchivo}" en el servidor.`);
       },
     });
-    
   }
   
     
   
-  subirNuevoArchivo(): void {
+  subirNuevoArchivo(archivo: File): void {
     const formData = new FormData();
     if (this.archivoSeleccionado) {
       formData.append('archivo', this.archivoSeleccionado);
@@ -243,20 +277,19 @@ allowedFileTypes: string[] = [
     if (this.idProyecto) {
       formData.append('idproyecto', this.idProyecto.toString());
     }
-    formData.append("idarea", this.usuario.idArea.toString());
-    formData.append("idusuario", this.usuario.id.toString());
+    formData.append('idarea', this.usuario.idArea.toString());
+    formData.append('idusuario', this.usuario.id.toString());
   
     this.loading = true;
     this.tareaService.subirArchivo(formData).subscribe({
       next: () => {
         this.cargarArchivosProyecto();
-        this.archivoSeleccionado = null;
         this.loading = false;
       },
       error: (error: HttpErrorResponse) => {
-        console.error("Error al subir archivo:", error);
+        console.error(`Error al subir el archivo "${archivo.name}":`, error);
         this.loading = false;
-        alert("Error al subir el archivo");
+        alert(`Error al subir el archivo "${archivo.name}".`);
       },
     });
   }

@@ -214,32 +214,40 @@
   </div>
   <div class="offcanvas-body">
     <div class="files-sidebar">
-      <!-- Título -->
-
-
       <!-- Sección de Subida -->
       <div class="upload-section mb-4 p-3 border rounded">
-        <h6 class="text-dark mb-2">Subir Archivo</h6>
+        <h6 class="text-dark mb-2">Subir Archivos</h6>
         <input 
           type="file" 
           #fileInput 
-          (change)="onFileSelected($event)" 
+          (change)="onFilesSelected($event)" 
           style="display: none"
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+          multiple>
         <button class="custom-button upload w-100 mb-2" 
                 *ngIf="usuario.idArea === proyecto.idArea || usuario.idRol === 1" 
                 (click)="fileInput.click()">
-          <i class="fas fa-upload"></i> Elegir Archivo
+          <i class="fas fa-upload"></i> Elegir Archivo(s)
         </button>
-        <div *ngIf="archivoSeleccionado" class="selected-file d-flex justify-content-between align-items-center">
-          <span class="text-muted"> {{truncarNombreArchivo(archivoSeleccionado.name)}}</span>
-          <button class="btn btn-outline-success" (click)="subirArchivo()">
-            Subir
+
+        <!-- Lista de archivos seleccionados -->
+        <div *ngIf="archivosSeleccionados.length > 0">
+          <div *ngFor="let archivo of archivosSeleccionados; let i = index" 
+               class="selected-file d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted">{{ truncarNombreArchivo(archivo.name) }}</span>
+            <button class="btn btn-outline-danger btn-sm" (click)="eliminarArchivo(i)">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <!-- Botón para subir todos los archivos -->
+          <button class="btn btn-outline-success w-100" (click)="subirArchivos()">
+            Subir Todos
           </button>
         </div>
       </div>
 
-      <!-- Lista de Archivos -->
+      <!-- Lista de Archivos Subidos -->
       <div class="files-list">
         <!-- Spinner de Carga -->
         <div *ngIf="loading" class="text-center py-3">
@@ -255,24 +263,25 @@
 
         <!-- Lista de Archivos -->
         <div *ngIf="!loading && archivosProyecto.length > 0" class="file-items">
-          <div *ngFor="let archivo of archivosProyecto" class="file-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+          <div *ngFor="let archivo of archivosProyecto" 
+               class="file-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
             <div class="file-info">
-              <a
-                (click)="descargarArchivo(archivo.nombre_completo)"
-                class="file-name"
-                href="javascript:void(0);">
+              <a (click)="descargarArchivo(archivo.nombre_completo)"
+                 class="file-name"
+                 href="javascript:void(0);"
+                 [title]="archivo.nombre_completo">
                 {{ truncarNombreArchivo(archivo.nombre_completo) }}
               </a>
               <small class="text-muted d-block">
-                Subido por: {{archivo.usuario_nombre}}
+                Subido por: {{ archivo.usuario_nombre }}
               </small>
               <small class="text-muted d-block">
-                {{archivo.fechacreacion | date:'dd/MM/yyyy HH:mm'}}
+                {{ archivo.fechacreacion | date:'dd/MM/yyyy HH:mm' }}
               </small>
             </div>
             <button *ngIf="usuario.idArea === proyecto.idArea" 
                     class="btn btn-outline-danger btn-sm" 
-                    (click)="confirmarEliminarArchivo(archivo.idarchivo,proyecto.idProyecto)">
+                    (click)="confirmarEliminarArchivo(archivo.idarchivo, proyecto.idProyecto)">
               <i class="fas fa-trash"></i> Eliminar
             </button>
           </div>

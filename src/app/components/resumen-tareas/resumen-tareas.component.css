@@ -37,3 +37,15 @@
 .titulo-bg-warning { background-color: rgb(250, 205, 120); color:#34383a;}
 .titulo-bg-secondary { background-color: rgb(252, 95, 95); }
 .titulo-bg-light { background-color: rgb(255, 235, 235); }
+
+.finalizado {
+  background-color: rgb(3, 255, 3);
+}
+
+.pendiente {
+  background-color: rgb(255, 166, 0);
+}
+
+.en-progreso {
+  background-color: rgb(0, 191, 255);
+}

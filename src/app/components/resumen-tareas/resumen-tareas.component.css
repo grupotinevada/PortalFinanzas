@@ -19,3 +19,11 @@
 .rounded-lg { border-radius: 0.5rem; }
 .shadow { box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1); }
 .mt-4 { margin-top: 1rem; }
+
+.dot {
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}

@@ -9,7 +9,7 @@ export interface TareaResumen {
   nombreTarea: string;
   fechaCompromisoTarea: Date;
   idProyectoTarea: number;
-  porcentajeAvanceTarea: number;
+  porcentajeAvanceTarea: string;
   descripcionEstado: string;
   //proyecto
   nombreProyecto: string;

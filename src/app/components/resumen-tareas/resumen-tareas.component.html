@@ -56,99 +56,113 @@
                 (change)="toggleProjectSelection(proyecto.id)"
               />
               <label class="form-check-label">
-                <span class="dot"></span>
+                <span class="dot" [ngClass]="getAreaClass(proyecto.nombreAreaProyecto)"></span>
                 {{ proyecto.nombre }}
               </label>
             </div>
           </div>
         </div>
-    
-        <!-- Card en blanco -->
         <div class="col-md-4 d-flex">
           <div class="card p-3 shadow-sm w-100 d-flex flex-column justify-content-between" style="min-height: 250px;">
-            <!-- Card vacía -->
-            <h6 class="fw-bold">Total de Tareas del Mes</h6>
-            <p class="text-muted small">Cantidad de tareas totales del mes {{ currentDate | date : "MMMM yyyy" | titlecase }}</p>
-            <p> {{contarTareasProyecto()}} </p>
+            <div>
+              <h6 class="fw-bold">Filtrar por estado de la Tarea</h6>
+              <div *ngFor="let estado of estadosDisponibles" class="form-check">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [checked]="selectedEstados.includes(estado.descripcion)"
+                  (change)="toggleEstadoSelection(estado.descripcion)"
+                />
+                <label class="form-check-label">
+                  <span class="dot"></span>
+                {{ estado.descripcion }}
+                </label>
+              </div>
+            </div>
+            
           </div>
         </div>
     
-        <!-- Progreso General -->
         <div class="col-md-4 d-flex">
           <div class="card p-3 shadow-sm w-100 d-flex flex-column justify-content-between" style="min-height: 250px;">
-            <h6 class="fw-bold">Progreso General</h6>
-            <p class="text-muted small">Promedio de todas las tareas del mes {{ currentDate | date : "MMMM yyyy" | titlecase }}</p>
-            <h4 class="fw-bold">{{ progresoGeneral || 0 }}%</h4>
-            <div class="progress">
-              <div class="progress-bar bg-dark" role="progressbar" 
-                   [style.width.%]="progresoGeneral || 0" 
-                   aria-valuemin="0" aria-valuemax="100">
+            <!-- Total de Tareas -->
+            <div class="mb-2">
+              <h6 class="fw-bold text-wrap">Total de Tareas del Mes</h6>
+              <p class="text-muted small text-wrap">Cantidad de tareas totales del mes {{ currentDate | date : "MMMM yyyy" | titlecase }}</p>
+              <p class="fw-bold text-wrap fs-2">{{contarTareasProyecto()}}</p>
+            </div>
+        
+            <!-- Progreso General -->
+            <div>
+              <h6 class="fw-bold text-wrap">Progreso General</h6>
+              <p class="text-muted small text-wrap">Promedio de todas las tareas del mes {{ currentDate | date : "MMMM yyyy" | titlecase }}</p>
+              <h4 class="fw-bold text-wrap">{{ progresoGeneral || 0 }}%</h4>
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-dark" role="progressbar" 
+                     [style.width.%]="progresoGeneral || 0" 
+                     aria-valuemin="0" aria-valuemax="100">
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+
       </div>
     </div>
 
     
+<!-- Visualizador de tareas -->
 
 
-
-  <div class="accordion mt-3" id="weekAccordion">
+<div class="container mt-3 ">
+  <div class="accordion" id="weekAccordion">
     <div *ngFor="let week of weeks" class="accordion-item">
       <h2 class="accordion-header" id="{{ week.id }}">
         <button
-          class="accordion-button h1"
+          class="accordion-button fw-bold collapsed"
           type="button"
           [attr.data-bs-toggle]="'collapse'"
           [attr.data-bs-target]="'#' + week.id + '-collapse'"
           aria-expanded="true"
           [attr.aria-controls]="week.id + '-collapse'"
         >
-          Semana del {{ week.start | date : " dd 'de' MMMM 'del' yyyy" }} al
-          {{ week.end | date : " dd 'de' MMMM 'del' yyyy" }}
+          Semana del {{ week.start | date : "dd 'de' MMMM 'del' yyyy" }} al
+          {{ week.end | date : "dd 'de' MMMM 'del' yyyy" }}
         </button>
       </h2>
-      <div id="{{ week.id }}-collapse" class="accordion-collapse collapse show">
-        <div class="accordion-body">
-          <div *ngFor="let project of week.tareas | keyvalue">
-            <h5 class="text-primary">
-              Proyecto: {{ project.value[0].nombreProyecto }}
-            </h5>
-            <p>
-              Avance del Proyecto:
-              {{ project.value[0].porcentajeAvanceProyecto }}%
-            </p>
-
-            <ul class="list-group">
-              <li *ngFor="let tarea of project.value" class="list-group-item">
-                <div>
-                  <strong>{{ tarea.nombreTarea }}</strong> -
-                  <span class="text-muted">{{
-                    tarea.fechaCompromisoTarea | date : "dd/MM/yyyy"
-                  }}</span>
+      <div id="{{ week.id }}-collapse" class="accordion-collapse collapse">
+        <div class="accordion-body ">
+          <div class="row ">
+            <div *ngFor="let project of week.tareas | keyvalue" class="col-md-12 ">
+              <h5 class="text-muted mb-3">Proyecto: {{ project.value[0].nombreProyecto }}</h5>
+              <div class="row">
+                <div *ngFor="let tarea of project.value" class="col-md-12 border-1 border-secondary">
+                  <div class="card mb-3 border-0 shadow-sm position-relative">
+                    <div class="card-body p-3 border-top border-2 border-dark">
+                      <span class="position-absolute top-0 end-0 p-2 fw-bold text-muted">{{ tarea.nombreUsuario }}</span>
+                      <p class="card-title">Tarea: {{ tarea.nombreTarea }}</p>
+                      <span class="badge" [ngClass]="getAreaClass(tarea.nombreArea)">{{ tarea.nombreArea }}</span>
+                      <p class="mb-1 text-muted">Asignado a: {{ tarea.nombreUsuario }}</p>
+                      <p class="mb-1 text-muted">Estado: {{ tarea.descripcionEstado }}</p>
+                      <p class="mb-1 text-muted">Fecha Compromiso: {{ tarea.fechaCompromisoTarea | date : "dd/MM/yyyy" }}</p>
+                      <div>
+                        <small>Progreso</small>
+                        <div class="progress" style="height: 6px;">
+                          <div class="progress-bar " [ngClass]="getAreaClass(tarea.nombreArea)" role="progressbar" [style.width]="tarea.porcentajeAvanceTarea + '%'" aria-valuenow="tarea.porcentajeAvanceTarea" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small class="text-end d-block mt-1">{{ tarea.porcentajeAvanceTarea }}%</small>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <small>Estado: {{ tarea.descripcionEstado }}</small>
-                </div>
-                <div>
-                  <small>Avance: {{ tarea.porcentajeAvanceTarea }}%</small>
-                </div>
-                <div>
-                  <small
-                    >Responsable: {{ tarea.nombreUsuario }} ({{
-                      tarea.correoUsuario
-                    }})</small
-                  >
-                </div>
-                <div>
-                  <small>Área: {{ tarea.nombreArea }}</small>
-                </div>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
+
 </div>

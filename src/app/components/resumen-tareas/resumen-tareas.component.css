@@ -21,9 +21,19 @@
 .mt-4 { margin-top: 1rem; }
 
 .dot {
-  height: 5px;
-  width: 5px;
+  height: 10px;
+  width: 10px;
   border-radius: 50%;
   display: inline-block;
   margin-right: 5px;
 }
+.accordion-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+/* Colores dinámicos para los títulos */
+.titulo-bg-primary { background-color: #076BCB; }
+.titulo-bg-success { background-color: #2A9061; }
+.titulo-bg-warning { background-color: rgb(250, 205, 120); color:#34383a;}
+.titulo-bg-secondary { background-color: rgb(252, 95, 95); }
+.titulo-bg-light { background-color: rgb(255, 235, 235); }

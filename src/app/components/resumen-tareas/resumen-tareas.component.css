@@ -44,8 +44,13 @@
 
 .pendiente {
   background-color: rgb(255, 166, 0);
+  color: #34383a;
 }
 
 .en-progreso {
   background-color: rgb(0, 191, 255);
+}
+
+.custom-mt {
+  margin-top: 6.5rem; /* Usa los valores de Bootstrap * 3 = mt-5 */
 }

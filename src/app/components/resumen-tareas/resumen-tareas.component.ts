@@ -10,6 +10,8 @@ import {
 import { isWithinInterval } from 'date-fns';
 import { ChangeDetectorRef } from '@angular/core';
 import { ProyectoService } from '../../services/proyecto.service';
+import jsPDF from 'jspdf';
+import autoTable, { UserOptions } from 'jspdf-autotable';
 @Component({
   selector: 'app-resumen-tareas',
   templateUrl: './resumen-tareas.component.html',
@@ -37,7 +39,7 @@ export class ResumenTareasComponent {
   tareasFiltradasAContar: TareaResumen[] = [];
   estadosDisponibles: { idEstado: number; descripcion: string }[] = [];
   selectedEstados: string[] = []; // ✅ Estados seleccionados
-
+  showSpinner: boolean = false;
 
   constructor(
     private tareaService: TareaService,
@@ -46,33 +48,46 @@ export class ResumenTareasComponent {
   ) { }
 
   ngOnInit(): void {
-    this.getTareas();
-    this.contarTareas = 0;
-    this.progresoGeneral;
-    this.getEstados();
-    this.getTareas();
+    this.carga()
   }
   ngAfterContentChecked(): void {
     this.cdr.detectChanges();
   }
 
+  carga(){
+  
+    this.getTareas();
+    this.contarTareas = 0;
+    this.progresoGeneral;
+    this.getEstados();
+    this.getTareas();
+
+    
+ 
+  }
+
   getEstados(): void {
+    this.showSpinner = true;
     this.proyectoService.getEstado().subscribe((estados) => {
       this.estadosDisponibles = estados;
       this.selectedEstados = estados
         .filter((e) => e.descripcion !== 'Finalizado') // ✅ Excluir "Finalizado"
         .map((e) => e.descripcion);
+        this.showSpinner = false;
     });
   }
 
   getTareas(): void {
+    this.showSpinner = true;
     this.tareaService.getTareas().subscribe((data: TareaResumen[]) => {
       this.tareas = data;
       console.log(data);
       this.generateWeeks();
+      this.showSpinner = false;
     });
   }
   generateWeeks(): void {
+
     const monthStart = startOfMonth(this.currentDate);
     const monthEnd = endOfMonth(this.currentDate);
     let weekStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -80,6 +95,7 @@ export class ResumenTareasComponent {
     this.allWeeks = [];
 
     while (weekStart <= monthEnd) {
+      this.showSpinner = true;
       let weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
 
       let startDate = new Date(
@@ -111,6 +127,7 @@ export class ResumenTareasComponent {
 
       weekStart = addWeeks(weekStart, 1);
     }
+    this.showSpinner = false;
 
     this.filterByProject();
   }
@@ -252,7 +269,9 @@ export class ResumenTareasComponent {
   }
 
   contarTareasProyecto(): number {
+    
     return this.tareasFiltradasAContar.length; // Usamos la variable almacenada
+    
   }
 
   prevMonth(): void {
@@ -276,5 +295,44 @@ export class ResumenTareasComponent {
       case 'Gerencia General': return 'titulo-bg-secondary';
       default: return 'titulo-bg-light';
     }
+  }
+  generarPDF(): void {
+    this.showSpinner = true;
+    const doc = new jsPDF() as jsPDF & { lastAutoTable: { finalY: number } };
+    doc.setFontSize(16);
+    doc.text('Resumen de Tareas Semanales', 14, 15);
+    doc.setFontSize(12);
+
+    let yPosition = 25;
+
+    this.weeks.forEach((week) => {
+      Object.keys(week.tareas).forEach((idProyecto) => {
+        const tareas = week.tareas[Number(idProyecto)];
+        if (tareas.length > 0) {
+          const nombreProyecto = tareas[0].nombreProyecto;
+          doc.setFont('helvetica', 'bold');
+          doc.text(`Proyecto: ${nombreProyecto}`, 14, yPosition);
+          yPosition += 7;
+
+          autoTable(doc, {
+            startY: yPosition,
+            head: [['Nombre', 'Descripción', 'Fecha Compromiso', 'Estado', 'Responsable']],
+            body: tareas.map((t) => [
+              t.nombreTarea,
+              t.descripcionTarea,
+              new Date(t.fechaCompromisoTarea).toLocaleDateString(),
+              t.descripcionEstado,
+              t.nombreUsuario,
+            ]),
+            styles: { fontSize: 10 },
+          });
+
+          yPosition = doc.lastAutoTable.finalY + 10;
+        }
+        this.showSpinner = false;
+      });
+    });
+
+    doc.save('resumen_tareas.pdf');
   }
 }

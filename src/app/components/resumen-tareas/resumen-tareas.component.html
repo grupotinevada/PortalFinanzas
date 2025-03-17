@@ -1,10 +1,11 @@
+<app-spinner [isLoading]="showSpinner"></app-spinner>
 <div class="jumbotron m-3">
   <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center py2">
       <h4 class="mb-0 text-wrap">Resumen de Tareas</h4>
 
       <div class="d-flex justify-content-end align-items-center py-2">
-        <button class="btn btn-outline-light me-3" (click)="prevMonth()">
+        <button class="btn btn-outline-light me-3 flex-shrink-0" (click)="prevMonth()">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -18,10 +19,10 @@
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
-        <h5 class="mb-0 text-light">
+        <h5 class="mb-0 text-light flex-grow-1 text-center ">
           {{ currentDate | date : "MMMM yyyy" | titlecase }}
         </h5>
-        <button class="btn btn-outline-light ms-3" (click)="nextMonth()">
+        <button class="btn btn-outline-light ms-3 flex-shrink-0" (click)="nextMonth()">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -43,25 +44,27 @@
 
     <div class="container mt-2 ">
       <div class="row">
-        <!-- Filtro por Proyecto -->
-        <div class="col-md-4 d-flex">
-          <div class="card p-4 shadow-sm w-100 d-flex flex-column justify-content-between">
-            <h6 class="fw-bold">Filtrar por Proyecto</h6>
-            <div *ngFor="let proyecto of proyectos" class="form-check">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                [value]="proyecto.id"
-                [checked]="selectedProjectIds.includes(proyecto.id)"
-                (change)="toggleProjectSelection(proyecto.id)"
-              />
-              <label class="form-check-label">
-                <span class="dot" [ngClass]="getAreaClass(proyecto.nombreAreaProyecto)"></span>
-                {{ proyecto.nombre }}
-              </label>
-            </div>
-          </div>
-        </div>
+<!-- Filtro por Proyecto -->
+<div class="col-md-4 d-flex">
+  <div class="card p-4 shadow-sm w-100 d-flex flex-column">
+    <h6 class="fw-bold">Filtrar por Proyecto</h6>
+    <div class="overflow-auto" style="max-height: 200px;">
+      <div *ngFor="let proyecto of proyectos" class="form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          [value]="proyecto.id"
+          [checked]="selectedProjectIds.includes(proyecto.id)"
+          (change)="toggleProjectSelection(proyecto.id)"
+        />
+        <label class="form-check-label">
+          <span class="dot" [ngClass]="getAreaClass(proyecto.nombreAreaProyecto)"></span>
+          {{ proyecto.nombre }}
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
         <div class="col-md-4 d-flex">
           <div class="card p-3 shadow-sm w-100 d-flex flex-column justify-content-between" style="min-height: 250px;">
             <div>
@@ -77,6 +80,14 @@
                   <span class="dot"></span>
                 {{ estado.descripcion }}
                 </label>
+              </div>
+              
+              <div class="col-12 d-flex custom-mt justify-content-center align-items-center">
+                <button 
+                (click)="generarPDF()"
+                class="btn btn-success">
+                  <span class="text-wrap">Imprimir resumen de tareas</span>
+                </button>
               </div>
             </div>
             

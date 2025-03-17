@@ -1,147 +1,198 @@
 <div class="sidebar-container d-flex">
   <!-- Icon Sidebar -->
-  <div class="icon-sidebar custom-bg-nevada text-white d-flex flex-column align-items-center position-fixed vh-100">
+  <div
+    class="icon-sidebar custom-bg-nevada text-white d-flex flex-column align-items-center position-fixed vh-100"
+  >
     <!-- Company Logo -->
     <div class="logo-container p-3 mb-4">
-      <img src="/nevadaicon.webp" alt="Logo de la empresa" class="company-logo">
+      <img
+        src="/nevadaicon.webp"
+        alt="Logo de la empresa"
+        class="company-logo"
+      />
     </div>
 
     <!-- Navigation Icons -->
     <nav class="nav flex-column w-100 text-center flex-grow-1">
-      <button mat-icon-button class="nav-link mb-3" 
-              (click)="IrInicio()" 
-              matTooltip="Panel" 
-              matTooltipPosition="right" title="Panel">
+      <button
+        mat-icon-button
+        class="nav-link mb-3"
+        (click)="IrInicio()"
+        matTooltip="Panel"
+        matTooltipPosition="right"
+        title="Panel"
+      >
         <mat-icon>dashboard</mat-icon>
       </button>
-      
-      <button mat-icon-button class="nav-link mb-3" 
-              (click)="irResumenTareas()" 
-              matTooltip="Resumen Tareas" 
-              matTooltipPosition="right" title="Resumen Tareas">
-        <mat-icon>task_alt</mat-icon>
+
+      <button
+        mat-icon-button
+        class="nav-link mb-3"
+        (click)="irResumenTareas()"
+        matTooltip="Resumen Tareas"
+        matTooltipPosition="right"
+        title="Tareas del mes"
+      >
+        <mat-icon>today</mat-icon>
       </button>
-      
-      <button mat-icon-button class="nav-link mb-3" 
-              (click)="irAProyecto()" 
-              matTooltip="Proyectos" 
-              matTooltipPosition="right" title="Proyectos">
+
+      <button
+        mat-icon-button
+        class="nav-link mb-3"
+        (click)="irAProyecto()"
+        matTooltip="Proyectos"
+        matTooltipPosition="right"
+        title="Proyectos"
+      >
         <mat-icon>work</mat-icon>
       </button>
-      
+
       <ng-container *ngIf="usuario?.idRol === 1">
-        <button mat-icon-button class="nav-link mb-3"
-                (click)="iraAdmin()" 
-                matTooltip="Admin" 
-                matTooltipPosition="right" title="Admin">
-          <mat-icon>settings</mat-icon>
+        <button
+          mat-icon-button
+          class="nav-link mb-3"
+          (click)="iraAdmin()"
+          matTooltip="Admin"
+          matTooltipPosition="right"
+          title="Admin"
+        >
+          <mat-icon>manage_accounts</mat-icon>
         </button>
       </ng-container>
-      
-      <button mat-icon-button class="nav-link mb-3" 
-              (click)="iraMiperfil()" 
-              matTooltip="Mi perfil" 
-              matTooltipPosition="right" title="Mi perfil">
-        <mat-icon>account_box</mat-icon>
-      </button>
-      
-      <button mat-icon-button class="nav-link mb-3" 
-              (click)="iraAprobaciones()" 
-              matTooltip="Aprobaciones" 
-              matTooltipPosition="right" title="Aprobaciones">
+
+      <button
+        mat-icon-button
+        class="nav-link mb-3"
+        (click)="iraAprobaciones()"
+        matTooltip="Aprobaciones"
+        matTooltipPosition="right"
+        title="Aprobaciones"
+      >
         <mat-icon>check_circle</mat-icon>
       </button>
-      
+
+      <button
+        mat-icon-button
+        class="nav-link mb-3"
+        (click)="iraMiperfil()"
+        matTooltip="Mi perfil"
+        matTooltipPosition="right"
+        title="Mi perfil"
+      >
+        <mat-icon>account_box</mat-icon>
+      </button>
+
       <div class="mt-auto mb-4 w-100">
-        <button mat-icon-button class="nav-link" 
-                (click)="cerrarSesion()" 
-                matTooltip="Cerrar sesión" 
-                matTooltipPosition="right" title="Cerrar sesión">
+        <button
+          mat-icon-button
+          class="nav-link"
+          (click)="cerrarSesion()"
+          matTooltip="Cerrar sesión"
+          matTooltipPosition="right"
+          title="Cerrar sesión"
+        >
           <mat-icon>logout</mat-icon>
         </button>
       </div>
     </nav>
 
     <!-- Toggle Expanded Sidebar Button -->
-    <button class="btn toggle-sidebar-btn mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+    <button
+      class="btn toggle-sidebar-btn mb-3"
+      type="button"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#sidebarOffcanvas"
+    >
       <mat-icon>menu</mat-icon>
     </button>
   </div>
 
   <!-- Expanded Sidebar (Offcanvas) -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
-
-    
     <div class="offcanvas-body p-0 custom-bg-nevada">
       <!-- User Info -->
       <div class="user-info p-3 d-flex align-items-center border-bottom">
         <div class="user-avatar">
-          <mat-icon  (click)="iraAprobaciones()">account_circle</mat-icon>
+          <mat-icon (click)="iraAprobaciones()">account_circle</mat-icon>
         </div>
         <div class="ms-2">
           <div class="fw-bold">{{ nombreUsuario }}</div>
           <small class="text-muted">{{ usuario?.nombreArea }}</small>
         </div>
       </div>
-      
+
       <!-- Navigation Menu -->
       <ul class="nav flex-column p-2">
         <li class="nav-item">
-          <button class="nav-link d-flex align-items-center" 
-                  (click)="IrInicio()">
-            <mat-icon class="me-3">dashboard</mat-icon> 
+          <button
+            class="nav-link d-flex align-items-center"
+            (click)="IrInicio()"
+          >
+            <mat-icon class="me-3">dashboard</mat-icon>
             <span>Panel</span>
           </button>
         </li>
-        
+
         <li class="nav-item">
-          <button class="nav-link d-flex align-items-center" 
-                  (click)="irAProyecto()">
-            <mat-icon class="me-3">work</mat-icon> 
-            <span>Proyectos</span>
+          <button
+            class="nav-link d-flex align-items-center"
+            (click)="irResumenTareas()"
+          >
+            <mat-icon class="me-3">today</mat-icon>
+            <span>Dashboard Tareas</span>
           </button>
         </li>
-        
+
         <li class="nav-item">
-          <button class="nav-link d-flex align-items-center" 
-                  (click)="irResumenTareas()">
-            <mat-icon class="me-3">task_alt</mat-icon> 
-            <span>Dashboard Tareas</span>
+          <button
+            class="nav-link d-flex align-items-center"
+            (click)="irAProyecto()"
+          >
+            <mat-icon class="me-3">work</mat-icon>
+            <span>Proyectos</span>
           </button>
         </li>
 
         <ng-container *ngIf="usuario?.idRol === 1">
           <li class="nav-item">
-            <button class="nav-link d-flex align-items-center" 
-                    (click)="iraAdmin()">
-              <mat-icon class="me-3">settings</mat-icon> 
+            <button
+              class="nav-link d-flex align-items-center"
+              (click)="iraAdmin()"
+            >
+              <mat-icon class="me-3">manage_accounts</mat-icon>
               <span>Administración</span>
             </button>
           </li>
         </ng-container>
-        
+
         <li class="nav-item">
-          <button class="nav-link d-flex align-items-center" 
-                  (click)="iraAprobaciones()">
-            <mat-icon class="me-3">check_circle</mat-icon> 
+          <button
+            class="nav-link d-flex align-items-center"
+            (click)="iraAprobaciones()"
+          >
+            <mat-icon class="me-3">check_circle</mat-icon>
             <span>Aprobaciones</span>
           </button>
         </li>
-      
+
         <li class="nav-item">
-          <button class="nav-link d-flex align-items-center" 
-                  (click)="iraMiperfil()">
-            <mat-icon class="me-3">account_box</mat-icon> 
+          <button
+            class="nav-link d-flex align-items-center"
+            (click)="iraMiperfil()"
+          >
+            <mat-icon class="me-3">account_box</mat-icon>
             <span>Mi Perfil</span>
           </button>
         </li>
       </ul>
-      
 
       <!-- Logout Button -->
       <div class="mt-4 p-3 border-top">
-        <button class="nav-link d-flex align-items-center w-100" (click)="cerrarSesion()">
-          <mat-icon class="me-3">logout</mat-icon> 
+        <button
+          class="nav-link d-flex align-items-center w-100"
+          (click)="cerrarSesion()"
+        >
+          <mat-icon class="me-3">logout</mat-icon>
           <span>Cerrar sesión</span>
         </button>
       </div>
@@ -154,4 +205,3 @@
   <!-- Your page content goes here -->
   <ng-content></ng-content>
 </div>
-

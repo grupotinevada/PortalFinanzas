@@ -280,7 +280,7 @@
                 {{ archivo.fechacreacion | date:'dd/MM/yyyy HH:mm' }}
               </small>
             </div>
-            <button *ngIf="usuario.idArea === proyecto.idArea" 
+            <button *ngIf="usuario.idArea === proyecto.idArea || usuario.idArea === 5 " 
                     class="btn btn-outline-danger btn-sm" 
                     (click)="confirmarEliminarArchivo(archivo.idarchivo, proyecto.idProyecto)">
               <i class="fas fa-trash"></i> Eliminar

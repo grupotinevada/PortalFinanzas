@@ -180,6 +180,20 @@ export class ResumenTareasComponent {
     this.filterByProject();
   }
 
+  tareaAtrasada(tarea: any): boolean {
+    if (!tarea.fechaCompromisoTarea || tarea.porcentajeAvanceTarea === 100) {
+      return false; // No está atrasada si no tiene fecha o ya está terminada
+    }
+  
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+  
+    const fechaCompromiso = new Date(tarea.fechaCompromisoTarea);
+    fechaCompromiso.setHours(0, 0, 0, 0);
+  
+    return fechaCompromiso < hoy && tarea.porcentajeAvanceTarea < 100;
+  }
+  
 
   get proyectos() {
     // Extraemos los proyectos únicos directamente de las tareas

@@ -500,19 +500,20 @@ obtenerHistorialCambios() {
   }
 
   tareaAtrasada(tarea: any): boolean {
-    if (!tarea.fechaCompromiso || tarea.porcentajeAvance === 100) {
-      return false; // No está atrasada si no tiene fecha de compromiso o ya está completada
+    if (!tarea.fechaCompromiso) {
+      return false; // No tiene fecha de compromiso, no se puede considerar atrasada
     }
   
     const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0); // Normalizamos la fecha actual (24-03-2025)
+    hoy.setHours(0, 0, 0, 0); // Normalizamos la fecha actual
   
     const fechaCompromiso = new Date(tarea.fechaCompromiso);
     fechaCompromiso.setHours(0, 0, 0, 0); // Normalizamos la fecha de compromiso
   
-    // Está atrasada si la fecha de compromiso ya pasó (hasta ayer) y no está completa
-    return fechaCompromiso < hoy;
+    // Solo está atrasada si la fecha ya pasó y el avance es menor al 100%
+    return fechaCompromiso < hoy && tarea.porcentajeAvance < 100;
   }
+  
   
   
 

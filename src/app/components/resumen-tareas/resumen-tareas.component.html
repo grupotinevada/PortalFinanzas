@@ -126,7 +126,7 @@
 <!-- Visualizador de tareas -->
 
 
-<div class="container mt-3 ">
+<div class="container mt-3">
   <div class="accordion" id="weekAccordion">
     <div *ngFor="let week of weeks" class="accordion-item">
       <h2 class="accordion-header" id="{{ week.id }}">
@@ -143,9 +143,9 @@
         </button>
       </h2>
       <div id="{{ week.id }}-collapse" class="accordion-collapse collapse">
-        <div class="accordion-body ">
-          <div class="row ">
-            <div *ngFor="let project of week.tareas | keyvalue" class="col-md-12 ">
+        <div class="accordion-body">
+          <div class="row">
+            <div *ngFor="let project of week.tareas | keyvalue" class="col-md-12">
               <h5 class="text-muted mb-1">Proyecto: {{ project.value[0].nombreProyecto }}</h5>
               <div class="row">
                 <div *ngFor="let tarea of project.value" class="col-md-12 border-1 border-secondary">
@@ -155,27 +155,43 @@
                     'finalizado': tarea.descripcionEstado === 'Finalizado',
                     'pendiente': tarea.descripcionEstado === 'Pendiente',
                     'en-progreso': tarea.descripcionEstado === 'En Progreso'
-                  }" >Estado: {{ tarea.descripcionEstado }}</span>
-                  
+                  }">Estado: {{ tarea.descripcionEstado }}</span>
+
                   <div class="card mb-3 border-0 shadow-sm position-relative">
-                    <div class="card-body p-3 border-top border-2 border-dark ">
-                      <span class="position-absolute top-0 end-0 p-2 fw-bold text-muted text-wrap">Asignado a: {{ tarea.nombreUsuario }} | ({{tarea.correoUsuario}})</span>
+                    <div class="card-body p-3 border-top border-2 border-dark">
+                      <span class="position-absolute top-0 end-0 p-2 fw-bold text-muted text-wrap">
+                        Asignado a: {{ tarea.nombreUsuario }} | ({{ tarea.correoUsuario }})
+                      </span>
+                      
                       <p class="mb-1 text-muted">Tarea: {{ tarea.nombreTarea }}</p>
-                      
                       <p class="mb-1 text-muted">Descripción: {{ tarea.descripcionTarea }}</p>
-                      <p class="mb-1 text-muted">
-                      <p class="mb-1 text-muted">Fecha Compromiso: {{ tarea.fechaCompromisoTarea | date : "dd/MM/yyyy" }}</p>
+                      <div class="d-flex align-items-center">
+                        <p class="mb-1 text-muted">
+                          Fecha Compromiso: {{ tarea.fechaCompromisoTarea | date: 'dd/MM/yyyy' }}
+                        </p>
+                        
+                        <span *ngIf="tareaAtrasada(tarea)" class="badge bg-danger ms-2">
+                          ⚠️
+                        </span>
+                      </div>
                       
+
                       <div>
                         <small>Progreso</small>
                         <div class="progress" style="height: 6px;">
-                          <div class="progress-bar " [ngClass]="getAreaClass(tarea.nombreArea)" role="progressbar" [style.width]="tarea.porcentajeAvanceTarea + '%'" aria-valuenow="tarea.porcentajeAvanceTarea" aria-valuemin="0" aria-valuemax="100"></div>
+                          <div class="progress-bar" [ngClass]="getAreaClass(tarea.nombreArea)"
+                               role="progressbar" 
+                               [style.width]="tarea.porcentajeAvanceTarea + '%'" 
+                               aria-valuenow="tarea.porcentajeAvanceTarea" 
+                               aria-valuemin="0" 
+                               aria-valuemax="100">
+                          </div>
                         </div>
                         <small class="text-end d-block mt-1">{{ tarea.porcentajeAvanceTarea }}%</small>
                       </div>
 
                     </div>
-                  </div>
+                  </div> <!-- Fin de card -->
                 </div>
               </div>
             </div>
@@ -184,6 +200,4 @@
       </div>
     </div>
   </div>
-</div>
-
 </div>

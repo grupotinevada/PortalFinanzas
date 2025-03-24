@@ -149,7 +149,15 @@
       <!-- Fecha Compromiso Column -->
       <ng-container matColumnDef="fechaCompromiso">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Compromiso </th>
-        <td mat-cell *matCellDef="let tarea"> {{ tarea.fechaCompromiso | date: 'dd-MM-YYYY'}} </td>
+        <td mat-cell *matCellDef="let tarea" class="position-relative">
+          {{ tarea.fechaCompromiso | date: 'dd-MM-yyyy' }}
+
+          <!-- Badge de tarea atrasada -->
+          <span *ngIf="tareaAtrasada(tarea)"
+                class="badge animated-gradient-badge">
+            ⚠️
+          </span>
+        </td>
       </ng-container>
 
       <!-- Fecha Fin Column -->

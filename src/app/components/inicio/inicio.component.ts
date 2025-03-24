@@ -200,11 +200,19 @@ hayProyectos(): boolean {
     }
   
     const hoy = new Date();
-    const fechaCompromiso = new Date(proyecto.fechaReal);
+    hoy.setHours(0, 0, 0, 0); // Normalizar a medianoche
   
-    // Está atrasado si la fecha compromiso ya pasó y el porcentaje no es 100%
+    const fechaCompromiso = new Date(proyecto.fechaReal);
+    fechaCompromiso.setHours(0, 0, 0, 0); // Normalizar a medianoche
+  
+    // Restar un día a "hoy"
+    const ayer = new Date(hoy);
+    ayer.setDate(hoy.getDate() - 1);
+  
+    // Está atrasado solo si la fecha de compromiso es antes de ayer y no está al 100%
     return hoy > fechaCompromiso && proyecto.porcentajeAvance < 100;
   }
+  
 
   getAreaClass(idArea: number): string {
     switch (idArea) {

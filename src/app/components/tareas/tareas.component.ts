@@ -499,7 +499,22 @@ obtenerHistorialCambios() {
     }
   }
 
-
+  tareaAtrasada(tarea: any): boolean {
+    if (!tarea.fechaCompromiso || tarea.porcentajeAvance === 100) {
+      return false; // No está atrasada si no tiene fecha de compromiso o ya está completada
+    }
+  
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Normalizamos la fecha actual (24-03-2025)
+  
+    const fechaCompromiso = new Date(tarea.fechaCompromiso);
+    fechaCompromiso.setHours(0, 0, 0, 0); // Normalizamos la fecha de compromiso
+  
+    // Está atrasada si la fecha de compromiso ya pasó (hasta ayer) y no está completa
+    return fechaCompromiso < hoy;
+  }
+  
+  
 
 
   // COMPONENTE PARA SUBIR TAREAS

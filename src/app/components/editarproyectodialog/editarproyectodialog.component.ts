@@ -220,7 +220,7 @@ export class EditarproyectodialogComponent implements OnInit {
   getAreas(): void {
     this.proyectoService.getArea().subscribe(
       (data: any[]) => {
-        this.areas = data;
+        this.areas = data.filter(area => area.idArea !== 5);
         //console.log('Areas cargadas:', this.areas); // Verifica que se carguen correctamente
       },
       error => {
